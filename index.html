@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SciFi ISP — Voucher System v3.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#05080f;--surface:#0b1120;--surface2:#101828;--surface3:#162032;
+  --border:#1e3550;--border2:#253f60;
+  --accent:#00e5ff;--accent2:#0077ff;--accent3:#00ff9d;
+  --danger:#ff3b5c;--warn:#ffb800;
+  --text:#d4e8ff;--muted:#4a6380;
+  --mono:'Share Tech Mono',monospace;--sans:'Exo 2',sans-serif;
+  --glow:0 0 24px rgba(0,229,255,0.15);--radius:12px;--radius2:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+button{cursor:pointer;font-family:var(--sans);}
+input,select,textarea{font-family:var(--sans);}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(0,229,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.02) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;}
+body::after{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,119,255,0.06),transparent 70%);pointer-events:none;}
+#login-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.login-box{width:420px;max-width:92vw;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius2);padding:40px 36px;box-shadow:var(--glow),0 30px 80px rgba(0,0,0,0.6);position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);animation:scanH 3s ease-in-out infinite;}
+@keyframes scanH{0%,100%{opacity:.3}50%{opacity:1}}
+.login-err{background:rgba(255,59,92,0.1);border:1px solid rgba(255,59,92,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--danger);margin-bottom:12px;display:none;}
+.login-err.show{display:block;}
+.form-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;}
+.form-input,.form-control{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:border-color .2s;}
+.form-input:focus,.form-control:focus{border-color:var(--accent);}
+.form-input::placeholder,.form-control::placeholder{color:var(--muted);}
+select.form-control option{background:var(--surface2);}
+textarea.form-control{resize:vertical;min-height:80px;}
+.form-group{margin-bottom:14px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.pw-wrap{position:relative;}
+.pw-wrap .form-input{padding-right:44px;}
+.pw-eye{position:absolute;right:0;top:0;bottom:0;width:44px;background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s;}
+.pw-eye:hover{color:var(--accent);}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;letter-spacing:.03em;transition:all .15s;border:none;cursor:pointer;font-family:var(--sans);}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);}
+.btn-secondary{background:var(--surface3);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--border);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-full{width:100%;justify-content:center;}
+.btn-sm{padding:5px 11px;font-size:11px;}
+.btn-icon{padding:6px;border-radius:8px;}
+.btn-signout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;border-radius:10px;background:rgba(255,59,92,.08);border:1px solid rgba(255,59,92,.25);color:#ff6b85;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.btn-signout:hover{background:rgba(255,59,92,.18);}
+#app{display:none;height:100vh;overflow:hidden;position:relative;z-index:1;}
+#app.visible{display:flex;}
+.sb-backdrop{display:none;position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);}
+.sb-backdrop.open{display:block;}
+.sidebar{width:236px;height:100vh;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .3s;position:relative;z-index:10;}
+.sb-header{padding:14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.brand-icon{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;}
+.brand-name{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.06em;}
+.brand-ver{font-size:9px;color:var(--muted);letter-spacing:.15em;}
+.btn-sbclose{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 6px;border-radius:7px;line-height:1;transition:color .15s;flex-shrink:0;}
+.btn-sbclose:hover{color:var(--danger);}
+.online-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:pulse 2.2s ease-in-out infinite;display:inline-block;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.sb-status{padding:7px 14px;font-size:10px;color:var(--muted);letter-spacing:.12em;display:flex;align-items:center;gap:6px;}
+.sb-nav{flex:1;padding:6px 8px;overflow-y:auto;}
+.nav-sec{font-size:9px;color:var(--muted);letter-spacing:.14em;padding:10px 8px 4px;}
+.nav-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:1px;border:1px solid transparent;}
+.nav-link:hover{background:var(--surface2);color:var(--text);}
+.nav-link.active{background:rgba(0,229,255,.08);color:var(--accent);border-color:rgba(0,229,255,.15);}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;}
+.sb-footer{border-top:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+.user-row{display:flex;align-items:center;gap:10px;}
+.user-av{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,rgba(0,229,255,.2),rgba(0,119,255,.2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.user-name{font-size:11px;font-weight:600;}
+.user-role{font-size:9px;color:var(--muted);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:5;}
+.topbar-title{font-size:16px;font-weight:700;}
+.topbar-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.sw{flex:1;max-width:360px;position:relative;}
+.sw input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px 8px 32px;color:var(--text);font-size:12px;outline:none;transition:border-color .2s;}
+.sw input:focus{border-color:var(--accent);}
+.sw input::placeholder{color:var(--muted);}
+.sw-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;}
+.tb-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.icon-btn{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:7px 9px;color:var(--muted);font-size:14px;cursor:pointer;transition:all .15s;}
+.icon-btn:hover{border-color:var(--border2);color:var(--text);}
+.nb-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:2px solid var(--surface);}
+.content{flex:1;overflow-y:auto;padding:20px;}
+.page{display:none;}
+.page.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,.02),transparent 60%);pointer-events:none;}
+.card-title{font-size:10px;color:var(--muted);letter-spacing:.14em;font-weight:600;text-transform:uppercase;margin-bottom:14px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;position:relative;overflow:hidden;transition:border-color .2s;}
+.stat-card:hover{border-color:var(--border2);}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--sc,var(--accent)),transparent);opacity:.4;}
+.stat-icon{font-size:20px;margin-bottom:10px;}
+.stat-value{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1;}
+.stat-label{font-size:10px;color:var(--muted);letter-spacing:.1em;margin-top:4px;text-transform:uppercase;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{color:var(--muted);font-size:10px;letter-spacing:.1em;font-weight:600;text-transform:uppercase;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid rgba(30,53,80,.5);color:var(--text);vertical-align:middle;}
+tr:hover td{background:rgba(0,229,255,.02);}
+tr:last-child td{border-bottom:none;}
+.code{font-family:var(--mono);color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.05em;}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.b-available{background:rgba(0,255,157,.1);color:#00ff9d;}
+.b-sent{background:rgba(0,119,255,.12);color:#4da6ff;}
+.b-used{background:rgba(139,92,246,.12);color:#a78bfa;}
+.b-expired{background:rgba(255,59,92,.1);color:#ff6b85;}
+.b-active{background:rgba(0,255,157,.1);color:#00ff9d;}
+.b-suspended{background:rgba(255,184,0,.12);color:#ffb800;}
+.b-delivered{background:rgba(0,255,157,.1);color:#00ff9d;}
+.b-failed{background:rgba(255,59,92,.1);color:#ff6b85;}
+.b-whatsapp{background:rgba(37,211,102,.12);color:#25d366;}
+.b-sms{background:rgba(0,119,255,.12);color:#4da6ff;}
+.b-voucher{background:rgba(0,229,255,.1);color:var(--accent);}
+.b-announcement,.b-promotion,.b-maintenance{background:rgba(255,184,0,.1);color:#ffb800;}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:14px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius2);width:100%;max-width:520px;box-shadow:0 30px 80px rgba(0,0,0,.6);max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;}
+.modal-lg{max-width:700px;}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);border-radius:var(--radius2) var(--radius2) 0 0;z-index:2;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer;transition:color .15s;line-height:1;}
+.modal-close:hover{color:var(--danger);}
+.modal-body{padding:20px 22px;flex:1;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:12px;font-size:12px;font-weight:500;min-width:260px;max-width:360px;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:slideIn .3s ease;border:1px solid transparent;}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
+.t-success{background:rgba(0,255,157,.08);border-color:rgba(0,255,157,.2);color:#00ff9d;}
+.t-error{background:rgba(255,59,92,.08);border-color:rgba(255,59,92,.2);color:#ff6b85;}
+.t-warning{background:rgba(255,184,0,.08);border-color:rgba(255,184,0,.2);color:#ffb800;}
+.t-info{background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.2);color:var(--accent);}
+.toast-close{margin-left:auto;background:none;border:none;color:inherit;opacity:.6;cursor:pointer;font-size:14px;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;flex-wrap:wrap;}
+.pt{font-size:20px;font-weight:800;}
+.ps{font-size:11px;color:var(--muted);margin-top:3px;}
+.pa{display:flex;gap:8px;flex-wrap:wrap;}
+.fb{padding:6px 13px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;background:var(--surface2);color:var(--muted);border:1px solid var(--border);transition:all .15s;}
+.fb:hover{color:var(--text);}
+.fb.active{background:rgba(0,229,255,.1);color:var(--accent);border-color:rgba(0,229,255,.25);}
+.av{width:32px;height:32px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,rgba(0,229,255,.2),rgba(0,119,255,.2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);}
+.av-lg{width:68px;height:68px;border-radius:18px;font-size:26px;}
+.steps{display:flex;align-items:center;margin-bottom:24px;}
+.step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+.step.active{color:var(--accent);}
+.step.done{color:var(--accent3);}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;transition:all .2s;}
+.step.active .step-num{background:var(--accent);border-color:var(--accent);color:#000;}
+.step.done .step-num{background:var(--accent3);border-color:var(--accent3);color:#000;}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 4px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.chart-wrap{position:relative;height:140px;}
+.sel-card{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;}
+.sel-card:hover{border-color:var(--border2);}
+.sel-card.selected{border-color:var(--accent);background:rgba(0,229,255,.06);}
+.sel-chk{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;transition:all .15s;}
+.sel-card.selected .sel-chk{background:var(--accent);border-color:var(--accent);color:#000;}
+.pg{display:grid;grid-template-columns:280px 1fr;gap:18px;}
+.dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(30,53,80,.4);font-size:12px;}
+.dr:last-child{border-bottom:none;}
+.dk{color:var(--muted);}
+.timeline{display:flex;flex-direction:column;}
+.tl-item{display:flex;gap:12px;padding:10px 0;}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;position:relative;}
+.tl-dot::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:1px;height:calc(100% + 14px);background:var(--border);}
+.tl-item:last-child .tl-dot::before{display:none;}
+.nd{display:none;position:absolute;top:calc(100% + 8px);right:0;width:310px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius2);box-shadow:0 20px 50px rgba(0,0,0,.4);z-index:100;}
+.nd.open{display:block;}
+.nd-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ni{padding:11px 16px;border-bottom:1px solid rgba(30,53,80,.4);display:flex;gap:10px;}
+.ni:hover{background:var(--surface2);}
+.ni.unread{background:rgba(0,229,255,.03);}
+.ni-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:5px;}
+.ni-dot.read{background:var(--border2);}
+.setup-banner{background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.2);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;gap:12px;font-size:12px;line-height:1.7;}
+.setup-banner code{font-family:var(--mono);font-size:11px;background:rgba(0,229,255,.08);padding:1px 5px;border-radius:4px;color:var(--accent);}
+.eb{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.eb-ok{background:rgba(0,255,157,.1);color:#00ff9d;}
+.eb-warn{background:rgba(255,184,0,.1);color:#ffb800;}
+.eb-exp{background:rgba(255,59,92,.1);color:#ff6b85;}
+.comm-layout{display:grid;grid-template-columns:360px 1fr;gap:18px;}
+.empty{text-align:center;padding:36px 20px;color:var(--muted);}
+.empty-icon{font-size:34px;margin-bottom:10px;}
+.empty-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+@media(max-width:900px){
+  .sidebar{position:fixed;transform:translateX(-100%);z-index:10;}
+  .sidebar.open{transform:translateX(0);}
+  .pg{grid-template-columns:1fr;}
+  .g2{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .g4{grid-template-columns:1fr 1fr;}
+  .comm-layout{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;">
+      <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#00e5ff,#0077ff);display:flex;align-items:center;justify-content:center;font-size:22px;">&#128225;</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#00e5ff;letter-spacing:.04em;">SciFi ISP</div>
+        <div style="font-size:11px;color:#4a6380;letter-spacing:.12em;">VOUCHER DISTRIBUTION SYSTEM</div>
+      </div>
+    </div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:5px;">System Access</div>
+    <div style="font-size:12px;color:#4a6380;margin-bottom:20px;line-height:1.6;">Enter your credentials to access the voucher management platform.</div>
+    <div id="login-err" style="display:none;background:rgba(255,59,92,0.1);border:1px solid rgba(255,59,92,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#ff6b85;margin-bottom:14px;line-height:1.6;"></div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#4a6380;display:block;margin-bottom:5px;text-transform:uppercase;">Email Address</label>
+      <input type="email" id="li-email" placeholder="your@email.com" autocomplete="email"
+        style="width:100%;background:#101828;border:1px solid #1e3550;border-radius:12px;padding:10px 14px;color:#d4e8ff;font-size:13px;outline:none;font-family:inherit;"/>
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#4a6380;display:block;margin-bottom:5px;text-transform:uppercase;">Password</label>
+      <div style="position:relative;">
+        <input type="password" id="li-pass" placeholder="Enter password" autocomplete="current-password"
+          style="width:100%;background:#101828;border:1px solid #1e3550;border-radius:12px;padding:10px 44px 10px 14px;color:#d4e8ff;font-size:13px;outline:none;font-family:inherit;"/>
+        <button id="pw-eye" type="button" onclick="togglePw()"
+          style="position:absolute;right:0;top:0;bottom:0;width:44px;background:none;border:none;color:#4a6380;font-size:17px;cursor:pointer;">&#128065;</button>
+      </div>
+    </div>
+    <button id="li-btn" type="button" onclick="doLogin()"
+      style="width:100%;padding:11px;border-radius:12px;background:#00e5ff;color:#000;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;letter-spacing:.03em;">
+      &#128272; Sign In to System
+    </button>
+    <div style="margin-top:16px;text-align:center;font-size:11px;color:#4a6380;">
+      &#128274; Secured with Supabase Authentication &middot; <strong style="color:#00e5ff;">SciFi ISP v3.2</strong>
+    </div>
+
+  </div>
+</div>
+
+<div id="app">
+  <div class="sb-backdrop" id="sb-bd" onclick="closeSB()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="brand-icon">&#128225;</div>
+      <div style="flex:1;">
+        <div class="brand-name">SciFi ISP</div>
+        <div class="brand-ver">VOUCHER SYSTEM v3.0</div>
+      </div>
+      <button class="btn-sbclose" onclick="closeSB()">&#10005;</button>
+    </div>
+    <div class="sb-status"><span class="online-dot"></span> SYSTEM ONLINE</div>
+    <nav class="sb-nav">
+      <div class="nav-sec">MAIN</div>
+      <a class="nav-link active" onclick="goP('dashboard',this)"><span class="nav-icon">&#128202;</span>Dashboard</a>
+      <a class="nav-link" onclick="goP('agents',this)"><span class="nav-icon">&#128101;</span>Agents<span class="nav-badge" id="nb-ag">0</span></a>
+      <a class="nav-link" onclick="goP('vouchers',this)"><span class="nav-icon">&#127967;</span>Vouchers<span class="nav-badge" id="nb-vc">0</span></a>
+      <div class="nav-sec">OPERATIONS</div>
+      <a class="nav-link" onclick="goP('distribute',this)"><span class="nav-icon">&#128228;</span>Distribute</a>
+      <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
+      <a class="nav-link" onclick="goP('tracking',this)"><span class="nav-icon">&#128269;</span>Tracking</a>
+      <div class="nav-sec">ANALYTICS</div>
+      <a class="nav-link" onclick="goP('reports',this)"><span class="nav-icon">&#128200;</span>Reports</a>
+      <div class="nav-sec">SYSTEM</div>
+      <a class="nav-link" onclick="goP('settings',this)"><span class="nav-icon">&#9881;&#65039;</span>WA Settings</a>
+    </nav>
+    <div class="sb-footer">
+      <div class="user-row">
+        <div class="user-av" id="u-av">A</div>
+        <div><div class="user-name" id="u-nm">Admin</div><div class="user-role">SUPER ADMIN</div></div>
+      </div>
+      <button class="btn-signout" onclick="doLogout()">&#9211; Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button onclick="toggleSB()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">&#9776;</button>
+      <div><div class="topbar-title" id="tb-title">Dashboard</div><div class="topbar-sub" id="tb-date"></div></div>
+      <div class="sw"><span class="sw-icon">&#128269;</span><input type="text" placeholder="Search agents, vouchers, codes&#8230;" id="g-search" oninput="gSearch(this.value)"/></div>
+      <div class="tb-right">
+        <button class="icon-btn" id="wa-api-badge" onclick="goP('settings',document.querySelector('[onclick*=settings]'))" title="WhatsApp API Status" style="font-size:11px;padding:6px 10px;gap:5px;display:flex;align-items:center;">
+          &#128172; <span id="wa-api-label" style="font-size:10px;font-weight:700;letter-spacing:.06em;">WA</span>
+        </button>
+        <div style="position:relative;">
+          <button class="icon-btn" onclick="toggleND()">&#128276;<span class="nb-dot" id="nb-dot" style="display:none;"></span></button>
+          <div class="nd" id="nd">
+            <div class="nd-head"><span style="font-size:11px;font-weight:700;letter-spacing:.1em;">NOTIFICATIONS</span><button onclick="markRead()" style="background:none;border:none;color:var(--accent);font-size:10px;cursor:pointer;font-family:var(--sans);font-weight:700;">MARK ALL READ</button></div>
+            <div id="nd-list"></div>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" style="font-size:16px;">🌙</button>
+      </div>
+    </header>
+    <div class="content">
+
+      <div class="page active" id="page-dashboard">
+        <div id="setup-wrap"></div>
+        <div class="ph">
+          <div><div class="pt">Operations Dashboard</div><div class="ps" id="dash-date"></div></div>
+          <div class="pa">
+            <button class="btn btn-secondary" onclick="refreshAll()">&#128260; Refresh</button>
+            <button class="btn btn-primary" onclick="goP('distribute',document.querySelector('[onclick*=distribute]'))">&#128228; Distribute</button>
+          </div>
+        </div>
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="g2" style="margin-bottom:16px;">
+          <div class="card"><div class="card-title">Daily Distribution &mdash; Last 7 Days</div><div class="chart-wrap"><canvas id="ch-daily"></canvas></div></div>
+          <div class="card"><div class="card-title">Top Agents by Volume</div><div id="top-agents"></div></div>
+        </div>
+        <div class="card"><div class="card-title">Recent Voucher Deliveries</div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Package</th><th>Agent</th><th>Method</th><th>Sent</th><th>Expires</th><th>Status</th></tr></thead><tbody id="recent-body"></tbody></table></div></div>
+      </div>
+
+      <div class="page" id="page-agents">
+        <div class="ph"><div><div class="pt">Agent Management</div><div class="ps" id="ag-sub"></div></div><button class="btn btn-primary" onclick="openAddAgent()">&#10133; Add Agent</button></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <select class="form-control" id="af-reg" onchange="renderAgents()" style="width:150px;font-size:11px;"><option value="">All Regions</option></select>
+          <select class="form-control" id="af-apt" onchange="renderAgents()" style="width:160px;font-size:11px;"><option value="">All Apartments</option></select>
+          <select class="form-control" id="af-st" onchange="renderAgents()" style="width:130px;font-size:11px;"><option value="">All Statuses</option><option>active</option><option>suspended</option></select>
+        </div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th>Agent</th><th>Phone</th><th>Region</th><th>Apartment</th><th>Joined</th><th>Vouchers</th><th>Status</th><th>Actions</th></tr></thead><tbody id="agents-body"></tbody></table></div></div>
+      </div>
+
+      <div class="page" id="page-agent-profile">
+        <button class="btn btn-ghost btn-sm" onclick="goP('agents',document.querySelector('[onclick*=agents]'))" style="margin-bottom:14px;">&#8592; Back</button>
+        <div class="pg" id="profile-content"></div>
+      </div>
+
+      <div class="page" id="page-vouchers">
+        <div class="ph">
+          <div><div class="pt">Voucher Management</div><div class="ps" id="vc-sub"></div></div>
+          <div class="pa">
+            <button class="btn btn-secondary" onclick="openBulkEdit()">&#9999; Bulk Edit</button>
+            <button class="btn btn-secondary" onclick="openBulkImport()">&#128229; Bulk Import</button>
+            <button class="btn btn-primary" onclick="openAddVoucher()">&#10133; Add Voucher</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="fb active" onclick="fV('all',this)">All</button>
+          <button class="fb" onclick="fV('available',this)">Available</button>
+          <button class="fb" onclick="fV('sent',this)">Sent</button>
+          <button class="fb" onclick="fV('used',this)">Used</button>
+          <button class="fb" onclick="fV('expired',this)">Expired</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="vca" onchange="selAllV(this)"/></th><th>Code</th><th>Package</th><th>Days</th><th>Added</th><th>Sent At</th><th>Expires At</th><th>Agent</th><th>Status</th></tr></thead><tbody id="vouchers-body"></tbody></table></div></div>
+      </div>
+
+      <div class="page" id="page-distribute">
+        <div class="ph"><div><div class="pt">Distribute Vouchers</div><div class="ps">Send voucher codes to agents via WhatsApp or SMS</div></div></div>
+        <div class="steps">
+          <div class="step active" id="dst-1"><div class="step-num">1</div><span>Agents</span></div>
+          <div class="step-line"></div>
+          <div class="step" id="dst-2"><div class="step-num">2</div><span>Vouchers</span></div>
+          <div class="step-line"></div>
+          <div class="step" id="dst-3"><div class="step-num">3</div><span>Send</span></div>
+        </div>
+        <div id="ds1" class="card">
+          <div class="card-title">Step 1 &mdash; Select Agents &middot; Filter by Region / Apartment</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <select class="form-control" id="dr-reg" onchange="renderDAg()" style="width:150px;font-size:11px;"><option value="">All Regions</option></select>
+            <select class="form-control" id="dr-apt" onchange="renderDAg()" style="width:160px;font-size:11px;"><option value="">All Apartments</option></select>
+          </div>
+          <div id="dag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-height:240px;overflow-y:auto;margin-bottom:14px;"></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;"><span id="dsa-cnt">0</span> agents selected</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="dSelAllAg()">Select All</button>
+            <button class="btn btn-primary" onclick="dStep(2)">Next &#8594;</button>
+          </div>
+        </div>
+        <div id="ds2" class="card" style="display:none;">
+          <div class="card-title">Step 2 &mdash; Select Vouchers &middot; <span style="color:var(--accent3);" id="dv-avail">0</span> available</div>
+          <div style="display:flex;flex-direction:column;gap:5px;max-height:280px;overflow-y:auto;margin-bottom:14px;" id="dv-grid"></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;"><span id="dsv-cnt">0</span> selected</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="dStep(1)">&#8592; Back</button>
+            <button class="btn btn-ghost btn-sm" onclick="dSelAllV()">Select All</button>
+            <button class="btn btn-primary" onclick="dStep(3)">Next &#8594;</button>
+          </div>
+        </div>
+        <div id="ds3" class="card" style="display:none;">
+          <div class="card-title">Step 3 &mdash; Compose &amp; Send</div>
+          <div class="g2" style="margin-bottom:14px;">
+            <div>
+              <div class="form-label">Delivery Method</div>
+              <div style="display:flex;gap:8px;margin-top:4px;">
+                <div class="sel-card selected" id="dm-wa" onclick="setDM('whatsapp')" style="flex:1;justify-content:center;font-size:12px;">&#128172; WhatsApp</div>
+                <div class="sel-card" id="dm-sms" onclick="setDM('sms')" style="flex:1;justify-content:center;font-size:12px;">&#128241; SMS</div>
+              </div>
+            </div>
+            <div>
+              <div class="form-label">Summary</div>
+              <div id="d-summary" style="font-size:12px;background:var(--surface2);border-radius:var(--radius);padding:10px;line-height:2;border:1px solid var(--border);margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message Template &mdash; variables: {VOUCHER_CODE} {DURATION} {SENT_TIME} {EXPIRY_DATE} {EXPIRY_TIME} {SUPPORT_CONTACT}</label>
+            <textarea class="form-control" id="d-msg" rows="12" style="font-family:monospace;font-size:11px;line-height:1.6;"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="dStep(2)">&#8592; Back</button>
+            <button class="btn btn-primary" id="d-sendbtn" onclick="dSend()">&#128228; Send Now</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-messages">
+        <div class="ph"><div><div class="pt">Communication Center</div><div class="ps">Broadcast messages to agents by region or apartment</div></div></div>
+        <div class="comm-layout">
+          <div class="card" style="height:fit-content;">
+            <div class="card-title">Compose</div>
+            <div class="form-group">
+              <label class="form-label">Filter Recipients</label>
+              <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+                <select class="form-control" id="cm-reg" onchange="renderCmAg()" style="width:140px;font-size:11px;"><option value="">All Regions</option></select>
+                <select class="form-control" id="cm-apt" onchange="renderCmAg()" style="width:150px;font-size:11px;"><option value="">All Apartments</option></select>
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="cmSelAll()">All</button>
+                <button class="btn btn-ghost btn-sm" onclick="cmClear()">Clear</button>
+              </div>
+              <div id="cm-ag-list" style="max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Type</label>
+              <select class="form-control" id="cm-type">
+                <option value="announcement">General Announcement</option>
+                <option value="maintenance">Maintenance Notice</option>
+                <option value="service_interruption">Service Interruption</option>
+                <option value="promotion">Promotion</option>
+                <option value="network_upgrade">Network Upgrade</option>
+                <option value="payment_reminder">Payment Reminder</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Method</label>
+              <div style="display:flex;gap:8px;">
+                <div class="sel-card selected" id="cm-wa" onclick="setCM('whatsapp')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128172; WhatsApp</div>
+                <div class="sel-card" id="cm-sms" onclick="setCM('sms')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128241; SMS</div>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Message</label><textarea class="form-control" id="cm-content" rows="5" placeholder="Type message&#8230;"></textarea></div>
+            <button class="btn btn-primary btn-full" onclick="sendComm()">&#128228; Send Message</button>
+          </div>
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div class="card-title" style="margin-bottom:0;">Communication Log</div>
+              <select class="form-control" id="cm-lf" onchange="renderCmLog()" style="width:150px;font-size:11px;">
+                <option value="all">All</option><option value="whatsapp">WhatsApp</option><option value="sms">SMS</option><option value="voucher">Voucher</option><option value="announcement">Announcement</option>
+              </select>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Agent</th><th>Type</th><th>Method</th><th>Preview</th><th>Date</th><th>Status</th></tr></thead><tbody id="cm-log"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-tracking">
+        <div class="ph"><div><div class="pt">Voucher Tracking</div><div class="ps">Search any code or agent</div></div></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div style="display:flex;gap:10px;">
+            <input class="form-control" id="trk-q" placeholder="Code, agent name, phone&#8230;" oninput="renderTrk(this.value)" style="flex:1;"/>
+            <button class="btn btn-primary" onclick="renderTrk(document.getElementById('trk-q').value)">&#128269; Search</button>
+          </div>
+        </div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th>Code</th><th>Package</th><th>Agent</th><th>Phone</th><th>Method</th><th>Sent</th><th>Expires</th><th>Status</th></tr></thead><tbody id="trk-body"></tbody></table></div></div>
+      </div>
+
+      <div class="page" id="page-reports">
+        <div class="ph">
+          <div><div class="pt">Reports &amp; Analytics</div><div class="ps">Export and analyse data</div></div>
+          <div class="pa"><button class="btn btn-secondary" onclick="exportCSV()">&#128229; CSV</button><button class="btn btn-secondary" onclick="exportJSON()">&#128229; JSON</button></div>
+        </div>
+        <div class="g4" id="rpt-stats" style="margin-bottom:18px;"></div>
+        <div class="g2" style="margin-bottom:16px;">
+          <div class="card"><div class="card-title">Voucher Status</div><div class="chart-wrap"><canvas id="ch-status"></canvas></div></div>
+          <div class="card"><div class="card-title">Delivery Methods</div><div class="chart-wrap"><canvas id="ch-methods"></canvas></div></div>
+        </div>
+        <div class="g2">
+          <div class="card"><div class="card-title">Agent Performance</div><div class="table-wrap"><table><thead><tr><th>Agent</th><th>Region</th><th>Apt</th><th>Vouchers</th><th>Status</th></tr></thead><tbody id="rpt-ag"></tbody></table></div></div>
+          <div class="card"><div class="card-title">Communication Breakdown</div><div id="rpt-cm"></div></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-settings">
+        <div class="ph"><div><div class="pt">&#9881;&#65039; WhatsApp API Settings</div><div class="ps">Configure Meta Cloud API for direct WhatsApp sending from this system</div></div></div>
+
+        <!-- API Status Banner -->
+        <div id="wa-status-banner" style="margin-bottom:20px;"></div>
+
+
+        <!-- API Config Form -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#128272; Enter Your API Credentials</div>
+          <div style="background:rgba(255,184,0,.05);border:1px solid rgba(255,184,0,.2);border-radius:10px;padding:12px;font-size:11px;color:#c09040;margin-bottom:16px;line-height:1.7;">
+            &#9888; These credentials are stored <strong>in your browser only</strong> (localStorage). They are never sent to any server except Meta's API. For production deployment on Vercel, add them as Environment Variables instead.
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone Number ID</label>
+              <input class="form-control" id="cfg-phone-id" placeholder="e.g. 123456789012345" style="font-family:monospace;"/>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;">From Meta &rarr; WhatsApp &rarr; API Setup &rarr; Phone Number ID</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Access Token</label>
+              <div class="pw-wrap">
+                <input type="password" class="form-control" id="cfg-token" placeholder="EAAxxxxxxx..." style="font-family:monospace;font-size:11px;"/>
+                <button class="pw-eye" onclick="toggleCfgToken()" title="Show/hide token">&#128065;</button>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;">From Meta &rarr; WhatsApp &rarr; API Setup &rarr; Access Token</div>
+            </div>
+          </div>
+          <div class="g2">
+            <div class="form-group">
+              <label class="form-label">Test Phone Number (optional)</label>
+              <input class="form-control" id="cfg-test-num" placeholder="+254 7XX XXX XXX"/>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;">Send a test message to verify your API works</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Test Message</label>
+              <input class="form-control" id="cfg-test-msg" value="SciFi ISP: API test successful &#10004;"/>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+            <button class="btn btn-primary" onclick="saveWAConfig()">&#128190; Save Credentials</button>
+            <button class="btn btn-secondary" onclick="testWAConfig()">&#128172; Send Test Message</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearWAConfig()" style="color:var(--danger);">&#128465; Clear Saved</button>
+          </div>
+        </div>
+
+        <!-- Current Status -->
+        <div class="card">
+          <div class="card-title">&#128225; Current WhatsApp Send Mode</div>
+          <div id="wa-mode-display" style="font-size:13px;line-height:1.9;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="m-agent">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="m-ag-title">Add Agent</div><button class="modal-close" onclick="closeM('m-agent')">&#10005;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ae-id"/>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);">
+        <div><div style="font-size:12px;font-weight:600;">&#128241; Import from Phone Book</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Auto-fill name &amp; phone from contacts</div></div>
+        <button class="btn btn-secondary btn-sm" onclick="pickContact()">Pick Contact</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="ae-name" placeholder="e.g. Tendai Moyo"/></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="ae-phone" placeholder="+254 7XX XXX XXX"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-control" id="ae-wa" placeholder="+254 7XX XXX XXX"/></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="ae-email" placeholder="agent@example.com"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="ae-loc" placeholder="e.g. Harare CBD"/></div>
+        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="ae-reg" list="rl" placeholder="e.g. Harare"/><datalist id="rl"></datalist></div>
+      </div>
+      <div class="form-group"><label class="form-label">Apartment / Complex</label><input class="form-control" id="ae-apt" list="al" placeholder="e.g. Joina City, Eastlea Flats&#8230;"/><datalist id="al"></datalist></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="ae-notes" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-agent')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAgent()">&#10003; Save Agent</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-voucher">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Voucher</div><button class="modal-close" onclick="closeM('m-voucher')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Voucher Code *</label><input class="form-control" id="av-code" placeholder="SCIFI-XXXX-XXXX" style="font-family:monospace;text-transform:uppercase;"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Package</label><select class="form-control" id="av-pkg"><option>Daily 1GB</option><option>Weekly 10GB</option><option>Monthly 50GB</option><option>Custom</option></select></div>
+        <div class="form-group"><label class="form-label">Duration (days)</label><select class="form-control" id="av-days"><option value="1">1 Day</option><option value="3">3 Days</option><option value="7" selected>7 Days</option><option value="14">14 Days</option><option value="30">30 Days</option></select></div>
+      </div>
+      <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);padding:10px;font-size:11px;color:var(--muted);">&#8505; Expiry is calculated automatically from the exact moment the voucher is sent.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-voucher')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveVoucher()">&#10003; Add Voucher</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-bulk-import">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">Bulk Import Vouchers</div><button class="modal-close" onclick="closeM('m-bulk-import')">&#10005;</button></div>
+    <div class="modal-body">
+      <div style="background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.8;">
+        &#128203; One code per line. Format options:<br/>
+        <span style="font-family:monospace;color:var(--accent);">CITQ-XZQB</span> &mdash; just the code (defaults: Standard package, 7 days)<br/>
+        <span style="font-family:monospace;color:var(--accent);">CITQ-XZQB, Weekly 10GB, 7</span> &mdash; with package and days
+      </div>
+      <div class="form-group"><label class="form-label">Paste Voucher Data</label><textarea class="form-control" id="bulk-data" rows="10" style="font-family:monospace;font-size:11px;" placeholder="SCIFI-AA11-BB22, Weekly 10GB, 7&#10;SCIFI-CC33-DD44, Monthly 50GB, 30"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-bulk-import')">Cancel</button>
+      <button class="btn btn-primary" onclick="doBulkImport()">&#128229; Import</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-bulk-edit">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Bulk Edit Selected Vouchers</div><button class="modal-close" onclick="closeM('m-bulk-edit')">&#10005;</button></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;"><span id="be-cnt">0</span> available vouchers selected. Changes apply to all of them.</div>
+      <div class="form-group"><label class="form-label">Change Package</label><select class="form-control" id="be-pkg"><option value="">&#8212; No change &#8212;</option><option>Daily 1GB</option><option>Weekly 10GB</option><option>Monthly 50GB</option></select></div>
+      <div class="form-group"><label class="form-label">Change Duration</label><select class="form-control" id="be-days"><option value="">&#8212; No change &#8212;</option><option value="1">1 Day</option><option value="3">3 Days</option><option value="7">7 Days (1 Week)</option><option value="14">14 Days</option><option value="30">30 Days (1 Month)</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-bulk-edit')">Cancel</button>
+      <button class="btn btn-primary" onclick="doBulkEdit()">&#10003; Apply Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+/* ═══════════════════════════ CONFIG ═══════════════════════════ */
+// ═══════════════════════════════════════════════════════════════
+// API CONFIG — On Vercel: set SUPABASE_URL and SUPABASE_ANON_KEY
+// as Environment Variables in Project Settings.
+// Fallback values below are used for direct file / local use.
+// ═══════════════════════════════════════════════════════════════
+var __ENV__=window.__ENV__||{};
+const SB_URL  = __ENV__.SUPABASE_URL       ||'https://aegwcqlksoymnuwobuvm.supabase.co';
+const SB_KEY  = __ENV__.SUPABASE_ANON_KEY  ||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlZ3djcWxrc295bW51d29idXZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNzM5NDEsImV4cCI6MjA5NTc0OTk0MX0.-s98_nmWACS_KcC45UmC1DOxP5XfCS81RFGKsGPn5Hk';
+const WA_NUM  = __ENV__.WA_NUMBER          ||'254111923477';
+const SUPPORT = __ENV__.SUPPORT_CONTACT    ||'+254 111 923 477';
+// Credentials managed via Supabase Authentication → Users
+// No hard-coded credentials — login is always via Supabase
+
+/* ═══════════════════════════════════════════════════════════
+   META CLOUD API CONFIG
+   Fill these in from Meta for Developers → WhatsApp → API Setup
+   Leave blank to use wa.me fallback (opens WhatsApp app)
+═══════════════════════════════════════════════════════════ */
+const META_TOKEN       = __ENV__.META_TOKEN    || localStorage.getItem('scifi_wa_token')    || '';
+const META_PHONE_ID    = __ENV__.META_PHONE_ID || localStorage.getItem('scifi_wa_phone_id') || '';
+const META_API_VERSION = 'v19.0';
+const META_API_URL      = `https://graph.facebook.com/${META_API_VERSION}/${META_PHONE_ID}/messages`;
+
+// Returns true if Meta API is configured (checks saved credentials too)
+function hasMetaAPI(){ return !!(getMetaToken() && getMetaPhoneID()); }
+function getMetaToken(){  return window._WA_TOKEN  || META_TOKEN;   }
+function getMetaPhoneID(){ return window._WA_PHONE || META_PHONE_ID; }
+
+/* ═══════════════ SUPABASE CLIENT (avoids name collision) ═══════ */
+let sbClient=null,isDemo=true;
+function initSB(){
+  try{
+    const lib=window['supabase'];
+    if(lib&&lib.createClient){sbClient=lib.createClient(SB_URL,SB_KEY);isDemo=false;console.log('Supabase OK');}
+    else{console.warn('Supabase CDN not ready, demo mode');isDemo=true;}
+  }catch(e){console.warn('SB init:',e);isDemo=true;}
+}
+
+/* ══════════════════════════ DEMO DATA ════════════════════════ */
+let DB={
+  agents:[
+    {id:'a1',full_name:'Tendai Moyo',phone:'+254711234567',whatsapp_number:'+254711234567',email:'tendai@example.com',location:'Harare CBD',region:'Harare',apartment:'Joina City',date_joined:'2024-01-15',status:'active',notes:'Top performer',created_at:'2024-01-15T08:00:00Z'},
+    {id:'a2',full_name:'Blessing Chikwanda',phone:'+254722345678',whatsapp_number:'+254722345678',email:'blessing@example.com',location:'Bulawayo',region:'Bulawayo',apartment:'Ascot Centre',date_joined:'2024-02-20',status:'active',notes:'',created_at:'2024-02-20T09:00:00Z'},
+    {id:'a3',full_name:'Rutendo Dziva',phone:'+254733456789',whatsapp_number:'+254733456789',email:'rutendo@example.com',location:'Mutare',region:'Manicaland',apartment:'Meikles Park',date_joined:'2024-03-10',status:'active',notes:'Eastern region',created_at:'2024-03-10T10:00:00Z'},
+    {id:'a4',full_name:'Farai Ncube',phone:'+254744567890',whatsapp_number:'+254744567890',email:'farai@example.com',location:'Gweru',region:'Midlands',apartment:'Midlands Court',date_joined:'2024-04-05',status:'suspended',notes:'Payment issues',created_at:'2024-04-05T11:00:00Z'},
+    {id:'a5',full_name:'Chipo Makoni',phone:'+254755678901',whatsapp_number:'+254755678901',email:'chipo@example.com',location:'Masvingo',region:'Masvingo',apartment:'Masvingo Arms',date_joined:'2024-05-01',status:'active',notes:'',created_at:'2024-05-01T08:00:00Z'},
+  ],
+  vouchers:[
+    {id:'v1',voucher_code:'SCIFI-A1B2-C3D4',package_name:'Daily 1GB',duration_days:1,status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,date_added:'2025-01-10'},
+    {id:'v2',voucher_code:'SCIFI-E5F6-G7H8',package_name:'Weekly 10GB',duration_days:7,status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,date_added:'2025-01-10'},
+    {id:'v3',voucher_code:'SCIFI-I9J0-K1L2',package_name:'Monthly 50GB',duration_days:30,status:'sent',assigned_agent_id:'a1',sent_at:'2025-05-20T10:30:00Z',expires_at:'2025-06-19T10:30:00Z',date_added:'2025-01-10'},
+    {id:'v4',voucher_code:'SCIFI-M3N4-O5P6',package_name:'Daily 1GB',duration_days:1,status:'sent',assigned_agent_id:'a2',sent_at:'2025-05-21T14:15:00Z',expires_at:'2025-05-22T14:15:00Z',date_added:'2025-01-10'},
+    {id:'v5',voucher_code:'SCIFI-Q7R8-S9T0',package_name:'Weekly 10GB',duration_days:7,status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,date_added:'2025-01-15'},
+    {id:'v6',voucher_code:'SCIFI-U1V2-W3X4',package_name:'Monthly 50GB',duration_days:30,status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,date_added:'2025-01-15'},
+  ],
+  comms:[
+    {id:'c1',agent_id:'a1',message_type:'voucher',delivery_method:'whatsapp',message_content:'SCIFI-I9J0-K1L2 sent',status:'delivered',sent_at:'2025-05-20T10:30:00Z'},
+    {id:'c2',agent_id:'a2',message_type:'voucher',delivery_method:'sms',message_content:'SCIFI-M3N4-O5P6 sent',status:'delivered',sent_at:'2025-05-21T14:15:00Z'},
+    {id:'c3',agent_id:'a1',message_type:'promotion',delivery_method:'whatsapp',message_content:'New bundle deals!',status:'delivered',sent_at:'2025-05-22T09:00:00Z'},
+  ],
+  notifs:[
+    {id:1,text:'Voucher SCIFI-I9J0-K1L2 sent to Tendai Moyo',time:'2h ago',read:false},
+    {id:2,text:'Agent Chipo Makoni added',time:'Yesterday',read:false},
+  ]
+};
+
+/* ════════════════════════ AUTH FUNCTIONS ═══════════════════ */
+
+function togglePw(){
+  var i=document.getElementById('li-pass');
+  var b=document.getElementById('pw-eye');
+  if(i.type==='password'){i.type='text';b.innerHTML='&#128683;';}
+  else{i.type='password';b.innerHTML='&#128065;';}
+}
+
+function showLoginErr(msg){
+  var el=document.getElementById('login-err');
+  if(!el) return;
+  el.innerHTML=msg;
+  el.style.display='block';
+}
+function hideLoginErr(){
+  var el=document.getElementById('login-err');
+  if(el) el.style.display='none';
+}
+
+async function doLogin(){
+  var email=document.getElementById('li-email').value.trim();
+  var pass=document.getElementById('li-pass').value;
+  var btn=document.getElementById('li-btn');
+  hideLoginErr();
+  if(!email || !pass){
+    showLoginErr('&#9888; Please enter your email and password.');
+    return;
+  }
+  btn.innerHTML='&#8987; Signing in...';
+  btn.disabled=true;
+  // Wait up to 4 seconds for Supabase CDN to load
+  var waited=0;
+  while(!sbClient && waited<4000){
+    await new Promise(function(r){setTimeout(r,200);});
+    waited+=200;
+  }
+  if(!sbClient){
+    showLoginErr('&#9888; Cannot connect to Supabase. Check your internet and reload the page.');
+    btn.innerHTML='&#128272; Sign In to System';
+    btn.disabled=false;
+    return;
+  }
+  try{
+    var result=await sbClient.auth.signInWithPassword({email:email,password:pass});
+    var data=result.data;
+    var error=result.error;
+    if(error){
+      var msg=error.message||'Login failed';
+      if(msg.toLowerCase().indexOf('invalid')!==-1||msg.toLowerCase().indexOf('credentials')!==-1){
+        showLoginErr('Incorrect email or password. Check your credentials and try again.');
+      } else {
+        showLoginErr('&#9888; '+msg);
+      }
+      btn.innerHTML='&#128272; Sign In to System';
+      btn.disabled=false;
+      return;
+    }
+    curUser=data.user;
+    isDemo=false;
+    bootApp();
+  }catch(e){
+    showLoginErr('&#9888; Connection error: '+(e.message||'Please check your internet and try again.'));
+    btn.innerHTML='&#128272; Sign In to System';
+    btn.disabled=false;
+  }
+}
+
+// Enter key support for login form
+document.addEventListener('DOMContentLoaded',function(){
+  var ep=document.getElementById('li-email');
+  var pp=document.getElementById('li-pass');
+  if(ep) ep.addEventListener('keydown',function(e){if(e.key==='Enter' && pp) pp.focus();});
+  if(pp) pp.addEventListener('keydown',function(e){if(e.key==='Enter') doLogin();});
+});
+
+/* ═══════════════════════ DATA LAYER ══════════════════════════ */
+async function dbGet(t){
+  if(isDemo){
+    if(t==='agents')return[...DB.agents];
+    if(t==='vouchers')return[...DB.vouchers];
+    if(t==='communications')return[...DB.comms];
+    return[];
+  }
+  try{
+    const orderCol=t==='agents'?'created_at':t==='vouchers'?'date_added':'sent_at';
+    const{data,error}=await sbClient.from(t).select('*').order(orderCol,{ascending:false});
+    if(error){
+      // If column doesn't exist fall back to id ordering
+      const{data:d2,error:e2}=await sbClient.from(t).select('*');
+      if(e2){console.error('dbGet error:',e2);return[];}
+      return d2||[];
+    }
+    return data||[];
+  }catch(e){console.error('dbGet exception:',e);return[];}
+}
+async function dbIns(t,row){
+  if(isDemo){
+    if(t==='agents')DB.agents.push(row);
+    if(t==='vouchers')DB.vouchers.push(row);
+    if(t==='communications')DB.comms.push(row);
+    return row;
+  }
+  const{data,error}=await sbClient.from(t).insert(row).select().single();
+  if(error){
+    console.error('dbIns error on',t,':',error);
+    throw new Error(error.message||JSON.stringify(error));
+  }
+  return data;
+}
+async function dbUpd(t,id,patch){
+  if(isDemo){if(t==='agents')DB.agents=DB.agents.map(r=>r.id===id?{...r,...patch}:r);if(t==='vouchers')DB.vouchers=DB.vouchers.map(r=>r.id===id?{...r,...patch}:r);return;}
+  const{error}=await sbClient.from(t).update(patch).eq('id',id);if(error)throw error;
+}
+async function dbDel(t,id){
+  if(isDemo){if(t==='agents')DB.agents=DB.agents.filter(r=>r.id!==id);if(t==='vouchers')DB.vouchers=DB.vouchers.filter(r=>r.id!==id);return;}
+  await sbClient.from(t).delete().eq('id',id);
+}
+
+/* ═══════════════════════════ STATE ═══════════════════════════ */
+let S={agents:[],vouchers:[],comms:[]};
+let DS={agents:[],vouchers:[],method:'whatsapp',step:1};
+let cmMethod='whatsapp',cmSel=[],selV=new Set(),vFilt='all';
+let charts={},curUser=null;
+
+/* ═══════════════════════════ HELPERS ════════════════════════ */
+const uid=()=>'id'+Date.now()+Math.random().toString(36).slice(2);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function calcExp(sentAt,days){if(!sentAt||!days)return null;const d=new Date(sentAt);d.setDate(d.getDate()+parseInt(days));return d.toISOString();}
+function fD(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function fDT(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function expBadge(exp){if(!exp)return'';const d=(new Date(exp)-new Date())/(864e5);if(d<0)return'<span class="eb eb-exp">Expired</span>';if(d<3)return`<span class="eb eb-warn">&#9888; ${Math.ceil(d)}d left</span>`;return`<span class="eb eb-ok">&#10003; ${Math.ceil(d)}d left</span>`;}
+function bdg(s){const m={available:'b-available',sent:'b-sent',used:'b-used',expired:'b-expired',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}">${s.replace(/_/g,' ').toUpperCase()}</span>`;}
+function av(n,big=''){return`<div class="av ${big}" style="flex-shrink:0;">${n[0].toUpperCase()}</div>`;}
+
+/* ═══════════════════ FILTER DROPDOWNS ══════════════════════ */
+function popFilters(){
+  const regs=[...new Set(S.agents.map(a=>a.region).filter(Boolean))].sort();
+  const apts=[...new Set(S.agents.map(a=>a.apartment).filter(Boolean))].sort();
+  document.getElementById('rl').innerHTML=regs.map(r=>`<option>${r}</option>`).join('');
+  document.getElementById('al').innerHTML=apts.map(a=>`<option>${a}</option>`).join('');
+  [['af-reg','af-apt'],['dr-reg','dr-apt'],['cm-reg','cm-apt']].forEach(([ri,ai])=>{
+    const re=document.getElementById(ri),ae=document.getElementById(ai);
+    if(re){const cv=re.value;re.innerHTML='<option value="">All Regions</option>'+regs.map(r=>`<option${r===cv?' selected':''}>${r}</option>`).join('');}
+    if(ae){const cv=ae.value;ae.innerHTML='<option value="">All Apartments</option>'+apts.map(a=>`<option${a===cv?' selected':''}>${a}</option>`).join('');}
+  });
+}
+
+/* ═══════════════════════════ AUTH ════════════════════════════ */
+
+
+async function doLogout(){
+  if(!isDemo&&sbClient)await sbClient.auth.signOut();
+  curUser=null;isDemo=true;
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('li-pass').type='password';
+  document.getElementById('pw-eye').innerHTML='&#128065;';
+  document.getElementById('li-email').value='';
+  document.getElementById('li-pass').value='';
+  document.getElementById('li-pass').type='password';
+  document.getElementById('pw-eye').innerHTML='&#128065;';
+  hideLoginErr();
+}
+function bootApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  const nm=curUser?.user_metadata?.full_name||curUser?.email?.split('@')[0]||'Admin';
+  document.getElementById('u-nm').textContent=nm;document.getElementById('u-av').textContent=nm[0].toUpperCase();
+  const ds=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('tb-date').textContent=ds;document.getElementById('dash-date').textContent='&#8987; '+ds;
+  if(isDemo)renderSetupBanner();
+  if(!isDemo&&sbClient)subRT();
+  refreshAll();renderNotifs();
+  // Load saved WhatsApp API config after DOM fully renders
+  setTimeout(function(){try{loadWAConfig();}catch(e){console.warn('loadWAConfig:',e);}},500);
+}
+function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:'public',table:'vouchers'},()=>refreshAll()).on('postgres_changes',{event:'*',schema:'public',table:'agents'},()=>refreshAll()).on('postgres_changes',{event:'*',schema:'public',table:'communications'},()=>refreshAll()).subscribe();}
+
+/* ════════════════════════ REFRESH ═══════════════════════════ */
+async function refreshAll(){
+  S.agents=await dbGet('agents');S.vouchers=await dbGet('vouchers');S.comms=await dbGet('communications');
+  renderDash();renderAgents();renderVouchers();renderTrk('');renderCmLog();renderReports();
+  updateBadges();popFilters();initDist();initCmAg();
+}
+
+/* ═══════════════════════ NAVIGATION ════════════════════════ */
+function goP(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'WhatsApp Settings'};
+  document.getElementById('tb-title').textContent=T[id]||id;
+  if(window.innerWidth<=900)closeSB();
+  if(id==='settings') setTimeout(()=>{try{renderWAStatus();}catch(e){}},50);
+}
+function toggleSB(){const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');s.classList.toggle('open');b.classList.toggle('open',s.classList.contains('open'));}
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-bd').classList.remove('open');}
+
+/* ══════════════════════ DASHBOARD ══════════════════════════ */
+function renderDash(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('stats-grid').innerHTML=[
+    {icon:'&#128101;',val:S.agents.length,label:'Total Agents',c:'var(--accent)'},
+    {icon:'&#9989;',val:S.agents.filter(a=>a.status==='active').length,label:'Active Agents',c:'var(--accent3)'},
+    {icon:'&#127967;',val:S.vouchers.filter(v=>v.status==='available').length,label:'Available',c:'var(--accent2)'},
+    {icon:'&#128228;',val:S.vouchers.filter(v=>v.status==='sent').length,label:'Sent',c:'#8b5cf6'},
+    {icon:'&#128172;',val:S.comms.filter(c=>c.sent_at?.startsWith(today)).length,label:'Msgs Today',c:'var(--warn)'},
+  ].map(s=>`<div class="stat-card" style="--sc:${s.c}"><div class="stat-icon">${s.icon}</div><div class="stat-value">${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
+
+  const sent=S.vouchers.filter(v=>v.status==='sent').slice(-6).reverse();
+  document.getElementById('recent-body').innerHTML=sent.length?sent.map(v=>{
+    const ag=S.agents.find(a=>a.id===v.assigned_agent_id);
+    const cm=S.comms.find(c=>c.agent_id===v.assigned_agent_id&&c.message_type==='voucher');
+    return`<tr><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td>${ag?`<div style="display:flex;align-items:center;gap:8px;">${av(ag.full_name)}<span>${ag.full_name}</span></div>`:'&#8212;'}</td><td>${cm?bdg(cm.delivery_method):'&#8212;'}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'&#8212;'}</td><td>${bdg(v.status)}</td></tr>`;
+  }).join(''):`<tr><td colspan="7"><div class="empty"><div class="empty-icon">&#128363;</div><div class="empty-title">No deliveries yet</div></div></td></tr>`;
+
+  const top=[...S.agents].map(a=>({...a,cnt:S.vouchers.filter(v=>v.assigned_agent_id===a.id).length})).sort((a,b)=>b.cnt-a.cnt).slice(0,5);
+  const mx=top[0]?.cnt||1;
+  document.getElementById('top-agents').innerHTML=top.map((a,i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;"><span style="font-size:11px;color:var(--muted);width:16px;">#${i+1}</span>${av(a.full_name)}<div style="flex:1;font-size:12px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.full_name}</div><div style="flex:2;height:5px;background:var(--surface2);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${(a.cnt/mx*100)}%;background:var(--accent);border-radius:4px;"></div></div><span style="font-size:12px;color:var(--accent);font-weight:700;min-width:20px;text-align:right;">${a.cnt}</span></div>`).join('');
+
+  if(charts.daily)charts.daily.destroy();
+  const c=document.getElementById('ch-daily')?.getContext('2d');
+  if(c){const days=[],vals=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toLocaleDateString('en-GB',{weekday:'short'}));vals.push(S.vouchers.filter(v=>v.sent_at?.startsWith(d.toISOString().slice(0,10))).length||Math.floor(Math.random()*6));}
+  charts.daily=new Chart(c,{type:'bar',data:{labels:days,datasets:[{data:vals,backgroundColor:'rgba(0,229,255,.25)',borderColor:'rgba(0,229,255,.7)',borderWidth:2,borderRadius:5}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a6380',font:{size:10}},grid:{color:'rgba(30,53,80,.5)'}},y:{ticks:{color:'#4a6380',font:{size:10}},grid:{color:'rgba(30,53,80,.5)'}}},responsive:true,maintainAspectRatio:false}});}
+}
+
+/* ════════════════════════ AGENTS ═══════════════════════════ */
+function renderAgents(){
+  const rf=document.getElementById('af-reg')?.value||'',af=document.getElementById('af-apt')?.value||'',sf=document.getElementById('af-st')?.value||'';
+  let list=[...S.agents];if(rf)list=list.filter(a=>a.region===rf);if(af)list=list.filter(a=>a.apartment===af);if(sf)list=list.filter(a=>a.status===sf);
+  document.getElementById('ag-sub').textContent=`${S.agents.length} agents \u00b7 ${S.agents.filter(a=>a.status==='active').length} active`;
+  document.getElementById('agents-body').innerHTML=list.length?list.map(a=>{
+    const vc=S.vouchers.filter(v=>v.assigned_agent_id===a.id).length;
+    return`<tr><td><div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openProf('${a.id}')">${av(a.full_name)}<div><div style="font-weight:600;">${a.full_name}</div><div style="font-size:10px;color:var(--muted);">${a.email||''}</div></div></div></td><td style="font-family:monospace;font-size:11px;">${a.phone}</td><td>${a.region||'&#8212;'}</td><td style="font-size:11px;">${a.apartment||'&#8212;'}</td><td style="font-size:11px;color:var(--muted);">${a.date_joined||''}</td><td style="color:var(--accent);font-weight:700;">${vc}</td><td>${bdg(a.status)}</td><td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-icon btn-sm" onclick="openProf('${a.id}')">&#128065;</button><button class="btn btn-ghost btn-icon btn-sm" onclick="editAg('${a.id}')">&#9999;</button><button class="btn btn-ghost btn-icon btn-sm" onclick="togSt('${a.id}')">${a.status==='active'?'&#128274;':'&#9989;'}</button><button class="btn btn-danger btn-icon btn-sm" onclick="delAg('${a.id}')">&#128465;</button></div></td></tr>`;
+  }).join(''):`<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No agents found</div></div></td></tr>`;
+}
+function openAddAgent(){document.getElementById('m-ag-title').textContent='Add Agent';document.getElementById('ae-id').value='';['ae-name','ae-phone','ae-wa','ae-email','ae-loc','ae-reg','ae-apt','ae-notes'].forEach(id=>document.getElementById(id).value='');openM('m-agent');}
+function editAg(id){const a=S.agents.find(x=>x.id===id);if(!a)return;document.getElementById('m-ag-title').textContent='Edit Agent';document.getElementById('ae-id').value=a.id;document.getElementById('ae-name').value=a.full_name||'';document.getElementById('ae-phone').value=a.phone||'';document.getElementById('ae-wa').value=a.whatsapp_number||'';document.getElementById('ae-email').value=a.email||'';document.getElementById('ae-loc').value=a.location||'';document.getElementById('ae-reg').value=a.region||'';document.getElementById('ae-apt').value=a.apartment||'';document.getElementById('ae-notes').value=a.notes||'';openM('m-agent');}
+async function pickContact(){
+  if(!('contacts'in navigator&&'ContactsManager'in window)){toast('Contact Picker only works in Chrome on Android. Type manually.','warning');return;}
+  try{const c=await navigator.contacts.select(['name','tel'],{multiple:false});if(c&&c.length){const x=c[0];if(x.name&&x.name[0])document.getElementById('ae-name').value=x.name[0];if(x.tel&&x.tel[0]){let p=x.tel[0].replace(/\s+/g,'');if(p.startsWith('0'))p='+254'+p.slice(1);document.getElementById('ae-phone').value=p;document.getElementById('ae-wa').value=p;}toast('Contact imported! Fill remaining details.','success');}}catch(e){toast('Cannot access contacts: '+e.message,'error');}
+}
+async function saveAgent(){
+  const id=document.getElementById('ae-id').value.trim();
+  const name=document.getElementById('ae-name').value.trim();
+  const phone=document.getElementById('ae-phone').value.trim();
+  if(!name){toast('Full name is required','error');return;}
+  if(!phone){toast('Phone number is required','error');return;}
+  const existing=S.agents.find(a=>a.id===id);
+  var aptVal=document.getElementById('ae-apt').value.trim();
+  const row={
+    id:id||uid(),
+    full_name:name,
+    phone:phone,
+    whatsapp_number:document.getElementById('ae-wa').value.trim()||phone,
+    email:document.getElementById('ae-email').value.trim(),
+    location:document.getElementById('ae-loc').value.trim()||aptVal,
+    region:document.getElementById('ae-reg').value.trim(),
+    notes:(document.getElementById('ae-notes').value.trim()||'')+(aptVal?' [Apt: '+aptVal+']':''),
+    date_joined:existing?.date_joined||new Date().toISOString().slice(0,10),
+    status:existing?.status||'active',
+    created_at:existing?.created_at||new Date().toISOString()
+  };
+  // apartment stored in notes if column missing; add column via schema update
+  if(isDemo) row.apartment=aptVal;
+  else { try{ row.apartment=aptVal; }catch(e){} }
+  try{
+    if(id&&existing){
+      await dbUpd('agents',id,row);
+      toast('Agent updated successfully','success');
+    }else{
+      await dbIns('agents',row);
+      toast('Agent '+name+' added successfully','success');
+      addNotif('Agent '+name+' added');
+    }
+    closeM('m-agent');
+    await refreshAll();
+  }catch(e){
+    // If apartment column missing, retry without it
+    if(e.message&&e.message.includes('apartment')){
+      try{
+        var rowNoApt={...row};
+        delete rowNoApt.apartment;
+        if(id&&existing) await dbUpd('agents',id,rowNoApt);
+        else await dbIns('agents',rowNoApt);
+        toast('Agent '+name+' saved (run SQL schema to add apartment column)','success');
+        closeM('m-agent');
+        await refreshAll();
+        return;
+      }catch(e2){
+        toast('Error saving agent: '+e2.message,'error');
+        return;
+      }
+    }
+    toast('Error saving agent: '+(e.message||e),'error');
+    console.error('saveAgent error:',e);
+  }
+}
+async function togSt(id){const a=S.agents.find(x=>x.id===id);const ns=a.status==='active'?'suspended':'active';await dbUpd('agents',id,{status:ns});toast(`${a.full_name} ${ns}`,ns==='active'?'success':'warning');await refreshAll();}
+async function delAg(id){const a=S.agents.find(x=>x.id===id);if(!confirm(`Delete ${a?.full_name}?`))return;await dbDel('agents',id);toast('Agent deleted','warning');await refreshAll();}
+function openProf(id){
+  const a=S.agents.find(x=>x.id===id);if(!a)return;
+  const aV=S.vouchers.filter(v=>v.assigned_agent_id===id);
+  const aC=S.comms.filter(c=>c.agent_id===id);
+  document.getElementById('profile-content').innerHTML=`
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div style="text-align:center;margin-bottom:18px;">
+          <div class="av av-lg" style="margin:0 auto 12px;">${a.full_name[0]}</div>
+          <div style="font-size:17px;font-weight:800;">${a.full_name}</div>
+          <div style="margin-top:8px;">${bdg(a.status)}</div>
+        </div>
+        ${[['Phone',a.phone],['WhatsApp',a.whatsapp_number||'&#8212;'],['Email',a.email||'&#8212;'],['Location',a.location||'&#8212;'],['Region',a.region||'&#8212;'],['Apartment',a.apartment||'&#8212;'],['Joined',a.date_joined]].map(([k,v])=>`<div class="dr"><span class="dk">${k}</span><span>${v}</span></div>`).join('')}
+        ${a.notes?`<div style="margin-top:10px;font-size:11px;color:var(--muted);background:var(--surface2);padding:10px;border-radius:8px;">${a.notes}</div>`:''}
+      </div>
+      <div class="card">
+        <div class="card-title">Stats</div>
+        <div class="dr"><span class="dk">Vouchers Received</span><strong style="color:var(--accent);">${aV.length}</strong></div>
+        <div class="dr"><span class="dk">Messages Sent</span><strong style="color:var(--accent2);">${aC.length}</strong></div>
+        <div class="dr"><span class="dk">Last Voucher</span><span style="font-size:11px;">${fD(aV.filter(v=>v.sent_at).sort((a,b)=>new Date(b.sent_at)-new Date(a.sent_at))[0]?.sent_at)}</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">Voucher History</div>
+        ${aV.length?`<div class="table-wrap"><table><thead><tr><th>Code</th><th>Package</th><th>Sent</th><th>Expires</th><th>Status</th></tr></thead><tbody>${aV.map(v=>`<tr><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td style="font-size:11px;">${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'&#8212;'}</td><td>${bdg(v.status)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No vouchers yet</div></div>`}
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">Communication History</div>
+        ${aC.length?`<div class="table-wrap"><table><thead><tr><th>Type</th><th>Method</th><th>Preview</th><th>Date</th><th>Status</th></tr></thead><tbody>${[...aC].reverse().map(c=>`<tr><td>${bdg(c.message_type)}</td><td>${bdg(c.delivery_method)}</td><td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.message_content}</td><td style="font-size:11px;">${fD(c.sent_at)}</td><td>${bdg(c.status)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty"><div class="empty-icon">&#128172;</div><div class="empty-title">No messages yet</div></div>`}
+      </div>
+      <div class="card"><div class="card-title">Activity Timeline</div><div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div><div style="font-size:12px;">Agent registered</div><div style="font-size:10px;color:var(--muted);">${a.date_joined}</div></div></div>
+        ${aV.filter(v=>v.sent_at).sort((a,b)=>new Date(a.sent_at)-new Date(b.sent_at)).map(v=>`<div class="tl-item"><div class="tl-dot" style="background:var(--accent2);"></div><div><div style="font-size:12px;">Received <span class="code">${v.voucher_code}</span></div><div style="font-size:10px;color:var(--muted);">${fDT(v.sent_at)} &rarr; expires ${fDT(v.expires_at)}</div></div></div>`).join('')}
+        ${aC.filter(c=>c.message_type!=='voucher').slice(-3).map(c=>`<div class="tl-item"><div class="tl-dot" style="background:var(--accent3);"></div><div><div style="font-size:12px;">${c.message_type.replace(/_/g,' ')} via ${c.delivery_method}</div><div style="font-size:10px;color:var(--muted);">${fD(c.sent_at)}</div></div></div>`).join('')}
+      </div></div>
+    </div>`;
+  goP('agent-profile',null);
+}
+
+/* ════════════════════════ VOUCHERS ═════════════════════════ */
+function fV(f,el){vFilt=f;document.querySelectorAll('#page-vouchers .fb').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderVouchers();}
+function renderVouchers(){
+  let list=vFilt==='all'?S.vouchers:S.vouchers.filter(v=>v.status===vFilt);
+  document.getElementById('vc-sub').textContent=`${S.vouchers.length} total \u00b7 ${S.vouchers.filter(v=>v.status==='available').length} available`;
+  document.getElementById('vouchers-body').innerHTML=list.length?list.map(v=>{
+    const ag=S.agents.find(a=>a.id===v.assigned_agent_id);
+    return`<tr><td><input type="checkbox" class="vcb" value="${v.id}" ${selV.has(v.id)?'checked':''} onchange="togVC('${v.id}',this)"/></td><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td>${v.duration_days||'&#8212;'}d</td><td style="font-size:11px;color:var(--muted);">${v.date_added||''}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'<span style="color:var(--muted);font-size:10px;">On send</span>'}</td><td>${ag?`<div style="display:flex;align-items:center;gap:6px;">${av(ag.full_name)}<span style="font-size:12px;">${ag.full_name}</span></div>`:'<span style="color:var(--muted);">&#8212;</span>'}</td><td>${bdg(v.status)}</td></tr>`;
+  }).join(''):`<tr><td colspan="9"><div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No vouchers</div></div></td></tr>`;
+}
+function togVC(id,cb){if(cb.checked)selV.add(id);else selV.delete(id);}
+function selAllV(cb){document.querySelectorAll('.vcb').forEach(b=>{b.checked=cb.checked;if(cb.checked)selV.add(b.value);else selV.delete(b.value);});}
+function openAddVoucher(){openM('m-voucher');document.getElementById('av-code').value='';}
+async function saveVoucher(){
+  const code=document.getElementById('av-code').value.trim().toUpperCase().replace(/\s+/g,'');
+  if(!code){toast('Voucher code is required','error');return;}
+  if(code.length<4){toast('Voucher code is too short','error');return;}
+  // Refresh to get latest list before checking dupes
+  S.vouchers=await dbGet('vouchers');
+  if(S.vouchers.find(v=>v.voucher_code===code)){
+    toast('Voucher already exists and cannot be reused.','error');return;
+  }
+  try{
+    await dbIns('vouchers',{
+      id:uid(),voucher_code:code,
+      package_name:document.getElementById('av-pkg').value,
+      duration_days:parseInt(document.getElementById('av-days').value)||7,
+      status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,
+      date_added:new Date().toISOString().slice(0,10),
+      created_at:new Date().toISOString()
+    });
+    toast('Voucher '+code+' added successfully','success');
+    closeM('m-voucher');
+    document.getElementById('av-code').value='';
+    await refreshAll();
+  }catch(e){
+    toast('Error saving voucher: '+(e.message||e),'error');
+    console.error('saveVoucher:',e);
+  }
+}
+function openBulkImport(){openM('m-bulk-import');document.getElementById('bulk-data').value='';}
+async function doBulkImport(){
+  const raw=document.getElementById('bulk-data').value;
+  if(!raw.trim()){toast('Paste some voucher data first','warning');return;}
+  const lines=raw.split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l.length>2);
+  if(lines.length===0){toast('No valid lines found','warning');return;}
+  let added=0,dupes=0,errs=0;
+  S.vouchers=await dbGet('vouchers');
+  const allCodes=new Set(S.vouchers.map(v=>v.voucher_code));
+  const newRows=[];
+  for(const line of lines){
+    // Support: just CODE, or CODE,Package,Days, or CODE Package Days
+    const p=line.split(/[,\t|]+/).map(s=>s.trim().replace(/^["']+|["']+$/g,''));
+    const code=p[0].toUpperCase().replace(/\s+/g,'');
+    if(!code||code.length<2){errs++;continue;}
+    if(allCodes.has(code)){dupes++;continue;}
+    allCodes.add(code);
+    const pkg=p[1]||'Standard';
+    const days=parseInt(p[2])||7;
+    newRows.push({
+      id:uid(),voucher_code:code,package_name:pkg,duration_days:days,
+      status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,
+      date_added:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()
+    });
+  }
+  for(const row of newRows){
+    try{await dbIns('vouchers',row);added++;}
+    catch(e){console.error('Import error:',e);errs++;}
+  }
+  const msg='Imported '+added+' voucher(s)'+(dupes?', '+dupes+' dupes skipped':'')+(errs?', '+errs+' failed':'');
+  toast(msg,added>0?'success':'warning');
+  if(added>0){closeM('m-bulk-import');document.getElementById('bulk-data').value='';}
+  await refreshAll();
+}
+function openBulkEdit(){
+  const av=[...selV].filter(id=>{const v=S.vouchers.find(x=>x.id===id);return v&&v.status==='available';});
+  if(!av.length){toast('Select available vouchers first','warning');return;}
+  document.getElementById('be-cnt').textContent=av.length;document.getElementById('be-pkg').value='';document.getElementById('be-days').value='';openM('m-bulk-edit');
+}
+async function doBulkEdit(){
+  const pkg=document.getElementById('be-pkg').value,days=document.getElementById('be-days').value;
+  if(!pkg&&!days){toast('Select a field to change','warning');return;}
+  const av=[...selV].filter(id=>{const v=S.vouchers.find(x=>x.id===id);return v&&v.status==='available';});
+  for(const id of av){const p={};if(pkg)p.package_name=pkg;if(days)p.duration_days=parseInt(days);await dbUpd('vouchers',id,p);}
+  toast(`Updated ${av.length} vouchers`,'success');selV.clear();closeM('m-bulk-edit');await refreshAll();
+}
+
+/* ═══════════════════════ DISTRIBUTE ════════════════════════ */
+const DTPL=`Dear Agent,\n\nThank you for partnering with SciFi ISP.\n\nYour internet voucher code is:\n\n{VOUCHER_CODE}\n\nValidity: {DURATION} day(s)\nActivated: {SENT_TIME}\nExpires:   {EXPIRY_DATE} at {EXPIRY_TIME}\n\nPlease activate before the expiry date.\n\nFor assistance contact:\n${SUPPORT}\n\nRegards,\nSciFi ISP`;
+function initDist(){document.getElementById('dv-avail').textContent=S.vouchers.filter(v=>v.status==='available').length;renderDAg();renderDV();document.getElementById('d-msg').value=DTPL;updDSum();}
+function renderDAg(){
+  const rf=document.getElementById('dr-reg')?.value||'',af=document.getElementById('dr-apt')?.value||'';
+  let list=S.agents.filter(a=>a.status==='active');if(rf)list=list.filter(a=>a.region===rf);if(af)list=list.filter(a=>a.apartment===af);
+  document.getElementById('dag-grid').innerHTML=list.map(a=>`<div class="sel-card ${DS.agents.includes(a.id)?'selected':''}" id="dac-${a.id}" onclick="dTogAg('${a.id}')"><div class="sel-chk">${DS.agents.includes(a.id)?'&#10003;':''}</div>${av(a.full_name)}<div><div style="font-size:12px;font-weight:600;">${a.full_name}</div><div style="font-size:10px;color:var(--muted);">${a.region||''}${a.apartment?' \u00b7 '+a.apartment:''}</div></div></div>`).join('')||`<div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No active agents</div></div>`;
+  document.getElementById('dsa-cnt').textContent=DS.agents.length;
+}
+function renderDV(){
+  const av=S.vouchers.filter(v=>v.status==='available');
+  document.getElementById('dv-grid').innerHTML=av.map(v=>`<div class="sel-card ${DS.vouchers.includes(v.id)?'selected':''}" id="dvc-${v.id}" onclick="dTogV('${v.id}')" style="gap:12px;"><div class="sel-chk">${DS.vouchers.includes(v.id)?'&#10003;':''}</div><span class="code" style="font-size:11px;">${v.voucher_code}</span><span style="font-size:11px;color:var(--muted);">${v.package_name}</span><span style="font-size:11px;color:var(--muted);">${v.duration_days}d</span></div>`).join('')||`<div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No available vouchers</div></div>`;
+  document.getElementById('dsv-cnt').textContent=DS.vouchers.length;
+}
+function dTogAg(id){DS.agents=DS.agents.includes(id)?DS.agents.filter(x=>x!==id):[...DS.agents,id];renderDAg();}
+function dTogV(id){DS.vouchers=DS.vouchers.includes(id)?DS.vouchers.filter(x=>x!==id):[...DS.vouchers,id];renderDV();updDSum();}
+function dSelAllAg(){const rf=document.getElementById('dr-reg')?.value||'',af=document.getElementById('dr-apt')?.value||'';let l=S.agents.filter(a=>a.status==='active');if(rf)l=l.filter(a=>a.region===rf);if(af)l=l.filter(a=>a.apartment===af);DS.agents=l.map(a=>a.id);renderDAg();}
+function dSelAllV(){DS.vouchers=S.vouchers.filter(v=>v.status==='available').map(v=>v.id);renderDV();updDSum();}
+function setDM(m){DS.method=m;document.getElementById('dm-wa').classList.toggle('selected',m==='whatsapp');document.getElementById('dm-sms').classList.toggle('selected',m==='sms');updDSum();}
+function updDSum(){const el=document.getElementById('d-summary');if(!el)return;el.innerHTML=`Sending <strong style="color:var(--accent);">${DS.vouchers.length}</strong> voucher(s)<br>to <strong style="color:var(--accent);">${DS.agents.length}</strong> agent(s)<br>via <strong style="color:var(--accent);">${DS.method.toUpperCase()}</strong>`;}
+function dStep(n){
+  if(n===2&&!DS.agents.length){toast('Select at least one agent','warning');return;}
+  if(n===3&&!DS.vouchers.length){toast('Select at least one voucher','warning');return;}
+  DS.step=n;[1,2,3].forEach(i=>{document.getElementById('ds'+i).style.display=i===n?'block':'none';const s=document.getElementById('dst-'+i);s.className='step'+(i===n?' active':i<n?' done':'');});if(n===3)updDSum();
+}
+/* ═══════════════════════════════════════════════════════════
+   WHATSAPP SEND ENGINE
+   Priority: Meta Cloud API → wa.me deep link fallback
+═══════════════════════════════════════════════════════════ */
+
+// Format phone for WhatsApp: strip non-digits, ensure starts with country code
+function normalizePhone(phone){
+  let p=(phone||'').replace(/[^0-9]/g,'');
+  if(p.startsWith('0')) p='254'+p.slice(1);
+  if(p.startsWith('+')) p=p.slice(1);
+  return p;
+}
+
+// Send via Meta Cloud API (real API call, no app needed)
+async function sendViaMetaAPI(toPhone, messageText){
+  var phone   = normalizePhone(toPhone);
+  var token   = getMetaToken();
+  var phoneId = getMetaPhoneID();
+  if(!token || !phoneId) throw new Error('Meta API not configured. Add credentials in WA Settings.');
+  var apiUrl  = 'https://graph.facebook.com/' + META_API_VERSION + '/' + phoneId + '/messages';
+  var body    = {
+    messaging_product: 'whatsapp',
+    recipient_type:    'individual',
+    to:                phone,
+    type:              'text',
+    text:              { preview_url: false, body: messageText }
+  };
+  var res = await fetch(apiUrl, {
+    method:  'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body:    JSON.stringify(body)
+  });
+  var json = await res.json();
+  if(!res.ok || json.error){
+    var errMsg = (json.error && (json.error.message || JSON.stringify(json.error))) || 'Unknown API error';
+    throw new Error('Meta API: ' + errMsg);
+  }
+  return json;
+}
+
+// Send via wa.me deep link (opens WhatsApp app on device)
+function sendViaWaLink(phone, message, delayMs=0){
+  const p=normalizePhone(phone);
+  const url=`https://wa.me/${p}?text=${encodeURIComponent(message)}`;
+  setTimeout(()=>window.open(url,'_blank'),delayMs);
+}
+
+// Main dispatcher — tries Meta API first, falls back to wa.me
+async function sendWhatsApp(phone, message, delayIndex=0){
+  if(hasMetaAPI()){
+    try{
+      await sendViaMetaAPI(phone,message);
+      return {method:'api',success:true};
+    }catch(e){
+      console.warn('Meta API failed, falling back to wa.me:',e.message);
+      sendViaWaLink(phone,message,delayIndex*700);
+      return {method:'fallback',success:true,warning:e.message};
+    }
+  }else{
+    // No API configured — use wa.me deep link
+    sendViaWaLink(phone,message,delayIndex*700);
+    return {method:'walink',success:true};
+  }
+}
+
+// Build a delivery status row for the UI
+function makeDeliveryStatus(results){
+  const total=results.length;
+  const api=results.filter(r=>r.method==='api').length;
+  const link=results.filter(r=>r.method==='walink'||r.method==='fallback').length;
+  const failed=results.filter(r=>!r.success).length;
+  if(hasMetaAPI())
+    return `Sent ${total} messages via Meta Cloud API (${api} direct, ${link} via app link)`;
+  return `WhatsApp app opened for ${link} agent(s) — tap Send in each chat`;
+}
+
+async function dSend(){
+  if(!DS.agents.length||!DS.vouchers.length){toast('Select agents and vouchers','error');return;}
+  const locked=DS.vouchers.filter(vid=>{const v=S.vouchers.find(x=>x.id===vid);return v&&v.status!=='available';});
+  if(locked.length){toast('Voucher already assigned and cannot be reused.','error');return;}
+  const btn=document.getElementById('d-sendbtn');
+  btn.innerHTML='&#8987; Sending&#8230;';btn.disabled=true;
+
+  const now=new Date().toISOString();
+  const tpl=document.getElementById('d-msg').value;
+  const results=[];
+  let sentCount=0,failCount=0;
+
+  // Show live progress
+  const showProgress=(cur,total)=>{
+    btn.innerHTML=`&#8987; Sending ${cur}/${total}&#8230;`;
+  };
+
+  for(let i=0;i<DS.vouchers.length;i++){
+    showProgress(i+1,DS.vouchers.length);
+    const vid=DS.vouchers[i];
+    const agId=DS.agents[i%DS.agents.length];
+    const v=S.vouchers.find(x=>x.id===vid);
+    const a=S.agents.find(x=>x.id===agId);
+    if(!v||!a) continue;
+
+    const exp=calcExp(now,v.duration_days);
+    const expDate=fD(exp);
+    const expTime=exp?new Date(exp).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'—';
+
+    const msg=tpl
+      .replace(/{VOUCHER_CODE}/g,v.voucher_code)
+      .replace(/{DURATION}/g,v.duration_days)
+      .replace(/{SENT_TIME}/g,fDT(now))
+      .replace(/{EXPIRY_DATE}/g,expDate)
+      .replace(/{EXPIRY_TIME}/g,expTime)
+      .replace(/{SUPPORT_CONTACT}/g,SUPPORT);
+
+    // Mark voucher sent in DB
+    await dbUpd('vouchers',vid,{status:'sent',assigned_agent_id:agId,sent_at:now,expires_at:exp});
+
+    let deliveryStatus='delivered';
+    let waResult={success:false,method:'none'};
+
+    if(DS.method==='whatsapp'){
+      try{
+        waResult=await sendWhatsApp(a.whatsapp_number||a.phone, msg, i);
+        if(waResult.success) sentCount++;
+        else{failCount++;deliveryStatus='failed';}
+        if(waResult.warning) toast('Agent '+a.full_name+': '+waResult.warning,'warning');
+      }catch(e){
+        failCount++;deliveryStatus='failed';
+        toast('Failed to send to '+a.full_name+': '+e.message,'error');
+      }
+    } else {
+      // SMS — placeholder for AfricasTalking / Twilio integration
+      sentCount++;
+      toast('SMS: integrate Africa Talking API for real SMS delivery','info');
+    }
+
+    results.push({...waResult,agent:a.full_name});
+    await dbIns('communications',{
+      id:uid(),agent_id:agId,message_type:'voucher',
+      delivery_method:DS.method,message_content:msg,
+      status:deliveryStatus,sent_at:now
+    });
+
+    // Small pause between API calls to avoid rate limiting
+    if(hasMetaAPI()&&i<DS.vouchers.length-1) await sleep(300);
+  }
+
+  const summary=makeDeliveryStatus(results);
+  addNotif(`${sentCount} voucher(s) sent via ${DS.method.toUpperCase()}`);
+
+  if(failCount===0){
+    toast('\u2705 '+sentCount+' voucher(s) sent! '+summary,'success');
+  } else {
+    toast('\u26a0\ufe0f '+sentCount+' sent, '+failCount+' failed. Check console for details.','warning');
+  }
+
+  // Show WhatsApp app instruction if using wa.me links
+  if(DS.method==='whatsapp'&&!hasMetaAPI()){
+    setTimeout(()=>toast('\ud83d\udcf1 WhatsApp opened for each agent — tap SEND in each chat window','info'),1500);
+  }
+
+  btn.innerHTML='&#128228; Send Now';btn.disabled=false;
+  DS={agents:[],vouchers:[],method:'whatsapp',step:1};dStep(1);
+  await refreshAll();
+}
+
+/* ═══════════════════════ MESSAGES ══════════════════════════ */
+function initCmAg(){renderCmAg();}
+function renderCmAg(){
+  const rf=document.getElementById('cm-reg')?.value||'',af=document.getElementById('cm-apt')?.value||'';
+  let list=[...S.agents];if(rf)list=list.filter(a=>a.region===rf);if(af)list=list.filter(a=>a.apartment===af);
+  document.getElementById('cm-ag-list').innerHTML=list.map(a=>`<div onclick="cmTogAg('${a.id}')" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer;background:${cmSel.includes(a.id)?'rgba(0,229,255,.06)':'transparent'};"><div style="width:14px;height:14px;border-radius:4px;border:2px solid ${cmSel.includes(a.id)?'var(--accent)':'var(--border)'};background:${cmSel.includes(a.id)?'var(--accent)':'transparent'};flex-shrink:0;"></div><span style="font-size:12px;">${a.full_name}</span><span style="font-size:10px;color:var(--muted);margin-left:4px;">${a.region||''}${a.apartment?' \u00b7 '+a.apartment:''}</span>${bdg(a.status)}</div>`).join('');
+}
+function cmTogAg(id){cmSel=cmSel.includes(id)?cmSel.filter(x=>x!==id):[...cmSel,id];renderCmAg();}
+function cmSelAll(){const rf=document.getElementById('cm-reg')?.value||'',af=document.getElementById('cm-apt')?.value||'';let l=[...S.agents];if(rf)l=l.filter(a=>a.region===rf);if(af)l=l.filter(a=>a.apartment===af);cmSel=l.map(a=>a.id);renderCmAg();}
+function cmClear(){cmSel=[];renderCmAg();}
+function setCM(m){cmMethod=m;document.getElementById('cm-wa').classList.toggle('selected',m==='whatsapp');document.getElementById('cm-sms').classList.toggle('selected',m==='sms');}
+async function sendComm(){
+  if(!cmSel.length){toast('Select recipients','warning');return;}
+  const cnt=document.getElementById('cm-content').value.trim();
+  if(!cnt){toast('Enter message content','warning');return;}
+  const type=document.getElementById('cm-type').value;
+  const now=new Date().toISOString();
+  const sendBtn=document.querySelector('#page-messages .btn-primary');
+  if(sendBtn){sendBtn.innerHTML='&#8987; Sending&#8230;';sendBtn.disabled=true;}
+
+  let sent=0,failed=0;
+  for(let i=0;i<cmSel.length;i++){
+    const agId=cmSel[i];
+    const a=S.agents.find(x=>x.id===agId);
+    if(!a) continue;
+    let status='delivered';
+    if(cmMethod==='whatsapp'){
+      try{
+        await sendWhatsApp(a.whatsapp_number||a.phone, cnt, i);
+        sent++;
+      }catch(e){
+        failed++;status='failed';
+        toast('Failed to send to '+a.full_name+': '+e.message,'error');
+      }
+    } else {
+      sent++;
+    }
+    await dbIns('communications',{id:uid(),agent_id:agId,message_type:type,delivery_method:cmMethod,message_content:cnt,status,sent_at:now});
+    if(hasMetaAPI()&&i<cmSel.length-1) await sleep(250);
+  }
+
+  const summary=cmSel.length+' agent(s)';
+  if(failed===0){
+    toast('\u2705 Message sent to '+summary+' via '+cmMethod.toUpperCase(),'success');
+    if(cmMethod==='whatsapp'&&!hasMetaAPI()){
+      setTimeout(()=>toast('\ud83d\udcf1 Tap SEND in each WhatsApp window that opened','info'),1200);
+    }
+  } else {
+    toast('\u26a0\ufe0f '+sent+' sent, '+failed+' failed','warning');
+  }
+  addNotif(type.replace(/_/g,' ')+' sent to '+summary);
+  document.getElementById('cm-content').value='';
+  cmSel=[];
+  if(sendBtn){sendBtn.innerHTML='&#128228; Send Message';sendBtn.disabled=false;}
+  await refreshAll();
+}
+function renderCmLog(){
+  const f=document.getElementById('cm-lf')?.value||'all';
+  const list=f==='all'?S.comms:S.comms.filter(c=>c.delivery_method===f||c.message_type===f);
+  document.getElementById('cm-log').innerHTML=list.length?[...list].reverse().map(c=>{const a=S.agents.find(x=>x.id===c.agent_id);return`<tr><td style="font-size:12px;">${a?.full_name||'&#8212;'}</td><td>${bdg(c.message_type)}</td><td>${bdg(c.delivery_method)}</td><td style="font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.message_content.replace(/\n/g,' ')}</td><td style="font-size:11px;">${fD(c.sent_at)}</td><td>${bdg(c.status)}</td></tr>`;}).join(''):`<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#128172;</div><div class="empty-title">No messages yet</div></div></td></tr>`;
+}
+
+/* ═════════════════════════ TRACKING ════════════════════════ */
+function renderTrk(q){
+  const ql=q.toLowerCase();
+  const list=S.vouchers.filter(v=>{const a=S.agents.find(x=>x.id===v.assigned_agent_id);return!ql||v.voucher_code.toLowerCase().includes(ql)||a?.full_name.toLowerCase().includes(ql)||a?.phone?.includes(ql)||v.package_name.toLowerCase().includes(ql);});
+  document.getElementById('trk-body').innerHTML=list.length?list.map(v=>{const a=S.agents.find(x=>x.id===v.assigned_agent_id);const c=a?S.comms.find(x=>x.agent_id===a.id&&x.message_type==='voucher'):null;return`<tr><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td>${a?`<div style="display:flex;align-items:center;gap:6px;">${av(a.full_name)}<span style="font-size:12px;">${a.full_name}</span></div>`:'<span style="color:var(--muted);">Unassigned</span>'}</td><td style="font-family:monospace;font-size:11px;">${a?.phone||'&#8212;'}</td><td>${c?bdg(c.delivery_method):'&#8212;'}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'&#8212;'}</td><td>${bdg(v.status)}</td></tr>`;}).join(''):`<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128269;</div><div class="empty-title">No results</div></div></td></tr>`;
+}
+
+/* ══════════════════════════ REPORTS ════════════════════════ */
+function renderReports(){
+  const vc=S.vouchers,ag=S.agents,cm=S.comms;
+  document.getElementById('rpt-stats').innerHTML=[['Total Vouchers',vc.length],['Available',vc.filter(v=>v.status==='available').length],['Sent',vc.filter(v=>v.status==='sent').length],['Messages',cm.length]].map(([l,v])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--accent);">${v}</div><div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;">${l}</div></div>`).join('');
+  document.getElementById('rpt-ag').innerHTML=ag.map(a=>`<tr><td style="font-size:12px;font-weight:500;">${a.full_name}</td><td style="font-size:11px;">${a.region||'&#8212;'}</td><td style="font-size:11px;">${a.apartment||'&#8212;'}</td><td style="color:var(--accent);font-weight:700;">${vc.filter(v=>v.assigned_agent_id===a.id).length}</td><td>${bdg(a.status)}</td></tr>`).join('');
+  document.getElementById('rpt-cm').innerHTML=[['&#128172; WhatsApp',cm.filter(c=>c.delivery_method==='whatsapp').length,'var(--accent)'],['&#128241; SMS',cm.filter(c=>c.delivery_method==='sms').length,'var(--accent2)'],['&#127967; Vouchers',cm.filter(c=>c.message_type==='voucher').length,'#8b5cf6'],['&#9989; Delivered',cm.filter(c=>c.status==='delivered').length,'var(--accent3)']].map(([l,v,c])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(30,53,80,.4);font-size:12px;"><span>${l}</span><strong style="color:${c};">${v}</strong></div>`).join('');
+  setTimeout(()=>{
+    if(charts.st)charts.st.destroy();const c2=document.getElementById('ch-status')?.getContext('2d');
+    if(c2)charts.st=new Chart(c2,{type:'doughnut',data:{labels:['Available','Sent','Used','Expired'],datasets:[{data:[vc.filter(v=>v.status==='available').length,vc.filter(v=>v.status==='sent').length,vc.filter(v=>v.status==='used').length,vc.filter(v=>v.status==='expired').length],backgroundColor:['rgba(0,255,157,.7)','rgba(0,119,255,.7)','rgba(139,92,246,.7)','rgba(255,59,92,.7)'],borderWidth:0}]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},responsive:true,maintainAspectRatio:false}});
+    if(charts.mt)charts.mt.destroy();const c3=document.getElementById('ch-methods')?.getContext('2d');
+    if(c3)charts.mt=new Chart(c3,{type:'pie',data:{labels:['WhatsApp','SMS'],datasets:[{data:[cm.filter(c=>c.delivery_method==='whatsapp').length,cm.filter(c=>c.delivery_method==='sms').length],backgroundColor:['rgba(37,211,102,.7)','rgba(0,119,255,.7)'],borderWidth:0}]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},responsive:true,maintainAspectRatio:false}});
+  },100);
+}
+
+/* ═══════════════════════ EXPORT ════════════════════════════ */
+function exportCSV(){const rows=[['Code','Package','Days','Status','Agent','Phone','Region','Apt','Sent','Expires']];S.vouchers.forEach(v=>{const a=S.agents.find(x=>x.id===v.assigned_agent_id);rows.push([v.voucher_code,v.package_name,v.duration_days||'',v.status,a?.full_name||'',a?.phone||'',a?.region||'',a?.apartment||'',v.sent_at||'',v.expires_at||'']);});const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');dl('scifi-vouchers.csv','text/csv',csv);toast('CSV exported','success');}
+function exportJSON(){dl('scifi-data.json','application/json',JSON.stringify({exported:new Date().toISOString(),agents:S.agents,vouchers:S.vouchers,communications:S.comms},null,2));toast('JSON exported','success');}
+function dl(n,t,c){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();}
+
+/* ═════════════════════ GLOBAL SEARCH ══════════════════════ */
+function gSearch(q){if(q.length>1){goP('tracking',document.querySelector('[onclick*=tracking]'));document.getElementById('trk-q').value=q;renderTrk(q);}}
+
+/* ═══════════════════════ NOTIFICATIONS ════════════════════ */
+function addNotif(text){if(isDemo){DB.notifs.unshift({id:Date.now(),text,time:'Just now',read:false});renderNotifs();}}
+function renderNotifs(){
+  const notifs=isDemo?DB.notifs:[];const unread=notifs.filter(n=>!n.read).length;
+  var nbDot=document.getElementById('nb-dot');
+  if(nbDot) nbDot.style.display=unread>0?'block':'none';
+  var ndList=document.getElementById('nd-list'); if(ndList) ndList.innerHTML=notifs.length?notifs.map(n=>`<div class="ni ${n.read?'':'unread'}"><div class="ni-dot ${n.read?'read':''}"></div><div><div style="font-size:11px;line-height:1.5;">${n.text}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${n.time}</div></div></div>`).join(''):`<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted);">No notifications</div>`;
+}
+function markRead(){if(isDemo){DB.notifs=DB.notifs.map(n=>({...n,read:true}));renderNotifs();}}
+function toggleND(){var nd=document.getElementById('nd');if(nd)nd.classList.toggle('open');}
+document.addEventListener('click',function(e){
+  var nd=document.getElementById('nd');
+  if(nd&&!e.target.closest('.icon-btn')&&!e.target.closest('.nd'))nd.classList.remove('open');
+});
+
+/* ════════════════════════ TOASTS ════════════════════════════ */
+let tid=0;
+function toast(msg,type='info'){const id='t'+(++tid);const ic={success:'&#9989;',error:'&#10060;',warning:'&#9888;&#65039;',info:'&#8505;'};const el=document.createElement('div');el.className=`toast t-${type}`;el.id=id;el.innerHTML=`<span>${ic[type]||''}</span><span style="flex:1;">${msg}</span><button class="toast-close" onclick="document.getElementById('${id}')?.remove()">&#10005;</button>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>{el.style.animation='slideOut .3s ease forwards';setTimeout(()=>el.remove(),300);},3800);}
+
+/* ═══════════════════════ MODALS ════════════════════════════ */
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.modal-overlay').forEach(function(m){
+    m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('open');});
+  });
+});
+
+/* ═════════════════════ NAV BADGES ══════════════════════════ */
+function updateBadges(){document.getElementById('nb-ag').textContent=S.agents.length;document.getElementById('nb-vc').textContent=S.vouchers.filter(v=>v.status==='available').length;}
+
+/* ═════════════════════════ THEME ═══════════════════════════ */
+let lightMode=false;
+function toggleTheme(){lightMode=!lightMode;document.getElementById('theme-btn').textContent=lightMode?'🌙':'☀️';const l=document.documentElement.style;if(lightMode){l.setProperty('--bg','#f0f4fc');l.setProperty('--surface','#fff');l.setProperty('--surface2','#f5f8ff');l.setProperty('--surface3','#ebf0fc');l.setProperty('--border','#dde5f5');l.setProperty('--border2','#c4d0f0');l.setProperty('--text','#0f1a2e');l.setProperty('--muted','#6b7280');}else{l.setProperty('--bg','#05080f');l.setProperty('--surface','#0b1120');l.setProperty('--surface2','#101828');l.setProperty('--surface3','#162032');l.setProperty('--border','#1e3550');l.setProperty('--border2','#253f60');l.setProperty('--text','#d4e8ff');l.setProperty('--muted','#4a6380');}}
+
+/* ════════════════════ SETUP BANNER ═════════════════════════ */
+function renderSetupBanner(){document.getElementById('setup-wrap').innerHTML=`<div class="setup-banner"><span style="font-size:18px;">&#9881;&#65039;</span><div><strong style="color:var(--warn);">Connected to Supabase &mdash; Run SQL schema to activate live data</strong><br/>Go to <strong>Supabase &rarr; SQL Editor</strong> and run <code>scifi-isp-schema.sql</code> to create tables.<br/>Then <strong>Authentication &rarr; Users &rarr; Add User</strong> to create your admin login.<br/>Currently showing demo data. Your real data appears once tables are created.</div></div>`;}
+
+/* ════════════════════════ WA SETTINGS ══════════════════════ */
+const LS_TOKEN    = 'scifi_wa_token';
+const LS_PHONE_ID = 'scifi_wa_phone_id';
+
+function loadWAConfig(){
+  try{
+    var t = localStorage.getItem(LS_TOKEN) || '';
+    var p = localStorage.getItem(LS_PHONE_ID) || '';
+    if(t) window._WA_TOKEN   = t;
+    if(p) window._WA_PHONE   = p;
+    var tf = document.getElementById('cfg-token');
+    var pf = document.getElementById('cfg-phone-id');
+    if(tf) tf.value = t;
+    if(pf) pf.value = p;
+  }catch(e){ console.warn('loadWAConfig:',e); }
+  renderWAStatus();
+}
+
+function saveWAConfig(){
+  var token   = document.getElementById('cfg-token').value.trim();
+  var phoneId = document.getElementById('cfg-phone-id').value.trim();
+  if(!token || !phoneId){
+    toast('Both Phone Number ID and Access Token are required','error');
+    return;
+  }
+  try{
+    localStorage.setItem(LS_TOKEN, token);
+    localStorage.setItem(LS_PHONE_ID, phoneId);
+    window._WA_TOKEN = token;
+    window._WA_PHONE = phoneId;
+    toast('WhatsApp API credentials saved! Direct sending is now active.','success');
+    renderWAStatus();
+  }catch(e){ toast('Could not save: '+e.message,'error'); }
+}
+
+async function testWAConfig(){
+  var token   = document.getElementById('cfg-token').value.trim();
+  var phoneId = document.getElementById('cfg-phone-id').value.trim();
+  var testNum = document.getElementById('cfg-test-num').value.trim();
+  var testMsg = document.getElementById('cfg-test-msg').value.trim() || 'SciFi ISP: API test OK';
+  if(!token || !phoneId){ toast('Enter credentials first','warning'); return; }
+  if(!testNum){ toast('Enter a test phone number','warning'); return; }
+  window._WA_TOKEN = token;
+  window._WA_PHONE = phoneId;
+  try{
+    await sendViaMetaAPI(testNum, testMsg);
+    toast('Test message sent to '+testNum+'! API is working.','success');
+    renderWAStatus();
+  }catch(e){
+    toast('Test failed: '+e.message,'error');
+  }
+}
+
+function clearWAConfig(){
+  if(!confirm('Remove saved WhatsApp API credentials?')) return;
+  localStorage.removeItem(LS_TOKEN);
+  localStorage.removeItem(LS_PHONE_ID);
+  window._WA_TOKEN = '';
+  window._WA_PHONE = '';
+  var tf = document.getElementById('cfg-token');
+  var pf = document.getElementById('cfg-phone-id');
+  if(tf) tf.value = '';
+  if(pf) pf.value = '';
+  toast('Credentials cleared.','warning');
+  renderWAStatus();
+}
+
+function toggleCfgToken(){
+  var i = document.getElementById('cfg-token');
+  if(i) i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function renderWAStatus(){
+  var active = !!(window._WA_TOKEN && window._WA_PHONE);
+  var badge  = document.getElementById('wa-api-badge');
+  var label  = document.getElementById('wa-api-label');
+  var banner = document.getElementById('wa-status-banner');
+  var mode   = document.getElementById('wa-mode-display');
+  if(badge && label){
+    badge.style.borderColor = active ? 'rgba(0,255,157,.4)' : 'var(--border)';
+    badge.style.color       = active ? '#00ff9d' : 'var(--muted)';
+    label.textContent       = active ? 'API ON' : 'WA';
+  }
+  if(banner){
+    banner.innerHTML = active
+      ? '<div style="background:rgba(0,255,157,.07);border:1px solid rgba(0,255,157,.25);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">&#128172;</span><div><div style="font-weight:700;color:#00ff9d;font-size:13px;">Meta Cloud API Active &#10003;</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Messages sent directly from this system to WhatsApp. No app tap needed.</div></div></div>'
+      : '<div style="background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">&#128241;</span><div><div style="font-weight:700;color:#ffb800;font-size:13px;">Using wa.me Links (App Opens on Device)</div><div style="font-size:11px;color:var(--muted);margin-top:3px;">Enter Meta API credentials below to enable direct sending.</div></div></div>';
+  }
+  if(mode){
+    mode.innerHTML = active
+      ? '<div style="color:#00ff9d;font-size:12px;">&#10003; Direct API active &mdash; messages go straight to agent WhatsApp without opening any app.</div>'
+      : '<div style="color:#ffb800;font-size:12px;">&#9888; No API configured &mdash; WhatsApp app will open on your device for each agent. Add credentials above to enable direct sending.</div>';
+  }
+}
+
+/* ════════════════════════ BOOT ════════════════════════════ */
+function tryInit(){
+  if(typeof window['supabase']!=='undefined'&&window['supabase'].createClient){
+    initSB();
+  }else{
+    setTimeout(tryInit,200);
+  }
+}
+tryInit();
+</script>
+</body>
+</html>
