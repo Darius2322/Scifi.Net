@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SciFi ISP — Voucher System v3.2</title>
+<title>SciFi ISP — Voucher System v3.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
@@ -133,6 +133,16 @@ tr:last-child td{border-bottom:none;}
 .b-sms{background:rgba(0,119,255,.12);color:#4da6ff;}
 .b-voucher{background:rgba(0,229,255,.1);color:var(--accent);}
 .b-announcement,.b-promotion,.b-maintenance{background:rgba(255,184,0,.1);color:#ffb800;}
+.b-disabled{background:rgba(74,99,128,.18);color:#8a9bb5;}
+.vc-menu{display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--surface);border:1px solid var(--border2);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.45);z-index:60;min-width:180px;overflow:hidden;}
+.vc-menu.open{display:block;}
+.vc-menu button{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:var(--text);font-size:12px;padding:9px 14px;text-align:left;cursor:pointer;transition:background .15s;font-family:var(--sans);}
+.vc-menu button:hover{background:var(--surface2);}
+.vc-menu button.danger{color:#ff6b85;}
+.vc-menu-sep{height:1px;background:var(--border);margin:2px 0;}
+.act-cell{display:flex;gap:4px;align-items:center;flex-wrap:nowrap;position:relative;}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end;}
+.filter-row .form-label{margin-bottom:3px;}
 .modal-overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:14px;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius2);width:100%;max-width:520px;box-shadow:0 30px 80px rgba(0,0,0,.6);max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;}
@@ -249,7 +259,7 @@ tr:last-child td{border-bottom:none;}
       &#128272; Sign In to System
     </button>
     <div style="margin-top:16px;text-align:center;font-size:11px;color:#4a6380;">
-      &#128274; Secured with Supabase Authentication &middot; <strong style="color:#00e5ff;">SciFi ISP v3.2</strong>
+      &#128274; Secured with Supabase Authentication &middot; <strong style="color:#00e5ff;">SciFi ISP v3.5</strong>
     </div>
 
   </div>
@@ -358,8 +368,38 @@ tr:last-child td{border-bottom:none;}
           <button class="fb" onclick="fV('sent',this)">Sent</button>
           <button class="fb" onclick="fV('used',this)">Used</button>
           <button class="fb" onclick="fV('expired',this)">Expired</button>
+          <button class="fb" onclick="fV('disabled',this)">Disabled</button>
         </div>
-        <div class="card"><div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="vca" onchange="selAllV(this)"/></th><th>Code</th><th>Package</th><th>Days</th><th>Added</th><th>Sent At</th><th>Expires At</th><th>Agent</th><th>Status</th></tr></thead><tbody id="vouchers-body"></tbody></table></div></div>
+        <div class="filter-row">
+          <div>
+            <label class="form-label">Package</label>
+            <select class="form-control" id="vf-pkg" onchange="renderVouchers()" style="width:150px;font-size:11px;"><option value="">All Packages</option></select>
+          </div>
+          <div>
+            <label class="form-label">Days</label>
+            <select class="form-control" id="vf-days" onchange="renderVouchers()" style="width:110px;font-size:11px;"><option value="">All Days</option><option value="1">1 Day</option><option value="3">3 Days</option><option value="7">7 Days</option><option value="14">14 Days</option><option value="30">30 Days</option></select>
+          </div>
+          <div>
+            <label class="form-label">Added From</label>
+            <input type="date" class="form-control" id="vf-add-from" onchange="renderVouchers()" style="width:140px;font-size:11px;"/>
+          </div>
+          <div>
+            <label class="form-label">Added To</label>
+            <input type="date" class="form-control" id="vf-add-to" onchange="renderVouchers()" style="width:140px;font-size:11px;"/>
+          </div>
+          <div>
+            <label class="form-label">Expires At</label>
+            <select class="form-control" id="vf-exp" onchange="renderVouchers()" style="width:160px;font-size:11px;">
+              <option value="">All</option>
+              <option value="expiring">Expiring &le;3 days</option>
+              <option value="expired">Expired</option>
+              <option value="active">Active &gt;3 days</option>
+              <option value="none">Not sent yet</option>
+            </select>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="clearVFilters()">&#10006; Clear Filters</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table><thead><tr><th><input type="checkbox" id="vca" onchange="selAllV(this)"/></th><th>Code</th><th>Package</th><th>Days</th><th>Added</th><th>Sent At</th><th>Expires At</th><th>Agent</th><th>Status</th><th>Actions</th></tr></thead><tbody id="vouchers-body"></tbody></table></div></div>
       </div>
 
       <div class="page" id="page-distribute">
@@ -367,7 +407,7 @@ tr:last-child td{border-bottom:none;}
         <div class="steps">
           <div class="step active" id="dst-1"><div class="step-num">1</div><span>Agents</span></div>
           <div class="step-line"></div>
-          <div class="step" id="dst-2"><div class="step-num">2</div><span>Vouchers</span></div>
+          <div class="step" id="dst-2"><div class="step-num">2</div><span>Assign</span></div>
           <div class="step-line"></div>
           <div class="step" id="dst-3"><div class="step-num">3</div><span>Send</span></div>
         </div>
@@ -385,12 +425,13 @@ tr:last-child td{border-bottom:none;}
           </div>
         </div>
         <div id="ds2" class="card" style="display:none;">
-          <div class="card-title">Step 2 &mdash; Select Vouchers &middot; <span style="color:var(--accent3);" id="dv-avail">0</span> available</div>
-          <div style="display:flex;flex-direction:column;gap:5px;max-height:280px;overflow-y:auto;margin-bottom:14px;" id="dv-grid"></div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;"><span id="dsv-cnt">0</span> selected</div>
-          <div style="display:flex;gap:8px;">
+          <div class="card-title">Step 2 &mdash; Voucher Assignment &middot; <span style="color:var(--accent3);" id="dv-avail">0</span> available</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6;">&#8505; Each selected agent is automatically assigned an available voucher. Use <strong>Change</strong> to pick a different one for any agent.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;margin-bottom:14px;" id="dv-grid"></div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;"><span id="dsv-cnt">0</span> of <span id="dsa-cnt2">0</span> agent(s) have a voucher assigned</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-ghost btn-sm" onclick="dStep(1)">&#8592; Back</button>
-            <button class="btn btn-ghost btn-sm" onclick="dSelAllV()">Select All</button>
+            <button class="btn btn-ghost btn-sm" onclick="dReassignAll()">&#128260; Re-assign All</button>
             <button class="btn btn-primary" onclick="dStep(3)">Next &#8594;</button>
           </div>
         </div>
@@ -470,11 +511,48 @@ tr:last-child td{border-bottom:none;}
       </div>
 
       <div class="page" id="page-tracking">
-        <div class="ph"><div><div class="pt">Voucher Tracking</div><div class="ps">Search any code or agent</div></div></div>
+        <div class="ph"><div><div class="pt">Voucher Tracking</div><div class="ps">Search any code or agent, then narrow down with filters</div></div></div>
         <div class="card" style="margin-bottom:14px;">
-          <div style="display:flex;gap:10px;">
-            <input class="form-control" id="trk-q" placeholder="Code, agent name, phone&#8230;" oninput="renderTrk(this.value)" style="flex:1;"/>
-            <button class="btn btn-primary" onclick="renderTrk(document.getElementById('trk-q').value)">&#128269; Search</button>
+          <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <input class="form-control" id="trk-q" placeholder="Code, agent name, phone&#8230;" oninput="renderTrk()" style="flex:1;"/>
+            <button class="btn btn-primary" onclick="renderTrk()">&#128269; Search</button>
+          </div>
+          <div class="filter-row" style="margin-bottom:0;">
+            <div>
+              <label class="form-label">Status</label>
+              <select class="form-control" id="trk-status" onchange="renderTrk()" style="width:130px;font-size:11px;"><option value="">All Statuses</option><option value="available">Available</option><option value="sent">Sent</option><option value="used">Used</option><option value="expired">Expired</option><option value="disabled">Disabled</option></select>
+            </div>
+            <div>
+              <label class="form-label">Package</label>
+              <select class="form-control" id="trk-pkg" onchange="renderTrk()" style="width:150px;font-size:11px;"><option value="">All Packages</option></select>
+            </div>
+            <div>
+              <label class="form-label">Method</label>
+              <select class="form-control" id="trk-method" onchange="renderTrk()" style="width:130px;font-size:11px;"><option value="">All Methods</option><option value="whatsapp">WhatsApp</option><option value="sms">SMS</option></select>
+            </div>
+            <div>
+              <label class="form-label">Region</label>
+              <select class="form-control" id="trk-reg" onchange="renderTrk()" style="width:140px;font-size:11px;"><option value="">All Regions</option></select>
+            </div>
+            <div>
+              <label class="form-label">Expires At</label>
+              <select class="form-control" id="trk-exp" onchange="renderTrk()" style="width:160px;font-size:11px;">
+                <option value="">All</option>
+                <option value="expiring">Expiring &le;3 days</option>
+                <option value="expired">Expired</option>
+                <option value="active">Active &gt;3 days</option>
+                <option value="none">Not sent</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Sent From</label>
+              <input type="date" class="form-control" id="trk-from" onchange="renderTrk()" style="width:140px;font-size:11px;"/>
+            </div>
+            <div>
+              <label class="form-label">Sent To</label>
+              <input type="date" class="form-control" id="trk-to" onchange="renderTrk()" style="width:140px;font-size:11px;"/>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="clearTrkFilters()">&#10006; Clear Filters</button>
           </div>
         </div>
         <div class="card"><div class="table-wrap"><table><thead><tr><th>Code</th><th>Package</th><th>Agent</th><th>Phone</th><th>Method</th><th>Sent</th><th>Expires</th><th>Status</th></tr></thead><tbody id="trk-body"></tbody></table></div></div>
@@ -488,11 +566,19 @@ tr:last-child td{border-bottom:none;}
         <div class="g4" id="rpt-stats" style="margin-bottom:18px;"></div>
         <div class="g2" style="margin-bottom:16px;">
           <div class="card"><div class="card-title">Voucher Status</div><div class="chart-wrap"><canvas id="ch-status"></canvas></div></div>
+          <div class="card"><div class="card-title">Package Distribution</div><div class="chart-wrap"><canvas id="ch-package"></canvas></div></div>
+        </div>
+        <div class="g2" style="margin-bottom:16px;">
           <div class="card"><div class="card-title">Delivery Methods</div><div class="chart-wrap"><canvas id="ch-methods"></canvas></div></div>
+          <div class="card"><div class="card-title">Monthly Trend &mdash; Added vs Sent</div><div class="chart-wrap"><canvas id="ch-trend"></canvas></div></div>
+        </div>
+        <div class="g2" style="margin-bottom:16px;">
+          <div class="card"><div class="card-title">Agent Performance</div><div class="table-wrap"><table><thead><tr><th>Agent</th><th>Region</th><th>Apt</th><th>Avail</th><th>Sent</th><th>Used</th><th>Expired</th><th>Total</th><th>Msgs</th><th>Status</th></tr></thead><tbody id="rpt-ag"></tbody></table></div></div>
+          <div class="card"><div class="card-title">Communication Breakdown</div><div id="rpt-cm"></div></div>
         </div>
         <div class="g2">
-          <div class="card"><div class="card-title">Agent Performance</div><div class="table-wrap"><table><thead><tr><th>Agent</th><th>Region</th><th>Apt</th><th>Vouchers</th><th>Status</th></tr></thead><tbody id="rpt-ag"></tbody></table></div></div>
-          <div class="card"><div class="card-title">Communication Breakdown</div><div id="rpt-cm"></div></div>
+          <div class="card"><div class="card-title">Voucher Breakdown by Package</div><div class="table-wrap"><table><thead><tr><th>Package</th><th>Total</th><th>Available</th><th>Sent</th><th>Used</th><th>Expired</th></tr></thead><tbody id="rpt-pkg"></tbody></table></div></div>
+          <div class="card"><div class="card-title">Expiring Soon &middot; &le;3 days</div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Package</th><th>Agent</th><th>Expires</th></tr></thead><tbody id="rpt-exp"></tbody></table></div></div>
         </div>
       </div>
 
@@ -527,7 +613,7 @@ tr:last-child td{border-bottom:none;}
           <div class="g2">
             <div class="form-group">
               <label class="form-label">Test Phone Number (optional)</label>
-              <input class="form-control" id="cfg-test-num" placeholder="+254 7XX XXX XXX"/>
+              <input class="form-control" id="cfg-test-num" placeholder="+254 7XX XXX XXX" />
               <div style="font-size:10px;color:var(--muted);margin-top:4px;">Send a test message to verify your API works</div>
             </div>
             <div class="form-group">
@@ -565,17 +651,29 @@ tr:last-child td{border-bottom:none;}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="ae-name" placeholder="e.g. Tendai Moyo"/></div>
-        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="ae-phone" placeholder="+254 7XX XXX XXX"/></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="ae-phone" placeholder="+254 7XX XXX XXX" /></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-control" id="ae-wa" placeholder="+254 7XX XXX XXX"/></div>
-        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="ae-email" placeholder="agent@example.com"/></div>
+        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-control" id="ae-wa" placeholder="+254 7XX XXX XXX" /></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="ae-email" placeholder="agent@gmail.com"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="ae-loc" placeholder="e.g. Harare CBD"/></div>
-        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="ae-reg" list="rl" placeholder="e.g. Harare"/><datalist id="rl"></datalist></div>
+        <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="ae-loc" placeholder="e.g. Nairobi CBD"/></div>
+        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="ae-reg" list="rl" placeholder="e.g. Nairobi"/><datalist id="rl">
+  <option value="Nairobi"><option value="Mombasa"><option value="Kisumu">
+  <option value="Nakuru"><option value="Eldoret"><option value="Thika">
+  <option value="Nyeri"><option value="Kisii"><option value="Nyanza">
+  <option value="Rift Valley"><option value="Central"><option value="Coast">
+  <option value="Western"><option value="Eastern"><option value="North Eastern">
+</datalist></div>
       </div>
-      <div class="form-group"><label class="form-label">Apartment / Complex</label><input class="form-control" id="ae-apt" list="al" placeholder="e.g. Joina City, Eastlea Flats&#8230;"/><datalist id="al"></datalist></div>
+      <div class="form-group"><label class="form-label">Apartment / Complex</label><input class="form-control" id="ae-apt" list="al" placeholder="e.g. Joina City, Eastlea Flats&#8230;"/><datalist id="al">
+  <option value="Jogoo House"><option value="Anniversary Towers">
+  <option value="Rahimtulla Tower"><option value="Times Tower">
+  <option value="Nation Centre"><option value="NSSF Building">
+  <option value="Lonrho House"><option value="UAP Tower">
+  <option value="Kencom House"><option value="Co-operative House">
+</datalist></div>
       <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="ae-notes" rows="2"></textarea></div>
     </div>
     <div class="modal-footer">
@@ -587,18 +685,39 @@ tr:last-child td{border-bottom:none;}
 
 <div class="modal-overlay" id="m-voucher">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Add Voucher</div><button class="modal-close" onclick="closeM('m-voucher')">&#10005;</button></div>
+    <div class="modal-header"><div class="modal-title" id="m-v-title">Add Voucher</div><button class="modal-close" onclick="closeM('m-voucher')">&#10005;</button></div>
     <div class="modal-body">
+      <input type="hidden" id="av-id"/>
       <div class="form-group"><label class="form-label">Voucher Code *</label><input class="form-control" id="av-code" placeholder="SCIFI-XXXX-XXXX" style="font-family:monospace;text-transform:uppercase;"/></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Package</label><select class="form-control" id="av-pkg"><option>Daily 1GB</option><option>Weekly 10GB</option><option>Monthly 50GB</option><option>Custom</option></select></div>
         <div class="form-group"><label class="form-label">Duration (days)</label><select class="form-control" id="av-days"><option value="1">1 Day</option><option value="3">3 Days</option><option value="7" selected>7 Days</option><option value="14">14 Days</option><option value="30">30 Days</option></select></div>
       </div>
-      <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);padding:10px;font-size:11px;color:var(--muted);">&#8505; Expiry is calculated automatically from the exact moment the voucher is sent.</div>
+      <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);padding:10px;font-size:11px;color:var(--muted);" id="av-note">&#8505; Expiry is calculated automatically from the exact moment the voucher is sent.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeM('m-voucher')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveVoucher()">&#10003; Add Voucher</button>
+      <button class="btn btn-primary" id="av-save-btn" onclick="saveVoucher()">&#10003; Add Voucher</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-voucher-view">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Voucher Details</div><button class="modal-close" onclick="closeM('m-voucher-view')">&#10005;</button></div>
+    <div class="modal-body" id="vv-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-voucher-view')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-voucher-picker">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Select Voucher for Agent</div><button class="modal-close" onclick="closeM('m-voucher-picker')">&#10005;</button></div>
+    <div class="modal-body" id="vp-list" style="display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-voucher-picker')">Cancel</button>
     </div>
   </div>
 </div>
@@ -681,11 +800,11 @@ function initSB(){
 /* ══════════════════════════ DEMO DATA ════════════════════════ */
 let DB={
   agents:[
-    {id:'a1',full_name:'Tendai Moyo',phone:'+254711234567',whatsapp_number:'+254711234567',email:'tendai@example.com',location:'Harare CBD',region:'Harare',apartment:'Joina City',date_joined:'2024-01-15',status:'active',notes:'Top performer',created_at:'2024-01-15T08:00:00Z'},
-    {id:'a2',full_name:'Blessing Chikwanda',phone:'+254722345678',whatsapp_number:'+254722345678',email:'blessing@example.com',location:'Bulawayo',region:'Bulawayo',apartment:'Ascot Centre',date_joined:'2024-02-20',status:'active',notes:'',created_at:'2024-02-20T09:00:00Z'},
-    {id:'a3',full_name:'Rutendo Dziva',phone:'+254733456789',whatsapp_number:'+254733456789',email:'rutendo@example.com',location:'Mutare',region:'Manicaland',apartment:'Meikles Park',date_joined:'2024-03-10',status:'active',notes:'Eastern region',created_at:'2024-03-10T10:00:00Z'},
-    {id:'a4',full_name:'Farai Ncube',phone:'+254744567890',whatsapp_number:'+254744567890',email:'farai@example.com',location:'Gweru',region:'Midlands',apartment:'Midlands Court',date_joined:'2024-04-05',status:'suspended',notes:'Payment issues',created_at:'2024-04-05T11:00:00Z'},
-    {id:'a5',full_name:'Chipo Makoni',phone:'+254755678901',whatsapp_number:'+254755678901',email:'chipo@example.com',location:'Masvingo',region:'Masvingo',apartment:'Masvingo Arms',date_joined:'2024-05-01',status:'active',notes:'',created_at:'2024-05-01T08:00:00Z'},
+    {id:'a1',full_name:'Tendai Moyo',phone:'+254711234567',whatsapp_number:'+254711234567',email:'tendai@example.com',location:'Nairobi CBD',region:'Nairobi',apartment:'Anniversary Towers',date_joined:'2024-01-15',status:'active',notes:'Top performer',created_at:'2024-01-15T08:00:00Z'},
+    {id:'a2',full_name:'Blessing Chikwanda',phone:'+254722345678',whatsapp_number:'+254722345678',email:'blessing@example.com',location:'Mombasa',region:'Mombasa',apartment:'Mombasa CBD Plaza',date_joined:'2024-02-20',status:'active',notes:'',created_at:'2024-02-20T09:00:00Z'},
+    {id:'a3',full_name:'Rutendo Dziva',phone:'+254733456789',whatsapp_number:'+254733456789',email:'rutendo@example.com',location:'Kisumu',region:'Nyanza',apartment:'Mega City Mall',date_joined:'2024-03-10',status:'active',notes:'Eastern region',created_at:'2024-03-10T10:00:00Z'},
+    {id:'a4',full_name:'Farai Ncube',phone:'+254744567890',whatsapp_number:'+254744567890',email:'farai@example.com',location:'Nakuru',region:'Rift Valley',apartment:'Nakuru Centre',date_joined:'2024-04-05',status:'suspended',notes:'Payment issues',created_at:'2024-04-05T11:00:00Z'},
+    {id:'a5',full_name:'Chipo Makoni',phone:'+254755678901',whatsapp_number:'+254755678901',email:'chipo@example.com',location:'Eldoret',region:'North Rift',apartment:'Eldoret Mall',date_joined:'2024-05-01',status:'active',notes:'',created_at:'2024-05-01T08:00:00Z'},
   ],
   vouchers:[
     {id:'v1',voucher_code:'SCIFI-A1B2-C3D4',package_name:'Daily 1GB',duration_days:1,status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,date_added:'2025-01-10'},
@@ -827,24 +946,31 @@ async function dbDel(t,id){
 
 /* ═══════════════════════════ STATE ═══════════════════════════ */
 let S={agents:[],vouchers:[],comms:[]};
-let DS={agents:[],vouchers:[],method:'whatsapp',step:1};
+let DS={agents:[],assignments:{},method:'whatsapp',step:1};
 let cmMethod='whatsapp',cmSel=[],selV=new Set(),vFilt='all';
 let charts={},curUser=null;
 
 /* ═══════════════════════════ HELPERS ════════════════════════ */
-const uid=()=>'id'+Date.now()+Math.random().toString(36).slice(2);
+function uid(){
+  // Generate a proper RFC4122 UUID v4 for Supabase
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+    var r=Math.random()*16|0;
+    return (c==='x'?r:(r&0x3|0x8)).toString(16);
+  });
+}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function calcExp(sentAt,days){if(!sentAt||!days)return null;const d=new Date(sentAt);d.setDate(d.getDate()+parseInt(days));return d.toISOString();}
 function fD(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
 function fDT(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 function expBadge(exp){if(!exp)return'';const d=(new Date(exp)-new Date())/(864e5);if(d<0)return'<span class="eb eb-exp">Expired</span>';if(d<3)return`<span class="eb eb-warn">&#9888; ${Math.ceil(d)}d left</span>`;return`<span class="eb eb-ok">&#10003; ${Math.ceil(d)}d left</span>`;}
-function bdg(s){const m={available:'b-available',sent:'b-sent',used:'b-used',expired:'b-expired',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}">${s.replace(/_/g,' ').toUpperCase()}</span>`;}
+function bdg(s){const m={available:'b-available',sent:'b-sent',used:'b-used',expired:'b-expired',disabled:'b-disabled',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}">${(s||'').replace(/_/g,' ').toUpperCase()}</span>`;}
 function av(n,big=''){return`<div class="av ${big}" style="flex-shrink:0;">${n[0].toUpperCase()}</div>`;}
 
 /* ═══════════════════ FILTER DROPDOWNS ══════════════════════ */
 function popFilters(){
   const regs=[...new Set(S.agents.map(a=>a.region).filter(Boolean))].sort();
   const apts=[...new Set(S.agents.map(a=>a.apartment).filter(Boolean))].sort();
+  const pkgs=[...new Set(S.vouchers.map(v=>v.package_name).filter(Boolean))].sort();
   document.getElementById('rl').innerHTML=regs.map(r=>`<option>${r}</option>`).join('');
   document.getElementById('al').innerHTML=apts.map(a=>`<option>${a}</option>`).join('');
   [['af-reg','af-apt'],['dr-reg','dr-apt'],['cm-reg','cm-apt']].forEach(([ri,ai])=>{
@@ -852,6 +978,14 @@ function popFilters(){
     if(re){const cv=re.value;re.innerHTML='<option value="">All Regions</option>'+regs.map(r=>`<option${r===cv?' selected':''}>${r}</option>`).join('');}
     if(ae){const cv=ae.value;ae.innerHTML='<option value="">All Apartments</option>'+apts.map(a=>`<option${a===cv?' selected':''}>${a}</option>`).join('');}
   });
+  // Voucher & Tracking package filters
+  [['vf-pkg','All Packages'],['trk-pkg','All Packages']].forEach(([id,lbl])=>{
+    const el=document.getElementById(id);
+    if(el){const cv=el.value;el.innerHTML=`<option value="">${lbl}</option>`+pkgs.map(p=>`<option${p===cv?' selected':''}>${p}</option>`).join('');}
+  });
+  // Tracking region filter
+  const trkReg=document.getElementById('trk-reg');
+  if(trkReg){const cv=trkReg.value;trkReg.innerHTML='<option value="">All Regions</option>'+regs.map(r=>`<option${r===cv?' selected':''}>${r}</option>`).join('');}
 }
 
 /* ═══════════════════════════ AUTH ════════════════════════════ */
@@ -888,7 +1022,7 @@ function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:
 /* ════════════════════════ REFRESH ═══════════════════════════ */
 async function refreshAll(){
   S.agents=await dbGet('agents');S.vouchers=await dbGet('vouchers');S.comms=await dbGet('communications');
-  renderDash();renderAgents();renderVouchers();renderTrk('');renderCmLog();renderReports();
+  renderDash();renderAgents();renderVouchers();renderTrk();renderCmLog();renderReports();
   updateBadges();popFilters();initDist();initCmAg();
 }
 
@@ -1051,39 +1185,256 @@ function openProf(id){
 /* ════════════════════════ VOUCHERS ═════════════════════════ */
 function fV(f,el){vFilt=f;document.querySelectorAll('#page-vouchers .fb').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderVouchers();}
 function renderVouchers(){
-  let list=vFilt==='all'?S.vouchers:S.vouchers.filter(v=>v.status===vFilt);
-  document.getElementById('vc-sub').textContent=`${S.vouchers.length} total \u00b7 ${S.vouchers.filter(v=>v.status==='available').length} available`;
+  let list=vFilt==='all'?[...S.vouchers]:S.vouchers.filter(v=>v.status===vFilt);
+  const pkgF=document.getElementById('vf-pkg')?.value||'';
+  const daysF=document.getElementById('vf-days')?.value||'';
+  const addFrom=document.getElementById('vf-add-from')?.value||'';
+  const addTo=document.getElementById('vf-add-to')?.value||'';
+  const expF=document.getElementById('vf-exp')?.value||'';
+  if(pkgF) list=list.filter(v=>v.package_name===pkgF);
+  if(daysF) list=list.filter(v=>String(v.duration_days||'')===daysF);
+  if(addFrom) list=list.filter(v=>v.date_added&&v.date_added>=addFrom);
+  if(addTo) list=list.filter(v=>v.date_added&&v.date_added<=addTo);
+  if(expF) list=list.filter(v=>{
+    if(expF==='none')return!v.expires_at;
+    if(!v.expires_at)return false;
+    const d=(new Date(v.expires_at)-new Date())/(864e5);
+    if(expF==='expired')return d<0;
+    if(expF==='expiring')return d>=0&&d<3;
+    if(expF==='active')return d>=3;
+    return true;
+  });
+  document.getElementById('vc-sub').textContent=`${S.vouchers.length} total \u00b7 ${S.vouchers.filter(v=>v.status==='available').length} available \u00b7 ${list.length} shown`;
   document.getElementById('vouchers-body').innerHTML=list.length?list.map(v=>{
     const ag=S.agents.find(a=>a.id===v.assigned_agent_id);
-    return`<tr><td><input type="checkbox" class="vcb" value="${v.id}" ${selV.has(v.id)?'checked':''} onchange="togVC('${v.id}',this)"/></td><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td>${v.duration_days||'&#8212;'}d</td><td style="font-size:11px;color:var(--muted);">${v.date_added||''}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'<span style="color:var(--muted);font-size:10px;">On send</span>'}</td><td>${ag?`<div style="display:flex;align-items:center;gap:6px;">${av(ag.full_name)}<span style="font-size:12px;">${ag.full_name}</span></div>`:'<span style="color:var(--muted);">&#8212;</span>'}</td><td>${bdg(v.status)}</td></tr>`;
-  }).join(''):`<tr><td colspan="9"><div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No vouchers</div></div></td></tr>`;
+    return`<tr><td><input type="checkbox" class="vcb" value="${v.id}" ${selV.has(v.id)?'checked':''} onchange="togVC('${v.id}',this)"/></td><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td>${v.duration_days||'&#8212;'}d</td><td style="font-size:11px;color:var(--muted);">${v.date_added||''}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'<span style="color:var(--muted);font-size:10px;">On send</span>'}</td><td>${ag?`<div style="display:flex;align-items:center;gap:6px;">${av(ag.full_name)}<span style="font-size:12px;">${ag.full_name}</span></div>`:'<span style="color:var(--muted);">&#8212;</span>'}</td><td>${bdg(v.status)}</td><td>${voucherActions(v)}</td></tr>`;
+  }).join(''):`<tr><td colspan="10"><div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No vouchers</div></div></td></tr>`;
 }
+function clearVFilters(){['vf-pkg','vf-days','vf-add-from','vf-add-to','vf-exp'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderVouchers();}
 function togVC(id,cb){if(cb.checked)selV.add(id);else selV.delete(id);}
 function selAllV(cb){document.querySelectorAll('.vcb').forEach(b=>{b.checked=cb.checked;if(cb.checked)selV.add(b.value);else selV.delete(b.value);});}
-function openAddVoucher(){openM('m-voucher');document.getElementById('av-code').value='';}
+
+/* ─────────────── Voucher row action buttons + "more" menu ─────────────── */
+function voucherActions(v){
+  const menu=`<div class="vc-menu" id="vm-${v.id}">
+    <button onclick="copyVoucherCode('${v.voucher_code}')">&#128203; Copy Code</button>
+    ${v.assigned_agent_id?`<button onclick="closeVMenus();openProf('${v.assigned_agent_id}')">&#128100; View Agent</button>`:''}
+    ${v.assigned_agent_id?`<button onclick="resendVoucher('${v.id}')">&#128228; Resend Message</button>`:''}
+    <div class="vc-menu-sep"></div>
+    ${v.status==='sent'?`<button onclick="markVoucherUsed('${v.id}')">&#9989; Mark as Used</button>`:''}
+    ${(v.status==='sent'||v.status==='available')?`<button onclick="markVoucherExpired('${v.id}')">&#9203; Mark as Expired</button>`:''}
+    ${['used','expired','disabled'].includes(v.status)?`<button onclick="returnVoucherToPool('${v.id}')">&#8634; Return to Pool</button>`:''}
+    <div class="vc-menu-sep"></div>
+    <button class="danger" onclick="delVoucher('${v.id}')">&#128465; Delete</button>
+  </div>`;
+  return`<div class="act-cell">
+    <button class="btn btn-ghost btn-icon btn-sm" onclick="viewVoucher('${v.id}')" title="View">&#128065;</button>
+    <button class="btn btn-ghost btn-icon btn-sm" onclick="editVoucher('${v.id}')" title="Edit">&#9999;</button>
+    <button class="btn btn-ghost btn-icon btn-sm" onclick="toggleVoucherDisable('${v.id}')" title="${v.status==='disabled'?'Enable':'Disable'}">${v.status==='disabled'?'&#128275;':'&#128274;'}</button>
+    <div style="position:relative;">
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="toggleVMenu('${v.id}',event)" title="More actions">&#8942;</button>
+      ${menu}
+    </div>
+  </div>`;
+}
+function toggleVMenu(id,ev){
+  ev.stopPropagation();
+  document.querySelectorAll('.vc-menu.open').forEach(m=>{if(m.id!=='vm-'+id)m.classList.remove('open');});
+  document.getElementById('vm-'+id)?.classList.toggle('open');
+}
+function closeVMenus(){document.querySelectorAll('.vc-menu.open').forEach(m=>m.classList.remove('open'));}
+document.addEventListener('click',closeVMenus);
+
+function copyVoucherCode(code){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(()=>toast('Code copied: '+code,'success')).catch(()=>toast('Could not copy code','error'));
+  }else{toast('Clipboard not available on this device','warning');}
+  closeVMenus();
+}
+async function markVoucherUsed(id){closeVMenus();await dbUpd('vouchers',id,{status:'used'});toast('Voucher marked as used','success');await refreshAll();}
+async function markVoucherExpired(id){closeVMenus();await dbUpd('vouchers',id,{status:'expired'});toast('Voucher marked as expired','warning');await refreshAll();}
+async function returnVoucherToPool(id){
+  closeVMenus();
+  await dbUpd('vouchers',id,{status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,prev_status:null});
+  toast('Voucher returned to available pool','success');
+  await refreshAll();
+}
+async function resendVoucher(id){
+  closeVMenus();
+  const v=S.vouchers.find(x=>x.id===id);if(!v)return;
+  const a=S.agents.find(x=>x.id===v.assigned_agent_id);
+  if(!a){toast('No agent assigned to this voucher','warning');return;}
+  const now=new Date().toISOString();
+  const expDate=v.expires_at?fD(v.expires_at):'&#8212;';
+  const expTime=v.expires_at?new Date(v.expires_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'&#8212;';
+  const msg=DTPL
+    .replace(/{VOUCHER_CODE}/g,v.voucher_code)
+    .replace(/{DURATION}/g,v.duration_days)
+    .replace(/{SENT_TIME}/g,fDT(v.sent_at||now))
+    .replace(/{EXPIRY_DATE}/g,expDate)
+    .replace(/{EXPIRY_TIME}/g,expTime)
+    .replace(/{SUPPORT_CONTACT}/g,SUPPORT);
+  try{
+    await sendWhatsApp(a.whatsapp_number||a.phone,msg,0);
+    await dbIns('communications',{id:uid(),agent_id:a.id,message_type:'voucher',delivery_method:'whatsapp',message_content:msg,status:'delivered',sent_at:now});
+    toast('Voucher resent to '+a.full_name,'success');
+    addNotif('Voucher '+v.voucher_code+' resent to '+a.full_name);
+    await refreshAll();
+  }catch(e){toast('Resend failed: '+(e.message||e),'error');}
+}
+async function toggleVoucherDisable(id){
+  closeVMenus();
+  const v=S.vouchers.find(x=>x.id===id);if(!v)return;
+  try{
+    if(v.status==='disabled'){
+      const restore=v.prev_status||'available';
+      try{await dbUpd('vouchers',id,{status:restore,prev_status:null});}
+      catch(e){await dbUpd('vouchers',id,{status:restore});}
+      toast('Voucher enabled','success');
+    }else{
+      try{await dbUpd('vouchers',id,{status:'disabled',prev_status:v.status});}
+      catch(e){await dbUpd('vouchers',id,{status:'disabled'});}
+      toast('Voucher disabled','warning');
+    }
+    await refreshAll();
+  }catch(e){toast('Error: '+(e.message||e),'error');}
+}
+async function delVoucher(id){
+  closeVMenus();
+  const v=S.vouchers.find(x=>x.id===id);if(!v)return;
+  if(!confirm(`Delete voucher ${v.voucher_code}? This cannot be undone.`))return;
+  await dbDel('vouchers',id);
+  toast('Voucher deleted','warning');
+  await refreshAll();
+}
+function viewVoucher(id){
+  const v=S.vouchers.find(x=>x.id===id);if(!v)return;
+  const ag=S.agents.find(a=>a.id===v.assigned_agent_id);
+  const hist=S.comms.filter(c=>c.message_type==='voucher'&&c.message_content&&c.message_content.includes(v.voucher_code));
+  document.getElementById('vv-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:16px;">
+      <div class="code" style="font-size:17px;">${v.voucher_code}</div>
+      <div style="margin-top:8px;">${bdg(v.status)}</div>
+    </div>
+    <div class="dr"><span class="dk">Package</span><span>${v.package_name}</span></div>
+    <div class="dr"><span class="dk">Duration</span><span>${v.duration_days||'&#8212;'} day(s)</span></div>
+    <div class="dr"><span class="dk">Date Added</span><span>${v.date_added||'&#8212;'}</span></div>
+    <div class="dr"><span class="dk">Sent At</span><span>${fDT(v.sent_at)}</span></div>
+    <div class="dr"><span class="dk">Expires At</span><span>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'&#8212;'}</span></div>
+    <div class="dr"><span class="dk">Assigned Agent</span><span>${ag?ag.full_name:'&#8212;'}</span></div>
+    ${ag?`<div class="dr"><span class="dk">Agent Phone</span><span style="font-family:monospace;">${ag.phone}</span></div>`:''}
+    ${hist.length?`<div style="margin-top:14px;"><div class="card-title" style="margin-bottom:8px;">Delivery History</div>${hist.map(c=>`<div class="dr"><span class="dk">${fDT(c.sent_at)}</span><span>${bdg(c.delivery_method)} ${bdg(c.status)}</span></div>`).join('')}</div>`:''}
+    ${ag?`<div style="margin-top:14px;"><button class="btn btn-secondary btn-sm btn-full" onclick="closeM('m-voucher-view');openProf('${ag.id}')">&#128100; View Agent Profile</button></div>`:''}
+  `;
+  openM('m-voucher-view');
+}
+function resetVoucherModal(){
+  document.getElementById('m-v-title').textContent='Add Voucher';
+  document.getElementById('av-id').value='';
+  document.getElementById('av-code').value='';
+  document.getElementById('av-code').disabled=false;
+  document.getElementById('av-pkg').value='Daily 1GB';
+  document.getElementById('av-days').value='7';
+  document.getElementById('av-save-btn').innerHTML='&#10003; Add Voucher';
+  document.getElementById('av-note').innerHTML='&#8505; Expiry is calculated automatically from the exact moment the voucher is sent.';
+}
+function editVoucher(id){
+  closeVMenus();
+  const v=S.vouchers.find(x=>x.id===id);if(!v)return;
+  document.getElementById('m-v-title').textContent='Edit Voucher';
+  document.getElementById('av-id').value=v.id;
+  document.getElementById('av-code').value=v.voucher_code;
+  document.getElementById('av-code').disabled=true;
+  document.getElementById('av-pkg').value=v.package_name;
+  document.getElementById('av-days').value=String(v.duration_days||7);
+  document.getElementById('av-save-btn').innerHTML='&#10003; Save Changes';
+  document.getElementById('av-note').innerHTML=v.sent_at?'&#8505; This voucher was already sent &mdash; changing the duration will recalculate its expiry date.':'&#8505; Expiry is calculated automatically from the exact moment the voucher is sent.';
+  openM('m-voucher');
+}
+
+function daysToText(d){
+  d=parseInt(d)||7;
+  if(d===1)  return '24 Hours';
+  if(d===3)  return '3 Days';
+  if(d===7)  return '7 Days';
+  if(d===14) return '14 Days';
+  if(d===30) return '30 Days';
+  return d+' Days';
+}
+function openAddVoucher(){resetVoucherModal();openM('m-voucher');}
 async function saveVoucher(){
+  const editId=document.getElementById('av-id').value;
   const code=document.getElementById('av-code').value.trim().toUpperCase().replace(/\s+/g,'');
   if(!code){toast('Voucher code is required','error');return;}
   if(code.length<4){toast('Voucher code is too short','error');return;}
+  var days=parseInt(document.getElementById('av-days').value)||7;
+  var pkg=document.getElementById('av-pkg').value;
+
+  // ── Edit existing voucher ──
+  if(editId){
+    const v=S.vouchers.find(x=>x.id===editId);
+    if(!v){toast('Voucher not found','error');return;}
+    const patch={package_name:pkg,duration:daysToText(days),duration_days:days};
+    if(v.sent_at) patch.expires_at=calcExp(v.sent_at,days);
+    try{
+      await dbUpd('vouchers',editId,patch);
+      toast('Voucher '+code+' updated','success');
+      closeM('m-voucher');
+      resetVoucherModal();
+      await refreshAll();
+    }catch(e){toast('Error updating voucher: '+(e.message||e),'error');}
+    return;
+  }
+
+  // ── Add new voucher ──
   // Refresh to get latest list before checking dupes
   S.vouchers=await dbGet('vouchers');
   if(S.vouchers.find(v=>v.voucher_code===code)){
     toast('Voucher already exists and cannot be reused.','error');return;
   }
+  var fullRow={
+    id:uid(),
+    voucher_code:code,
+    package_name:pkg,
+    duration:daysToText(days),
+    duration_days:days,
+    status:'available',
+    assigned_agent_id:null,
+    sent_at:null,
+    expires_at:null,
+    date_added:new Date().toISOString().slice(0,10),
+    created_at:new Date().toISOString()
+  };
+  // Core row without optional columns (fallback if schema is missing columns)
+  // Minimal row — only guaranteed columns; duration is NOT NULL so must be sent
+  var coreRow={
+    id:fullRow.id,
+    voucher_code:code,
+    package_name:pkg,
+    duration:daysToText(days),
+    status:'available'
+  };
   try{
-    await dbIns('vouchers',{
-      id:uid(),voucher_code:code,
-      package_name:document.getElementById('av-pkg').value,
-      duration_days:parseInt(document.getElementById('av-days').value)||7,
-      status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,
-      date_added:new Date().toISOString().slice(0,10),
-      created_at:new Date().toISOString()
-    });
+    await dbIns('vouchers',fullRow);
     toast('Voucher '+code+' added successfully','success');
     closeM('m-voucher');
     document.getElementById('av-code').value='';
     await refreshAll();
   }catch(e){
+    // Retry with core columns only if extra columns are missing
+    if(e.message&&(e.message.includes('column')||e.message.includes('schema')||e.message.includes('does not exist')||e.message.includes('Could not find'))){
+      try{
+        await dbIns('vouchers',coreRow);
+        toast('Voucher '+code+' added. Run schema update to add missing columns.','success');
+        closeM('m-voucher');
+        document.getElementById('av-code').value='';
+        await refreshAll();
+        return;
+      }catch(e2){
+        toast('Error saving voucher: '+e2.message,'error');
+        return;
+      }
+    }
     toast('Error saving voucher: '+(e.message||e),'error');
     console.error('saveVoucher:',e);
   }
@@ -1108,14 +1459,33 @@ async function doBulkImport(){
     const pkg=p[1]||'Standard';
     const days=parseInt(p[2])||7;
     newRows.push({
-      id:uid(),voucher_code:code,package_name:pkg,duration_days:days,
-      status:'available',assigned_agent_id:null,sent_at:null,expires_at:null,
-      date_added:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()
+      id:uid(),
+      voucher_code:code,
+      package_name:pkg,
+      duration:daysToText(days),
+      duration_days:days,
+      status:'available',
+      assigned_agent_id:null,
+      sent_at:null,
+      expires_at:null,
+      date_added:new Date().toISOString().slice(0,10),
+      created_at:new Date().toISOString()
     });
   }
   for(const row of newRows){
-    try{await dbIns('vouchers',row);added++;}
-    catch(e){console.error('Import error:',e);errs++;}
+    try{
+      await dbIns('vouchers',row);
+      added++;
+    }catch(e){
+      // Retry with minimal columns if extra columns missing
+      if(e.message&&(e.message.includes('column')||e.message.includes('schema')||e.message.includes('Could not find'))){
+        try{
+          var minR={id:row.id,voucher_code:row.voucher_code,
+            package_name:row.package_name,duration:row.duration||'7 Days',status:'available'};
+          await dbIns('vouchers',minR);added++;
+        }catch(e2){console.error('Import retry error:',e2);errs++;}
+      }else{console.error('Import error:',e);errs++;}
+    }
   }
   const msg='Imported '+added+' voucher(s)'+(dupes?', '+dupes+' dupes skipped':'')+(errs?', '+errs+' failed':'');
   toast(msg,added>0?'success':'warning');
@@ -1144,21 +1514,87 @@ function renderDAg(){
   document.getElementById('dag-grid').innerHTML=list.map(a=>`<div class="sel-card ${DS.agents.includes(a.id)?'selected':''}" id="dac-${a.id}" onclick="dTogAg('${a.id}')"><div class="sel-chk">${DS.agents.includes(a.id)?'&#10003;':''}</div>${av(a.full_name)}<div><div style="font-size:12px;font-weight:600;">${a.full_name}</div><div style="font-size:10px;color:var(--muted);">${a.region||''}${a.apartment?' \u00b7 '+a.apartment:''}</div></div></div>`).join('')||`<div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No active agents</div></div>`;
   document.getElementById('dsa-cnt').textContent=DS.agents.length;
 }
-function renderDV(){
-  const av=S.vouchers.filter(v=>v.status==='available');
-  document.getElementById('dv-grid').innerHTML=av.map(v=>`<div class="sel-card ${DS.vouchers.includes(v.id)?'selected':''}" id="dvc-${v.id}" onclick="dTogV('${v.id}')" style="gap:12px;"><div class="sel-chk">${DS.vouchers.includes(v.id)?'&#10003;':''}</div><span class="code" style="font-size:11px;">${v.voucher_code}</span><span style="font-size:11px;color:var(--muted);">${v.package_name}</span><span style="font-size:11px;color:var(--muted);">${v.duration_days}d</span></div>`).join('')||`<div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No available vouchers</div></div>`;
-  document.getElementById('dsv-cnt').textContent=DS.vouchers.length;
+// Auto-assign an available voucher to every selected agent that doesn't have one yet.
+// DS.assignments[agentId] === undefined  -> never decided, auto-assign now
+// DS.assignments[agentId] === null       -> explicitly skipped by the user
+// DS.assignments[agentId] === voucherId  -> assigned
+function autoAssignVouchers(){
+  const availableVouchers=S.vouchers.filter(v=>v.status==='available');
+  const usedIds=new Set(Object.values(DS.assignments).filter(Boolean));
+  DS.agents.forEach(agId=>{
+    if(DS.assignments[agId]===undefined){
+      const next=availableVouchers.find(v=>!usedIds.has(v.id));
+      DS.assignments[agId]=next?next.id:null;
+      if(next)usedIds.add(next.id);
+    }
+  });
+  // Drop assignments for agents that are no longer selected
+  Object.keys(DS.assignments).forEach(agId=>{if(!DS.agents.includes(agId))delete DS.assignments[agId];});
 }
-function dTogAg(id){DS.agents=DS.agents.includes(id)?DS.agents.filter(x=>x!==id):[...DS.agents,id];renderDAg();}
-function dTogV(id){DS.vouchers=DS.vouchers.includes(id)?DS.vouchers.filter(x=>x!==id):[...DS.vouchers,id];renderDV();updDSum();}
+function renderDV(){
+  autoAssignVouchers();
+  const availableVouchers=S.vouchers.filter(v=>v.status==='available');
+  document.getElementById('dv-avail').textContent=availableVouchers.length;
+  document.getElementById('dv-grid').innerHTML=DS.agents.length?DS.agents.map(agId=>{
+    const a=S.agents.find(x=>x.id===agId);if(!a)return'';
+    const vId=DS.assignments[agId];
+    const v=vId?S.vouchers.find(x=>x.id===vId):null;
+    return`<div class="sel-card" style="justify-content:space-between;cursor:default;">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        ${av(a.full_name)}
+        <div style="min-width:0;">
+          <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.full_name}</div>
+          <div style="font-size:11px;color:var(--muted);">${v?`<span class="code">${v.voucher_code}</span> &middot; ${v.package_name} &middot; ${v.duration_days}d`:'<span style="color:var(--danger);">No voucher assigned</span>'}</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openVoucherPicker('${agId}')">${v?'Change':'Assign'}</button>
+    </div>`;
+  }).join(''):`<div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No agents selected</div></div>`;
+  const assigned=Object.values(DS.assignments).filter(Boolean).length;
+  document.getElementById('dsv-cnt').textContent=assigned;
+  const cnt2=document.getElementById('dsa-cnt2');if(cnt2)cnt2.textContent=DS.agents.length;
+}
+function dReassignAll(){DS.assignments={};autoAssignVouchers();renderDV();updDSum();}
+let VP_AGENT=null;
+function openVoucherPicker(agId){
+  VP_AGENT=agId;
+  const a=S.agents.find(x=>x.id===agId);
+  const usedElsewhere=new Set(Object.entries(DS.assignments).filter(([k])=>k!==agId).map(([,v])=>v).filter(Boolean));
+  const list=S.vouchers.filter(v=>v.status==='available'&&!usedElsewhere.has(v.id));
+  document.querySelector('#m-voucher-picker .modal-title').textContent='Select Voucher for '+(a?a.full_name:'Agent');
+  const noneOpt=`<div class="sel-card" onclick="pickVoucherFor(null)" style="gap:12px;color:var(--muted);justify-content:center;">&#8212; Skip this agent &#8212;</div>`;
+  const items=list.length?list.map(v=>`<div class="sel-card ${DS.assignments[agId]===v.id?'selected':''}" onclick="pickVoucherFor('${v.id}')" style="gap:12px;"><div class="sel-chk">${DS.assignments[agId]===v.id?'&#10003;':''}</div><span class="code" style="font-size:11px;">${v.voucher_code}</span><span style="font-size:11px;color:var(--muted);">${v.package_name}</span><span style="font-size:11px;color:var(--muted);">${v.duration_days}d</span></div>`).join(''):`<div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No other available vouchers</div></div>`;
+  document.getElementById('vp-list').innerHTML=noneOpt+items;
+  openM('m-voucher-picker');
+}
+function pickVoucherFor(vid){
+  if(!VP_AGENT)return;
+  DS.assignments[VP_AGENT]=vid;
+  closeM('m-voucher-picker');
+  VP_AGENT=null;
+  renderDV();updDSum();
+}
+function dTogAg(id){
+  DS.agents=DS.agents.includes(id)?DS.agents.filter(x=>x!==id):[...DS.agents,id];
+  if(!DS.agents.includes(id))delete DS.assignments[id];
+  renderDAg();
+}
 function dSelAllAg(){const rf=document.getElementById('dr-reg')?.value||'',af=document.getElementById('dr-apt')?.value||'';let l=S.agents.filter(a=>a.status==='active');if(rf)l=l.filter(a=>a.region===rf);if(af)l=l.filter(a=>a.apartment===af);DS.agents=l.map(a=>a.id);renderDAg();}
-function dSelAllV(){DS.vouchers=S.vouchers.filter(v=>v.status==='available').map(v=>v.id);renderDV();updDSum();}
 function setDM(m){DS.method=m;document.getElementById('dm-wa').classList.toggle('selected',m==='whatsapp');document.getElementById('dm-sms').classList.toggle('selected',m==='sms');updDSum();}
-function updDSum(){const el=document.getElementById('d-summary');if(!el)return;el.innerHTML=`Sending <strong style="color:var(--accent);">${DS.vouchers.length}</strong> voucher(s)<br>to <strong style="color:var(--accent);">${DS.agents.length}</strong> agent(s)<br>via <strong style="color:var(--accent);">${DS.method.toUpperCase()}</strong>`;}
+function updDSum(){
+  const el=document.getElementById('d-summary');if(!el)return;
+  const assigned=Object.values(DS.assignments).filter(Boolean).length;
+  el.innerHTML=`Sending to <strong style="color:var(--accent);">${assigned}</strong> agent(s)<br>each their own individual voucher<br>via <strong style="color:var(--accent);">${DS.method.toUpperCase()}</strong>`;
+}
 function dStep(n){
   if(n===2&&!DS.agents.length){toast('Select at least one agent','warning');return;}
-  if(n===3&&!DS.vouchers.length){toast('Select at least one voucher','warning');return;}
-  DS.step=n;[1,2,3].forEach(i=>{document.getElementById('ds'+i).style.display=i===n?'block':'none';const s=document.getElementById('dst-'+i);s.className='step'+(i===n?' active':i<n?' done':'');});if(n===3)updDSum();
+  if(n===3){
+    autoAssignVouchers();
+    if(!Object.values(DS.assignments).filter(Boolean).length){toast('No vouchers assigned to selected agents','warning');return;}
+  }
+  DS.step=n;[1,2,3].forEach(i=>{document.getElementById('ds'+i).style.display=i===n?'block':'none';const s=document.getElementById('dst-'+i);s.className='step'+(i===n?' active':i<n?' done':'');});
+  if(n===2)renderDV();
+  if(n===3)updDSum();
 }
 /* ═══════════════════════════════════════════════════════════
    WHATSAPP SEND ENGINE
@@ -1237,9 +1673,11 @@ function makeDeliveryStatus(results){
 }
 
 async function dSend(){
-  if(!DS.agents.length||!DS.vouchers.length){toast('Select agents and vouchers','error');return;}
-  const locked=DS.vouchers.filter(vid=>{const v=S.vouchers.find(x=>x.id===vid);return v&&v.status!=='available';});
-  if(locked.length){toast('Voucher already assigned and cannot be reused.','error');return;}
+  autoAssignVouchers();
+  const pairs=DS.agents.map(agId=>({agId,vId:DS.assignments[agId]})).filter(p=>p.vId);
+  if(!pairs.length){toast('No vouchers assigned to send. Assign a voucher to at least one agent.','error');return;}
+  const locked=pairs.filter(p=>{const v=S.vouchers.find(x=>x.id===p.vId);return!v||v.status!=='available';});
+  if(locked.length){toast('One or more assigned vouchers are no longer available. Click Re-assign All.','error');return;}
   const btn=document.getElementById('d-sendbtn');
   btn.innerHTML='&#8987; Sending&#8230;';btn.disabled=true;
 
@@ -1253,11 +1691,10 @@ async function dSend(){
     btn.innerHTML=`&#8987; Sending ${cur}/${total}&#8230;`;
   };
 
-  for(let i=0;i<DS.vouchers.length;i++){
-    showProgress(i+1,DS.vouchers.length);
-    const vid=DS.vouchers[i];
-    const agId=DS.agents[i%DS.agents.length];
-    const v=S.vouchers.find(x=>x.id===vid);
+  for(let i=0;i<pairs.length;i++){
+    showProgress(i+1,pairs.length);
+    const {agId,vId}=pairs[i];
+    const v=S.vouchers.find(x=>x.id===vId);
     const a=S.agents.find(x=>x.id===agId);
     if(!v||!a) continue;
 
@@ -1273,8 +1710,8 @@ async function dSend(){
       .replace(/{EXPIRY_TIME}/g,expTime)
       .replace(/{SUPPORT_CONTACT}/g,SUPPORT);
 
-    // Mark voucher sent in DB
-    await dbUpd('vouchers',vid,{status:'sent',assigned_agent_id:agId,sent_at:now,expires_at:exp});
+    // Mark voucher sent in DB — each agent gets their own individual voucher
+    await dbUpd('vouchers',vId,{status:'sent',assigned_agent_id:agId,sent_at:now,expires_at:exp});
 
     let deliveryStatus='delivered';
     let waResult={success:false,method:'none'};
@@ -1303,14 +1740,14 @@ async function dSend(){
     });
 
     // Small pause between API calls to avoid rate limiting
-    if(hasMetaAPI()&&i<DS.vouchers.length-1) await sleep(300);
+    if(hasMetaAPI()&&i<pairs.length-1) await sleep(300);
   }
 
   const summary=makeDeliveryStatus(results);
-  addNotif(`${sentCount} voucher(s) sent via ${DS.method.toUpperCase()}`);
+  addNotif(`${sentCount} voucher(s) sent individually to ${pairs.length} agent(s) via ${DS.method.toUpperCase()}`);
 
   if(failCount===0){
-    toast('\u2705 '+sentCount+' voucher(s) sent! '+summary,'success');
+    toast('\u2705 '+sentCount+' voucher(s) sent individually! '+summary,'success');
   } else {
     toast('\u26a0\ufe0f '+sentCount+' sent, '+failCount+' failed. Check console for details.','warning');
   }
@@ -1321,7 +1758,7 @@ async function dSend(){
   }
 
   btn.innerHTML='&#128228; Send Now';btn.disabled=false;
-  DS={agents:[],vouchers:[],method:'whatsapp',step:1};dStep(1);
+  DS={agents:[],assignments:{},method:'whatsapp',step:1};dStep(1);
   await refreshAll();
 }
 
@@ -1388,23 +1825,123 @@ function renderCmLog(){
 }
 
 /* ═════════════════════════ TRACKING ════════════════════════ */
-function renderTrk(q){
-  const ql=q.toLowerCase();
-  const list=S.vouchers.filter(v=>{const a=S.agents.find(x=>x.id===v.assigned_agent_id);return!ql||v.voucher_code.toLowerCase().includes(ql)||a?.full_name.toLowerCase().includes(ql)||a?.phone?.includes(ql)||v.package_name.toLowerCase().includes(ql);});
+function renderTrk(){
+  const q=(document.getElementById('trk-q')?.value||'').toLowerCase();
+  const statusF=document.getElementById('trk-status')?.value||'';
+  const pkgF=document.getElementById('trk-pkg')?.value||'';
+  const methodF=document.getElementById('trk-method')?.value||'';
+  const regF=document.getElementById('trk-reg')?.value||'';
+  const expF=document.getElementById('trk-exp')?.value||'';
+  const fromF=document.getElementById('trk-from')?.value||'';
+  const toF=document.getElementById('trk-to')?.value||'';
+  const list=S.vouchers.filter(v=>{
+    const a=S.agents.find(x=>x.id===v.assigned_agent_id);
+    if(q&&!(v.voucher_code.toLowerCase().includes(q)||a?.full_name.toLowerCase().includes(q)||a?.phone?.includes(q)||v.package_name.toLowerCase().includes(q)))return false;
+    if(statusF&&v.status!==statusF)return false;
+    if(pkgF&&v.package_name!==pkgF)return false;
+    if(regF&&a?.region!==regF)return false;
+    if(fromF&&(!v.sent_at||v.sent_at.slice(0,10)<fromF))return false;
+    if(toF&&(!v.sent_at||v.sent_at.slice(0,10)>toF))return false;
+    if(expF){
+      if(expF==='none'){if(v.expires_at)return false;}
+      else{
+        if(!v.expires_at)return false;
+        const d=(new Date(v.expires_at)-new Date())/(864e5);
+        if(expF==='expired'&&!(d<0))return false;
+        if(expF==='expiring'&&!(d>=0&&d<3))return false;
+        if(expF==='active'&&!(d>=3))return false;
+      }
+    }
+    if(methodF){
+      const c=S.comms.find(x=>x.agent_id===v.assigned_agent_id&&x.message_type==='voucher'&&x.delivery_method===methodF);
+      if(!c)return false;
+    }
+    return true;
+  });
   document.getElementById('trk-body').innerHTML=list.length?list.map(v=>{const a=S.agents.find(x=>x.id===v.assigned_agent_id);const c=a?S.comms.find(x=>x.agent_id===a.id&&x.message_type==='voucher'):null;return`<tr><td class="code">${v.voucher_code}</td><td>${v.package_name}</td><td>${a?`<div style="display:flex;align-items:center;gap:6px;">${av(a.full_name)}<span style="font-size:12px;">${a.full_name}</span></div>`:'<span style="color:var(--muted);">Unassigned</span>'}</td><td style="font-family:monospace;font-size:11px;">${a?.phone||'&#8212;'}</td><td>${c?bdg(c.delivery_method):'&#8212;'}</td><td style="font-size:11px;">${fDT(v.sent_at)}</td><td>${v.expires_at?fDT(v.expires_at)+' '+expBadge(v.expires_at):'&#8212;'}</td><td>${bdg(v.status)}</td></tr>`;}).join(''):`<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128269;</div><div class="empty-title">No results</div></div></td></tr>`;
 }
+function clearTrkFilters(){['trk-q','trk-status','trk-pkg','trk-method','trk-reg','trk-exp','trk-from','trk-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderTrk();}
 
 /* ══════════════════════════ REPORTS ════════════════════════ */
 function renderReports(){
   const vc=S.vouchers,ag=S.agents,cm=S.comms;
-  document.getElementById('rpt-stats').innerHTML=[['Total Vouchers',vc.length],['Available',vc.filter(v=>v.status==='available').length],['Sent',vc.filter(v=>v.status==='sent').length],['Messages',cm.length]].map(([l,v])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--accent);">${v}</div><div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;">${l}</div></div>`).join('');
-  document.getElementById('rpt-ag').innerHTML=ag.map(a=>`<tr><td style="font-size:12px;font-weight:500;">${a.full_name}</td><td style="font-size:11px;">${a.region||'&#8212;'}</td><td style="font-size:11px;">${a.apartment||'&#8212;'}</td><td style="color:var(--accent);font-weight:700;">${vc.filter(v=>v.assigned_agent_id===a.id).length}</td><td>${bdg(a.status)}</td></tr>`).join('');
-  document.getElementById('rpt-cm').innerHTML=[['&#128172; WhatsApp',cm.filter(c=>c.delivery_method==='whatsapp').length,'var(--accent)'],['&#128241; SMS',cm.filter(c=>c.delivery_method==='sms').length,'var(--accent2)'],['&#127967; Vouchers',cm.filter(c=>c.message_type==='voucher').length,'#8b5cf6'],['&#9989; Delivered',cm.filter(c=>c.status==='delivered').length,'var(--accent3)']].map(([l,v,c])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(30,53,80,.4);font-size:12px;"><span>${l}</span><strong style="color:${c};">${v}</strong></div>`).join('');
+  const totalMsgs=cm.length;
+  const delivered=cm.filter(c=>c.status==='delivered').length;
+  const successRate=totalMsgs?Math.round(delivered/totalMsgs*100):0;
+
+  document.getElementById('rpt-stats').innerHTML=[
+    ['Total Vouchers',vc.length,'var(--accent)'],
+    ['Available',vc.filter(v=>v.status==='available').length,'#00ff9d'],
+    ['Sent',vc.filter(v=>v.status==='sent').length,'#4da6ff'],
+    ['Used',vc.filter(v=>v.status==='used').length,'#a78bfa'],
+    ['Expired',vc.filter(v=>v.status==='expired').length,'#ff6b85'],
+    ['Disabled',vc.filter(v=>v.status==='disabled').length,'#8a9bb5'],
+    ['Total Agents',ag.length,'var(--accent2)'],
+    ['Active Agents',ag.filter(a=>a.status==='active').length,'#00ff9d'],
+    ['Messages Sent',totalMsgs,'var(--warn)'],
+    ['Delivery Rate',successRate+'%','#00ff9d'],
+    ['Expiring &le;3d',vc.filter(v=>{if(!v.expires_at)return false;const d=(new Date(v.expires_at)-new Date())/(864e5);return d>=0&&d<3;}).length,'var(--warn)'],
+    ['Avg Vouchers/Agent',ag.length?(vc.filter(v=>v.assigned_agent_id).length/ag.length).toFixed(1):'0','var(--accent)'],
+  ].map(([l,v,c])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;"><div style="font-size:22px;font-weight:800;color:${c};">${v}</div><div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;">${l}</div></div>`).join('');
+
+  // Agent performance — broken down by voucher status + message count
+  document.getElementById('rpt-ag').innerHTML=ag.length?ag.map(a=>{
+    const av_=vc.filter(v=>v.assigned_agent_id===a.id);
+    const cnt=s=>av_.filter(v=>v.status===s).length;
+    const msgs=cm.filter(c=>c.agent_id===a.id).length;
+    return`<tr><td style="font-size:12px;font-weight:500;">${a.full_name}</td><td style="font-size:11px;">${a.region||'&#8212;'}</td><td style="font-size:11px;">${a.apartment||'&#8212;'}</td><td>${cnt('available')}</td><td style="color:var(--accent);font-weight:700;">${cnt('sent')}</td><td>${cnt('used')}</td><td>${cnt('expired')}</td><td style="font-weight:700;">${av_.length}</td><td>${msgs}</td><td>${bdg(a.status)}</td></tr>`;
+  }).join(''):`<tr><td colspan="10"><div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No agents</div></div></td></tr>`;
+
+  // Communication breakdown — methods, message types and delivery outcomes
+  document.getElementById('rpt-cm').innerHTML=[
+    ['&#128172; WhatsApp',cm.filter(c=>c.delivery_method==='whatsapp').length,'var(--accent)'],
+    ['&#128241; SMS',cm.filter(c=>c.delivery_method==='sms').length,'var(--accent2)'],
+    ['&#127967; Voucher Messages',cm.filter(c=>c.message_type==='voucher').length,'#8b5cf6'],
+    ['&#128226; Announcements &amp; Other',cm.filter(c=>c.message_type!=='voucher').length,'var(--warn)'],
+    ['&#9989; Delivered',cm.filter(c=>c.status==='delivered').length,'var(--accent3)'],
+    ['&#10060; Failed',cm.filter(c=>c.status==='failed').length,'var(--danger)'],
+    ['&#128197; Sent Today',cm.filter(c=>c.sent_at?.startsWith(new Date().toISOString().slice(0,10))).length,'var(--accent)'],
+  ].map(([l,v,c])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(30,53,80,.4);font-size:12px;"><span>${l}</span><strong style="color:${c};">${v}</strong></div>`).join('');
+
+  // Voucher breakdown by package
+  const pkgs=[...new Set(vc.map(v=>v.package_name).filter(Boolean))].sort();
+  document.getElementById('rpt-pkg').innerHTML=pkgs.length?pkgs.map(p=>{
+    const pv=vc.filter(v=>v.package_name===p);
+    return`<tr><td style="font-size:12px;font-weight:500;">${p}</td><td style="font-weight:700;">${pv.length}</td><td style="color:#00ff9d;">${pv.filter(v=>v.status==='available').length}</td><td style="color:#4da6ff;">${pv.filter(v=>v.status==='sent').length}</td><td style="color:#a78bfa;">${pv.filter(v=>v.status==='used').length}</td><td style="color:#ff6b85;">${pv.filter(v=>v.status==='expired').length}</td></tr>`;
+  }).join(''):`<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No vouchers</div></div></td></tr>`;
+
+  // Expiring soon list
+  const expSoon=vc.filter(v=>{if(!v.expires_at)return false;const d=(new Date(v.expires_at)-new Date())/(864e5);return d>=0&&d<3;}).sort((a,b)=>new Date(a.expires_at)-new Date(b.expires_at));
+  document.getElementById('rpt-exp').innerHTML=expSoon.length?expSoon.map(v=>{
+    const a=S.agents.find(x=>x.id===v.assigned_agent_id);
+    return`<tr><td class="code">${v.voucher_code}</td><td style="font-size:11px;">${v.package_name}</td><td style="font-size:11px;">${a?.full_name||'&#8212;'}</td><td style="font-size:11px;">${fDT(v.expires_at)} ${expBadge(v.expires_at)}</td></tr>`;
+  }).join(''):`<tr><td colspan="4"><div class="empty"><div class="empty-icon">&#9989;</div><div class="empty-title">Nothing expiring soon</div></div></td></tr>`;
+
   setTimeout(()=>{
     if(charts.st)charts.st.destroy();const c2=document.getElementById('ch-status')?.getContext('2d');
-    if(c2)charts.st=new Chart(c2,{type:'doughnut',data:{labels:['Available','Sent','Used','Expired'],datasets:[{data:[vc.filter(v=>v.status==='available').length,vc.filter(v=>v.status==='sent').length,vc.filter(v=>v.status==='used').length,vc.filter(v=>v.status==='expired').length],backgroundColor:['rgba(0,255,157,.7)','rgba(0,119,255,.7)','rgba(139,92,246,.7)','rgba(255,59,92,.7)'],borderWidth:0}]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},responsive:true,maintainAspectRatio:false}});
+    if(c2)charts.st=new Chart(c2,{type:'doughnut',data:{labels:['Available','Sent','Used','Expired','Disabled'],datasets:[{data:[vc.filter(v=>v.status==='available').length,vc.filter(v=>v.status==='sent').length,vc.filter(v=>v.status==='used').length,vc.filter(v=>v.status==='expired').length,vc.filter(v=>v.status==='disabled').length],backgroundColor:['rgba(0,255,157,.7)','rgba(0,119,255,.7)','rgba(139,92,246,.7)','rgba(255,59,92,.7)','rgba(74,99,128,.7)'],borderWidth:0}]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},responsive:true,maintainAspectRatio:false}});
+
+    if(charts.pkg)charts.pkg.destroy();const cp=document.getElementById('ch-package')?.getContext('2d');
+    if(cp)charts.pkg=new Chart(cp,{type:'doughnut',data:{labels:pkgs.length?pkgs:['No data'],datasets:[{data:pkgs.length?pkgs.map(p=>vc.filter(v=>v.package_name===p).length):[1],backgroundColor:['rgba(0,229,255,.7)','rgba(139,92,246,.7)','rgba(255,184,0,.7)','rgba(0,255,157,.7)','rgba(255,59,92,.7)','rgba(74,99,128,.7)'],borderWidth:0}]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},responsive:true,maintainAspectRatio:false}});
+
     if(charts.mt)charts.mt.destroy();const c3=document.getElementById('ch-methods')?.getContext('2d');
     if(c3)charts.mt=new Chart(c3,{type:'pie',data:{labels:['WhatsApp','SMS'],datasets:[{data:[cm.filter(c=>c.delivery_method==='whatsapp').length,cm.filter(c=>c.delivery_method==='sms').length],backgroundColor:['rgba(37,211,102,.7)','rgba(0,119,255,.7)'],borderWidth:0}]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},responsive:true,maintainAspectRatio:false}});
+
+    if(charts.trend)charts.trend.destroy();const ct=document.getElementById('ch-trend')?.getContext('2d');
+    if(ct){
+      const months=[],added=[],sentArr=[];
+      for(let i=5;i>=0;i--){
+        const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);
+        const ym=d.toISOString().slice(0,7);
+        months.push(d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}));
+        added.push(vc.filter(v=>v.date_added?.startsWith(ym)).length);
+        sentArr.push(vc.filter(v=>v.sent_at?.startsWith(ym)).length);
+      }
+      charts.trend=new Chart(ct,{type:'line',data:{labels:months,datasets:[
+        {label:'Added',data:added,borderColor:'rgba(0,229,255,.9)',backgroundColor:'rgba(0,229,255,.15)',tension:.3,fill:true},
+        {label:'Sent',data:sentArr,borderColor:'rgba(0,255,157,.9)',backgroundColor:'rgba(0,255,157,.15)',tension:.3,fill:true}
+      ]},options:{plugins:{legend:{labels:{color:'#4a6380',font:{size:10}}}},scales:{x:{ticks:{color:'#4a6380',font:{size:10}},grid:{color:'rgba(30,53,80,.5)'}},y:{ticks:{color:'#4a6380',font:{size:10}},grid:{color:'rgba(30,53,80,.5)'}}},responsive:true,maintainAspectRatio:false}});
+    }
   },100);
 }
 
@@ -1414,7 +1951,7 @@ function exportJSON(){dl('scifi-data.json','application/json',JSON.stringify({ex
 function dl(n,t,c){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();}
 
 /* ═════════════════════ GLOBAL SEARCH ══════════════════════ */
-function gSearch(q){if(q.length>1){goP('tracking',document.querySelector('[onclick*=tracking]'));document.getElementById('trk-q').value=q;renderTrk(q);}}
+function gSearch(q){if(q.length>1){goP('tracking',document.querySelector('[onclick*=tracking]'));document.getElementById('trk-q').value=q;renderTrk();}}
 
 /* ═══════════════════════ NOTIFICATIONS ════════════════════ */
 function addNotif(text){if(isDemo){DB.notifs.unshift({id:Date.now(),text,time:'Just now',read:false});renderNotifs();}}
