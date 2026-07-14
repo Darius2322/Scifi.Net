@@ -3,19 +3,28 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SciFi ISP — Voucher System v3.6</title>
+<title>SciFi ISP — Management System</title>
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU2NpRmkgTmV0d29ya3MgXHUyMDE0IFZvdWNoZXIgU3lzdGVtIiwic2hvcnRfbmFtZSI6IlNjaUZpIFZvdWNoZXJzIiwiZGVzY3JpcHRpb24iOiJTY2lGaSBOZXR3b3JrcyBJU1Agdm91Y2hlciBkaXN0cmlidXRpb24gYW5kIG1hbmFnZW1lbnQgc3lzdGVtIiwic3RhcnRfdXJsIjoiLiIsInNjb3BlIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwib3JpZW50YXRpb24iOiJwb3J0cmFpdC1wcmltYXJ5IiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNzBkMWEiLCJ0aGVtZV9jb2xvciI6IiMwMGQ0ZmYiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNQUFBQURBQ0FZQUFBQlMzR3dIQUFBRVBVbEVRVlI0bk8zZFBaTFRTZ0NGVVhscXFoeDVBeVpsQ1NRc2pGV3dNQktXUU1wc1lDSkhKcUNnaHNIalVVc3RxZFgzbkJqL1ZMMzd1V1ZENlIyR3hoeFA1K3ZXN3lIRnB5OC9xanpQOTY4ZlIvL1p5L1BUb2NxTFZ2SzQ1WXNiZTU1Yi84MjNqR0wxQUl5ZTExNXVZdTBZVmd2QThCbmp6MDdXQ21IeEFBeWZLZFlLWWJFQURKOGFsZzZoZWdDR3p4S1dDdUdoNXBNWlAwdXJ2YkVxSjREaHM2YWFwOEhzRThENDJVcU43YzBLd1BqWjJ0d05UZzdBK0duRm5DMU9Dc0Q0YWMzVVRSWUhZUHkwYXNvMml3SXdmbHBYdXRIUkFSZy9lMUd5MVZFQkdEOTdNM2F6N3daZy9PelZtTzFXL2FjUXNEZDNBL0Rwejk2OXQrRTNBekIrZW5Gdnl5NkJpSFl6QUovKzlPYXRUVHNCaVBaZkFENzk2ZFd0YlRzQmlQWlBBRDc5NmQzcmpUc0JpUFkzQUovK3BIaTVkU2NBMFFSQXRNZGhjUG5Uc3RKYm1KZmNxanpaOFhTK1hwNmZEazZBaGsyNWYzK3RlLzZuRUVDajVneFpCT01Kb0VFMUJpeUNjUVJBdEFkZmdFbDFQSjJ2VGdDaUNZQm9BaUNhQUlnbUFLSUpnR2dDSUpvQWlDWUFvZ21BYUFJZ21nQ0lKZ0NpQ1lCb0FpQ2FBSWdtQUtJSmdHZ0NJSm9BaUNZQW9nbUFhQUlnbWdDSUpnQ2lDWUJvQWlDYUFJZ21BS0k5YnYwRzl1cnk3V2ZSbno5Ky9yRFFPMkVPSjhBRXBlT2YraGlXSjRCQ2M0WXNndllJb0VDTkFZdWdMUUlnbWdDSUpnQ2lDWUJvQWlDYUFJZ21BS0lKZ0dnQ0lKb0FpQ1lBb2dtQWFBSWdtZ0NJSmdDaUNZQm9BaUNhQUlnbUFLSUpnR2dDSUpvQWlDWUFvZ21BYUFJZ21nQ0kxdDNkb2QyMW1SSmRuUUR1Mmt5cGJnSncxMmFtNkNJQWQyMW1xaTRDZ0trRVFEUUJFRTBBUkJNQTBRUkFOQUVRVFFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMFFSQU5BRVFUUUJFRXdEUkJFQTBBUkJOQUVRVEFORUVRRFFCRUUwQVJCTUEwUVJBTkFFUVRRQkVFd0RSQkVBMEFSQk5BRVRySW9BYS82L2ZNYyt4MXV0OC8vcHg5dXVNZVk2MVhxZGxYUVF3RFBQR1dmTFl0VjVuenJCS0hydlc2N1NxbXdDR1lkbzRXMzdNbElHMS9KZ1dIWTZuODNYck53RmI2ZW9FZ0ZJQ0lKb0FpQ1lBb2dtQWFBSWdtZ0NJSmdDaUNZQm9BaUNhQUlnbUFLSUpnR2dDSUpvQWlDWUFvajFjbnA4T1c3OEoyTUxsK2VuZ0JDQ2FBSWdtQUtJSmdHZ1B3L0Q3eThEV2J3VFc5R2Z6VGdDaUNZQm9md053R1VTS2wxdDNBaER0bndDY0F2VHU5Y2FkQUVUN0x3Q25BTDI2dFcwbkFORnVCdUFVb0RkdmJkb0pRTFEzQTNBSzBJdDdXNzU3QW9pQXZYdHZ3eTZCaVBadUFFNEI5bXJNZGtlZEFDSmdiOFp1ZHZRbGtBallpNUt0Rm4wSEVBR3RLOTFvOFpkZ0VkQ3FLZHVjOUN1UUNHak4xRTFPL2hsVUJMUml6aFpuL1QyQUNOamEzQTNPL29zd0ViQ1ZHdHVyT3Q3ajZYeXQrWHh3UzgwUDNhci9GTUpwd05KcWIyeXh3VG9OcUdtcEQ5ZkZQN0dGd0J4TFgxV3Nkc2tpQkVxc2RUbTkralc3RUxobjdlK1JtMzVwRlFQRHNPMlBKODM5YWlPS3ZyWDJTK0V2Q0Zra3VHTE85b3NBQUFBQVNVVk9SSzVDWUlJPSIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmciLCJwdXJwb3NlIjoiYW55In0seyJzcmMiOiJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWdBQUFBSUFDQVlBQUFEMGVOVDZBQUFPRlVsRVFWUjRuTzNjTVhJVFN4aUYwVEZGbFNNMkFDbExJR0ZocklLRmtiQUVVdGdBa1NOZVFJazNCa25Xakthbi81NTd6Z0xzOXJqSzkxTkw4REJSMHVPYnQ3OTZud0ZZNXNPbmI3MlBzTnJYeisrYmZlMm5uejhlbW4xeFZudmQrd0NwRER5UTRxVy9kd0toRHdHd0EyTVBjTm01djVHaW9EMEIwSURCQjdqUDMzOUhCY0gyQk1BR0RENUFXNEpnZXdKZ0phTVAwTS84YjdBWVdFY0FMR0QwQWVvUkErc0lnQmNZZllCeGlJSGJDWUFMREQvQTJFNS94NFhBZVFKZ3h1Z0RISTliZ2ZNRXdHVDRBVks0RmZoZmRBQVlmb0JNUWlBMEFBdy9BTk9VSFFKUkFXRDRBVGduTVFRaUFzRHdBM0NMcEJCNDFmc0FyUmwvQUpaSzJJN0QzZ0FrL1BJQWFPZm90d0dIQ3dEREQ4Q1dqaG9DaDNvTHdQZ0QwTXJSTnVZUU53QkgrNlVBVU5PUmJnT0d2d0V3L2dEczdRamJNM1FBSE9FWEFNQ1lSdCtnSWQ4Q0dQMmhBM0FNSTc4bE1Od05nUEVIb0pvUnQybW9BQmp4QVFPUVliU05HdUl0Z05FZUtnQ1pSbnBMb1B3TmdQRUhZRFFqYkZmcEFCamhBUUxBT2RVM3JHd0FWSDl3QVBDU3lsdFdNZ0FxUHpBQVdLTHFwcFVMZ0tvUENnRFdxcmh0cFFLZzRnTUNnQzFVMjdneUFWRHR3UURBMWlwdFhZa0FxUFJBQUtDbEtwdlhQUUNxUEFnQTJFdUY3ZXNhQUJVZUFBRDAwSHNEdXdWQTd4OGNBSHJydVlWZEFzRDRBOEJ2dlRaeDl3QXcvZ0R3WEk5dDNEVUFqRDhBbkxmM1J1NFdBTVlmQUs3YmN5dDNDUURqRHdDMzJXc3p1LzgvQUFEQS9wb0hnRmYvQUxETUh0dlpOQUNNUHdDczAzcERtd1dBOFFlQSs3VGNVcDhCQUlCQVRRTEFxMzhBMkVhclRkMDhBSXcvQUd5cnhiWnVHZ0RHSHdEYTJIcGpmUVlBQUFKdEZnQmUvUU5BVzF0dTdTWUJZUHdCWUI5YmJhNjNBQUFnME4wQjROVS9BT3hyaSsxMUF3QUFnZTRLQUsvK0FhQ1BlemQ0ZFFBWWZ3RG82NTR0OWhZQUFBUmFGUUJlL1FOQURXczMyUTBBQUFSYUhBQmUvUU5BTFd1MjJRMEFBQVJhRkFCZS9RTkFUVXMzMmcwQUFBUzZPUUM4K2dlQTJwWnN0UnNBQUFoMFV3QjQ5UThBWTdoMXM5MEFBRUFnQVFBQWdWNE1BTmYvQURDV1c3YmJEUUFBQkxvYUFGNzlBOENZWHRwd053QUFFRWdBQUVDZ2l3SGcraDhBeG5adHk5MEFBRUFnQVFBQWdjNEdnT3QvQURpR1M1dnVCZ0FBQWdrQUFBajBUd0M0L2dlQVl6bTM3YTk3SEFUSThlSFR0MlpmKyt2bjk4MitOaHlkQUFBMjEzTDBMMzBmTVFETENBQmdNM3NOLzdYdkxRVGdOczgrQStEOWYyQ3RudU0vVitVY1VNM2ZHKzlmQVFCM3F6YTYxYzRERlFrQTRDNVZ4N2JxdWFBS0FRQ3NWbjFrcTU4UGV2b1RBTjcvQjVZWVpWeEhPU2ZzWWI3MWJnQUFJSkFBQUJZYjdWWDFhT2VGUFFnQUFBZ2tBQUFnMEt0cDhnRkE0SGFqWHFlUGVtN1kybW56M1FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRWV1WC9BQUNBTEk5djN2NXlBd0FBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRU9oMTd3UEFFVHg5K2Q3c2F6OStmTmZzYXdPNUJBQ3MxSEwwTDMwZk1RQnNSUURBUW5zTi83WHZMUVNBZS9rTUFDelFjL3pucXB3REdKY0FnQnRWRzkxcTV3SEdJZ0RnQmxYSHR1cTVnUG9FQUx5ZytzaFdQeDlRa3dDQUswWVoxMUhPQ2RRaEFBQWdrQUNBQzBaN1ZUM2FlWUcrQkFBQUJCSUFBQkJJQU1BWm8xNm5qM3B1WUg4Q0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBcjN1ZlFERzhmVGxlN092L2ZqeFhiT3ZEY0MvQkFCWHRSejlTOTlIREFDMEp3QTRhNi9odi9hOWhRQkFPejREd0Q5Nmp2OWNsWE1BSEpFQTRKbHFvMXZ0UEFCSElRRDRvK3JZVmowWHdNZ0VBTk0wMVIvWjZ1Y0RHSTBBWUpoeEhlV2NBQ01RQUFBUVNBQ0VHKzFWOVdqbkJhaEtBQUJBSUFFQUFJRUVRTEJScjlOSFBUZEFKUUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFpRFk0OGQzdlkrd3loN245bXd1Ky9yNWZmUHYwY0llNS9ac0dJa0FBSUJBQWdBQUFnbUFjS05kZGU5NVhzL21zdEd1alBjOHIyZkRLQVFBQUFRU0FBenpTcmZIT1QyYnkwWjU1ZGpqbko0Tkl4QUFUTk5VZitoNm5zK3p1YXo2Z1BROG4yZERkUUtBUDZvT1hZVnpWVGpET1JYT1ZYVklLcHlyd2huT3FYb3U5aVVBZUtiQ29NeFZPaytsczB4VHJmTlVHNVJLNTZsMGxtbXFkeDc2RVFEOG84cXdWRG5IWEpVelZUbkhYSlZocVhLT3VTcG5xbklPYW5oNGZQUDJWKzlEVU5mVGwrKzdmOCtLNDNhT1ozUFpoMC9mZHYrZW80eWJaME1WQW9DYnRSeThVWWJ0RXMvbXNwYUROL3F3ZVRiMEpBQUFJSkRQQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFT2pWMDg4ZkQ3MFBBUURzNStubmp3YzNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUZlVGRQdmZ3L1kreUFBUUh1bnpYY0RBQUNCQkFBQUJCSUFBQkJJQUFCQW9EOEI0SU9BQUhCczg2MTNBd0FBZ1FRQUFBUVNBQUFRNkZrQStCd0FBQnpUM3h2dkJnQUFBZ2tBQUFna0FBQWcwRDhCNEhNQUFIQXM1N2JkRFFBQUJCSUFBQkRvYkFCNEd3QUFqdUhTcHJzQkFJQkFBZ0FBQWwwTUFHOERBTURZcm0yNUd3QUFDQ1FBQUNEUTFRRHdOZ0FBak9tbERYY0RBQUNCWGd3QXR3QUFNSlpidHRzTkFBQUVFZ0FBRU9pbUFQQTJBQUNNNGRiTmRnTUFBSUZ1RGdDM0FBQlEyNUt0ZGdNQUFJRVdCWUJiQUFDb2FlbEd1d0VBZ0VDTEE4QXRBQURVc21hYjNRQUFRS0JWQWVBV0FBQnFXTHZKYmdBQUlORHFBSEFMQUFCOTNiUEZkOTBBaUFBQTZPUGVEZllXQUFBRXVqc0EzQUlBd0w2MjJGNDNBQUFRYUpNQWNBc0FBUHZZYW5NM3V3RVFBUURRMXBaYjZ5MEFBQWkwYVFDNEJRQ0FOcmJlMk0xdkFFUUFBR3lyeGJZMmVRdEFCQURBTmxwdHFzOEFBRUNnWmdIZ0ZnQUE3dE55UzV2ZUFJZ0FBRmluOVlZMmZ3dEFCQURBTW50c3A4OEFBRUNnWFFMQUxRQUEzR2F2emR6dEJrQUVBTUIxZTI3bHJtOEJpQUFBT0cvdmpkejlNd0FpQUFDZTY3R05YVDRFS0FJQTRMZGVtOWp0WHdHSUFBRFM5ZHpDcnY4TVVBUUFrS3IzQm5iL2Z3QjZQd0FBMkZ1Rjdlc2VBTk5VNDBFQXdCNnFiRjZKQUppbU9nOEVBRnFwdEhWbEFtQ2FhajBZQU5oU3RZMHJGUURUVk84QkFjQzlLbTVidVFDWXBwb1BDZ0RXcUxwcEpRTmdtdW8rTUFDNFZlVXRLeHNBMDFUN3dRSEFOZFUzckhRQVRGUDlCd2dBZnh0aHU4b2ZjTzd4emR0ZnZjOEFBSmVNTVB3bjVXOEE1a1o2c0FCa0dXMmpoZ3FBYVJydkFRTndmQ051MDNBSG52T1dBQUE5alRqOEo4UGRBTXlOL09BQkdOdm9HelIwQUV6VCtMOEFBTVp6aE8wWi9nZVk4NVlBQUMwZFlmaFBocjhCbUR2U0x3YUFXbzYyTVlmNlllYmNCZ0N3aGFNTi84a2hmNmc1SVFEQUdrY2QvcE5EdlFWd3p0Ri9nUUJzTDJFN0R2OER6cmtOQU9DYWhPRS9pZmxCNTRRQUFITkp3MzhTOXdQUENRR0FiSW5EZnhMN2c4OEpBWUFzeWNOL0V2OEE1b1FBd0xFWi92OTVFQmVJQVlCak1Qcm5lU2d2RUFJQVl6TDgxM2s0QzRnQmdOcU0vdTA4cUpYRUFFQU5SbjhkRDIwRFlnQmdYMGIvZmg1Z0E0SUFZRnNHZjNzZTZBNEVBY0F5QnI4OUQ3Z1RVUUR3bTdIdncwTXZTaUFBUjJIZ2Evb1BpY29JaFJoN3lmWUFBQUFBU1VWT1JLNUNZSUk9Iiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyIsInB1cnBvc2UiOiJhbnkifSx7InNyYyI6ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBTUFBQUFEQUNBWUFBQUJTM0d3SEFBQUVLMGxFUVZSNG5PM2RQV3BVVVFDRzRZa0lBU0ViaUsxTHNCSFhaV3RobTNXSlRaWmdxeHNRaEZTeEdoZ0RJYm4zL043elBVK2R5VnlUNzUweitYRnlkU0xXNTI5L0gydThuKzlmMzEzVmVEOGp2Qmw5QVRDU0FJZ21BS0lKZ0dnQ0lKb0FpQ1lBb2dtQWFBSWdtZ0NJSmdDaUNZQm9BaUNhQUlqMmR2UUYxSFI5YzF2bDEzdkpjZGdBakgwZTF6ZTNqdzkvZmgveS93UWNLZ0NqbjlmbDUrWklNUndpQU1NL2x2UG42d2doVEIyQTRSL2JFVUtZTWdERFg4dk1JVXdWZ09HdmJjWVFwdms1Z1BIbm1PbHpQZndFbU9tRFFUK3puQVpEVHdEalovUUdoZ1V3K2gvT1BFWnVZVWdBeHM5VG96YlJQUURqNXpranR0RTFBT1BuSmIwMzBpMEE0K2UxZW02bFN3REd6MWE5TnRQODV3REdYK2JqbDUrYjN2Nys3a09qSyttdng2OVpOejBCakwvTTF2SHZ2YzNNV205b21sK0Y0SDhsUTE0dGdwYWFCZURSZjc4YUExNHBncFpiYWhLQThWTmJxMDE1Q2tTMDZnRjQ5S2VWRnR0eUFoQ3RhZ0FlL1dtdDlzYWNBRVNyRm9CSGYzcXB1VFVuQU5HcUJPRFJuOTVxYmM0SlFEUUJFSzA0QUU5L0dLWEc5cHdBUkJNQTBRUkFOQUVRclNnQVh3QXpXdWtHblFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMFFSQU5BRVFUUUJFRXdEUm12K0pwRlU5L1BpMTZlMnZQNzF2ZENXVWNBTHNzSFg4ZTI5RGV3TFlxR1RJSXBpUEFEYW9NV0FSekVVQVJCTUEwUVJBTkFFUVRRQkVFd0RSQkVBMEFSQk5BRVFUQU5FRVFEUUJFRTBBUkJNQTBRUkFOQUVRVFFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMFpaN2RXaXYyc3dXUzUwQVhyV1pyWllKd0tzMnM4Y1NBWGpWWnZaYUlnRFlTd0JFRXdEUkJFQTBBUkJOQUVRVEFORUVRRFFCRUUwQVJCTUEwUVJBTkFFUVRRQkVFd0RSQkVBMEFSQk5BRVFUQU5FRVFEUUJFRTBBUkJNQTBRUkFOQUVRVFFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMFFSQXRDVUNxUEczZmwvelBucmR6LzNkaCtMN2VjMzc2SFUvTTFzaWdOT3BiSnhiYnR2cmZrcUd0ZVcydmU1blZzc0VjRHJ0RytmTXQ5a3pzSmx2TTZPcmtodGYzOXcrMXJvUTJPdmh6Ky9kTzE3cUJJQ3RpZ0lvS1E5cUtOMmdFNEJvQWlDYUFJZ21BS0lWQitBTFlVYXBzVDBuQU5FRVFMUXFBWGdhUkcrMU51Y0VJRnExQUp3QzlGSnphMDRBb2xVTndDbEFhN1UzNWdRZ1d2VUFuQUswMG1KYlRnQ2lOUW5BS1VCdHJUYlY3QVFRQWJXMDNKS25RRVJyR29CVGdGS3ROOVQ4QkJBQmUvWFlUcGVuUUNKZ3ExNmI2ZlkxZ0FoNHJaNWI2ZnBGc0FoNFNlK05kUDh1a0FoNHpvaHREUGsycUFoNGF0UW1odjBjUUFTY2pkekMwQitFaVlEUkc1aG1nRjVwT3N2bzRaOU44NnNRczN4QWFHK216L1UwRjNMSmFiQ21tWVovTnQwRlhSTENHbVljL3RtMEYzWkpDTWMwOC9EUHByL0FTMEk0aGlNTS8rd3dGL3FVR09aeXBORmZPdVJGUDBjVWZSeDE3QUFBQUFBQUFBQUFBQUFBQy9rSGlKa2xuS1JhK2Y4QUFBQUFTVVZPUks1Q1lJST0iLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwicHVycG9zZSI6Im1hc2thYmxlIn0seyJzcmMiOiJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWdBQUFBSUFDQVlBQUFEMGVOVDZBQUFOeGtsRVFWUjRuTzNiTzQ0Y1Z4S0cwYVJBb0lFQnVBSEsxUkxrRUxNdXVXUEkxYm9HY3JRRXVlUUdDQXhBaTJOUUVwdnNxdTU2NUNNaS9uTVcwQjJvdkxyeE1hdjFhZ0ZnRmYvKzlYK2ZqNTdoVnYvOXo3OWVIVDBEKy9yaDZBRUFnUDBKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJTkRyb3dlZ3A0YzNiejhmUFFNQXR4TUFuR1RCQTh3bUFMRHNBUUlKZ0VBV1BnQUNJSUNGRDd6ayszdmkwOGNQcjQ2YWhYMElnS0VzZmVBZWorOFFNVENUQUJqRTBnZTJJQVptRWdETldmckFuc1RBSEFLZ0tZc2ZPTnJmOTVBUTZFa0FOR0xwQXhWNUs5Q1RBR2pBNGdlNjhGYWdEd0ZRbU1VUGRDVUU2aE1BQlZuOHdCUkNvQzRCVUlqRkQwd2xCT29SQUFWWS9FQUtJVkRIRDBjUGtNN3lCeEs1KzQ3bkRjQkJISDRnbmJjQnh4SUFPN1A0QWI0bEJJN2hLNEFkV2Y0QTU3a2o5K1VOd0E0Y2FvRExlQnV3SDI4QU5tYjVBMXpQM2JrOUFiQWhCeGpnZHU3UWJma0tZQU1PTGNBNmZDV3dIVzhBVm1iNUE2elAzYm8rQWJBaUJ4UmdPKzdZZGZrS1lBVU9KY0ErZkNXd0htOEE3bVQ1QSt6UDNYcy9BWEFIQnhEZ09PN2crd2lBR3psNEFNZHpGOTlPQU56QWdRT293NTE4R3dGd0pRY05vQjUzOC9VRXdCVWNNSUM2M05IWEVRQVhjckFBNm5OWFgwNEFYTUNCQXVqRG5YMFpBZkFDQndtZ0gzZjN5d1RBTXh3Z2dMN2M0YzhUQUdjNE9BRDl1Y3ZQRXdBbk9EQUFjN2pUVHhNQTMzRlFBT1p4dHo4bEFCNXhRQURtY3NkL1N3RDh4Y0VBbU05ZC81VUFXQndJZ0NUdS9DOWVIejBBTU52UHYveTUyYy8rNDdlZk52dlpNRjE4QUNoQldOK1dTLy9jN3hFRFhPUGh6ZHZQbno1K2VIWDBIRWVLRGdETEg5YTExK0ovN25jTEFTNlZIZ0d4ZndOZytjTzZqbHorajFXWmd4NlNkMEZzQUFEcnFiWjBxODBERlVVR1FITHh3ZHFxTHR1cWMxRlA2azZJQzREVUJ3MWJxTDVrcTg5SEhZbTdJU29BRWg4d2JLWExjdTB5SjhkTDJ4RlJBUUFBZkJFVEFHbGxCMXZxOXEvcWJ2TnluS1JkRVJFQVNROFVnUHVrN0l5SUFBQUF2alUrQUZKS0R2YlM5WFY2MTdrNVJzTHVHQjhBQU1CVG93TWdvZUFBMk1iMEhUSTJBS1kvT0FDMk4zbVhqQTBBQU9DOGtRRXd1ZGdBMk5mVW5USXlBQUNBNTQwTGdLbWxCc0J4SnU2V2NRRUFBTHhzVkFCTUxEUUFhcGkyWTBZRkFBQndtVEVCTUszTUFLaG4wcTRaRXdBQXdPVkdCTUNrSWdPZ3RpazdaMFFBQUFEWEVRQUFFS2g5QUV4NUZRTkFIeE4yVC9zQUFBQ3Uxem9BSmhRWUFEMTEzMEd0QXdBQXVJMEFBSUJBYlFPZys2c1hBUHJydkl2YUJnQUFjRHNCQUFDQldnWkE1MWN1QU16U2RTZTFEQUFBNEQ0Q0FBQUN0UXVBcnE5YUFKaXI0MjVxRndBQXdQMEVBQUFFRWdBQUVLaFZBSFQ4amdXQUROMTJWS3NBQUFEV0lRQUFJSkFBQUlCQWJRS2cyM2NyQU9UcHRLdmFCQUFBc0I0QkFBQ0JCQUFBQkJJQUFCQ29SUUIwK3FNS0FMSjEyVmt0QWdBQVdKY0FBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ2xRK0FMdjgvSlFEOHJjUHVLaDhBQU1ENkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVPajEwUVBBQko5K2Y3L1p6MzU0OStObVB4dklKUURnUmxzdS9YTy9Sd3dBYXhFQWNLVzlGdjl6djFzSUFQZnlOd0J3aFNPWC8yTlY1Z0Q2RWdCd29XcEx0OW84UUM4Q0FDNVFkZGxXblF1b1R3REFDNm92MmVyekFUVUpBSGhHbCtYYVpVNmdEZ0VBQUlFRUFKelI3Vi9WM2VZRmppVUFBQ0NRQUFDQVFBSUFUdWo2T3IzcjNNRCtCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFSNmZmUUE5UEhwOS9lYi9leUhkejl1OXJNQmVFb0E4S3d0bC82NTN5TUdBTFluQURocHI4WC8zTzhXQWdEYjhUY0FQSEhrOG4rc3lod0FFd2tBdmxGdDZWYWJCMkFLQWNBL3FpN2Jxbk1CZENZQVdKYWwvcEt0UGg5QU53S0FOc3UxeTV3QUhRZ0FBQWdrQU1KMSsxZDF0M2tCcWhJQUFCQklBQUJBSUFFUXJPdnI5SzV6QTFRaUFBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBQUNDUUFBQ0FRQUlBQUFJSkFBQUlKQUFBSUpBQUFJQkFBZ0FBQWdrQUFBZ2tBQUFna0FBQWdFQUNBQUFDQ1FBQUNDUUFBQ0NRQUFDQVFBSUFBQUlKQUFBSUpBQUFJSkFBQUlCQUFnQUFBZ2tBQUFna0FBQWdrQUFBZ0VBQ0FBQUNDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQUFDQ1FBZ2oyOCsvSG9FVzZ5eDl3K20vUCsrTzJuelgvSEZ2YVkyMmRESndJQUFBSUpBQUFJSkFEQ2RYdlZ2ZWU4UHB2enVyMHkzbk5lbncxZENBQUFDQ1FBYVBNdjNTUG05Tm1jMStWZmprZk02Yk9oQXdIQXNpejFGOTJSOC9sc3pxdStRSTZjejJkRGRRS0FmMVJkZEJYbXFqRERLUlhtcXJwSUtzeFZZWVpUcXM3RnZnUUEzNml3VUI2ck5FK2xXWmFsMWp6VkZrcWxlU3JOc2l6MTV1RTRBb0FucWl5V0tuTThWbVdtS25NOFZtV3hWSm5qc1NvelZabURHbDRkUGNCTEh0NjgvWHowRE1rKy9mNSs5OTlaY2JtZDRyTTU3K2RmL3R6OWQzWlpiajZiSEo4K2ZpaTlZMHNQdHl3Q29KSXRGMTZYeFhhT3orYThMUmRlOThYbXM1bE5BTnhKQUFEUVVmVUFLUDgzQU5VL1FBRDRYb2ZkVlQ0QUFJRDFDUUFBQ0NRQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlGQ0xBT2p3LzFNQ3dMTDAyVmt0QWdBQVdKY0FBSUJBQWdBQUFna0FBQWpVSmdDNi9GRUZBTGs2N2FvMkFRQUFyRWNBQUVBZ0FRQUFnVm9GUUtmdlZnREkwbTFIdFFvQUFHQWRBZ0FBQWdrQUFBalVMZ0M2ZmNjQ3dId2RkMU83QUFBQTdpY0FBQ0JReXdEbytLb0ZnSm02N3FTV0FRQUEzRWNBQUVDZ3RnSFE5WlVMQUhOMDNrVnRBd0FBdUowQUFJQkFyUU9nODZzWEFIcnJ2b05hQndBQWNKdjJBZEM5d0FEb1o4THVhUjhBQU1EMUJBQUFCQm9SQUJOZXhRRFF3NVNkTXlJQUFJRHJqQW1BS1VVR1FGMlRkczJZQUFBQUxqY3FBQ2FWR1FDMVROc3hvd0lBQUxqTXVBQ1lWbWdBSEcvaWJoa1hBQURBeTBZR3dNUlNBK0FZVTNmS3lBQUFBSjQzTmdDbUZoc0ErNW04UzhZR3dMTE1mbkFBYkd2NkRoa2RBQURBYWVNRFlIckJBYkMraE4weFBnQUFnS2NpQWlDaDVBQllSOHJPaUFpQVpjbDVvQURjTG1sWHhBUUFBUEJWVkFBa2xSMEExMG5iRVZFQnNDeDVEeGlBbHlYdWhyZ0FXSmJNQnczQWFhazdJVElBQUNCZGJBQ2tGaDhBWHlYdmd0Z0FXSmJzQncrUUxuMEhSQWZBc2pnQUFJbmMvUUlBQUNJSmdFVUpBaVJ4NTM4aEFQN2lRQURNNTY3L1NnQTg0bUFBek9XTy81WUErSTREQWpDUHUvMHBBWENDZ3dJd2h6djlOQUZ3aGdNRDBKKzcvRHdCOEF3SEI2QXZkL2p6Qk1BTEhDQ0FmdHpkTHhNQUYzQ1FBUHB3WjE5R0FGeklnUUtvejExOU9RRndCUWNMb0M1MzlIVUV3SlVjTUlCNjNNM1hFd0EzY05BQTZuQW4zMFlBM01pQkF6aWV1L2gyQXVBT0RoN0FjZHpCOXhFQWQzSUFBZmJuN3IyZkQzQkZEMi9lZmo1NkJvREpMUDcxZUFPd0lnY1RZRHZ1MkhVSmdKVTVvQURyYzdldXp3ZTZJVjhKQU56SDR0K09Od0FiY25BQmJ1Y08zWllBMkpnRERIQTlkK2YyZk1BNzhwVUF3UE1zL3YxNEE3QWpCeHZnUEhma3ZuellCL0UyQU9BTGkvOFlQdlNEQ1FFZ2xjVi9MRjhCSE14L0FFQWlkOS94UElCQ3ZBMEFwclA0Ni9BZ0NoSUN3RFFXZnowZVNHRkNBT2pPNHEvTGcybEFDQURkV1B6MWVVQ05DQUdnT291L0R3K3FLVEVBVkdIcDkrU2hOU2NFZ0tOWS9MMTVlSU9JQVdCcmx2NGNIdVJRWWdCWWk2VS9rNGNhUUF3QTE3TDA1L09BQXdrQzRIc1dmaDRQSEVFQWdTeDhIQUJPRWdVd2gyWFBLUTRGTnhFSVVJY0ZEd0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRHovUitmMVFpRFY3aElsUUFBQUFCSlJVNUVya0pnZ2c9PSIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmciLCJwdXJwb3NlIjoibWFza2FibGUifV19"/>
+<meta name="theme-color" content="#00d4ff"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="SciFi Vouchers"/>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAEPUlEQVR4nO3dPZLTSgCFUXlqqhx5AyZlCSQsjFWwMBKWQMpsYCJHJqCghsHjUUstqdX3nBj/VL37uWVD6R2GxhxP5+vW7yHFpy8/qjzP968fR//Zy/PTocqLVvK45Ysbe55b/823jGL1AIye115uYu0YVgvA8Bnjz07WCmHxAAyfKdYKYbEADJ8alg6hegCGzxKWCuGh5pMZP0urvbEqJ4Dhs6aap8HsE8D42UqN7c0KwPjZ2twNTg7A+GnFnC1OCsD4ac3UTRYHYPy0aso2iwIwflpXutHRARg/e1Gy1VEBGD97M3az7wZg/OzVmO1W/acQsDd3A/Dpz969t+E3AzB+enFvyy6BiHYzAJ/+9OatTTsBiPZfAD796dWtbTsBiPZPAD796d3rjTsBiPY3AJ/+pHi5dScA0QRAtMdhcPnTstJbmJfcqjzZ8XS+Xp6fDk6Ahk25f3+te/6nEECj5gxZBOMJoEE1BiyCcQRAtAdfgEl1PJ2vTgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKI9bv0G9ury7WfRnz9+/rDQO2EOJ8AEpeOf+hiWJ4BCc4YsgvYIoECNAYugLQIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCI1t3dod21mRJdnQDu2kypbgJw12am6CIAd21mqi4CgKkEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAETrIoAa/6/fMc+x1ut8//px9uuMeY61XqdlXQQwDPPGWfLYtV5nzrBKHrvW67SqmwCGYdo4W37MlIG1/JgWHY6n83XrNwFb6eoEgFICIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAoj1cnp8OW78J2MLl+engBCCaAIgmAKIJgGgPw/D7y8DWbwTW9GfzTgCiCYBofwNwGUSKl1t3AhDtnwCcAvTu9cadAET7LwCnAL26tW0nANFuBuAUoDdvbdoJQLQ3A3AK0It7W757AoiAvXtvwy6BiPZuAE4B9mrMdkedACJgb8ZudvQlkAjYi5KtFn0HEAGtK91o8ZdgEdCqKduc9CuQCGjN1E1O/hlUBLRizhZn/T2ACNja3A3O/oswEbCVGturOt7j6Xyt+XxwS80P3ar/FMJpwNJqb2yxwToNqGmpD9fFP7GFwBxLX1WsdskiBEqsdTm9+jW7ELhn7e+Rm35pFQPDsO2PJ839aiOKvrX2S+EvCFkkuGLO9osAAAAASUVORK5CYII="/>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAEPUlEQVR4nO3dPZLTSgCFUXlqqhx5AyZlCSQsjFWwMBKWQMpsYCJHJqCghsHjUUstqdX3nBj/VL37uWVD6R2GxhxP5+vW7yHFpy8/qjzP968fR//Zy/PTocqLVvK45Ysbe55b/823jGL1AIye115uYu0YVgvA8Bnjz07WCmHxAAyfKdYKYbEADJ8alg6hegCGzxKWCuGh5pMZP0urvbEqJ4Dhs6aap8HsE8D42UqN7c0KwPjZ2twNTg7A+GnFnC1OCsD4ac3UTRYHYPy0aso2iwIwflpXutHRARg/e1Gy1VEBGD97M3az7wZg/OzVmO1W/acQsDd3A/Dpz969t+E3AzB+enFvyy6BiHYzAJ/+9OatTTsBiPZfAD796dWtbTsBiPZPAD796d3rjTsBiPY3AJ/+pHi5dScA0QRAtMdhcPnTstJbmJfcqjzZ8XS+Xp6fDk6Ahk25f3+te/6nEECj5gxZBOMJoEE1BiyCcQRAtAdfgEl1PJ2vTgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKI9bv0G9ury7WfRnz9+/rDQO2EOJ8AEpeOf+hiWJ4BCc4YsgvYIoECNAYugLQIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCI1t3dod21mRJdnQDu2kypbgJw12am6CIAd21mqi4CgKkEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAETrIoAa/6/fMc+x1ut8//px9uuMeY61XqdlXQQwDPPGWfLYtV5nzrBKHrvW67SqmwCGYdo4W37MlIG1/JgWHY6n83XrNwFb6eoEgFICIJoAiCYAogmAaAIgmgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAoj1cnp8OW78J2MLl+engBCCaAIgmAKIJgGgPw/D7y8DWbwTW9GfzTgCiCYBofwNwGUSKl1t3AhDtnwCcAvTu9cadAET7LwCnAL26tW0nANFuBuAUoDdvbdoJQLQ3A3AK0It7W757AoiAvXtvwy6BiPZuAE4B9mrMdkedACJgb8ZudvQlkAjYi5KtFn0HEAGtK91o8ZdgEdCqKduc9CuQCGjN1E1O/hlUBLRizhZn/T2ACNja3A3O/oswEbCVGturOt7j6Xyt+XxwS80P3ar/FMJpwNJqb2yxwToNqGmpD9fFP7GFwBxLX1WsdskiBEqsdTm9+jW7ELhn7e+Rm35pFQPDsO2PJ839aiOKvrX2S+EvCFkkuGLO9osAAAAASUVORK5CYII="/>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#05080f;--surface:#0b1120;--surface2:#101828;--surface3:#162032;
-  --border:#1e3550;--border2:#253f60;
-  --accent:#00e5ff;--accent2:#0077ff;--accent3:#00ff9d;
-  --danger:#ff3b5c;--warn:#ffb800;
-  --text:#d4e8ff;--muted:#4a6380;
+  --bg:#070d1a;--surface:#0d1526;--surface2:#111d31;--surface3:#162338;
+  --border:#1a2e4a;--border2:#22395e;
+  --accent:#00d4ff;--accent2:#3b82f6;--accent3:#10b981;
+  --danger:#ef4444;--warn:#f59e0b;
+  --text:#e2eeff;--muted:#4d6a8a;
   --mono:'Share Tech Mono',monospace;--sans:'Exo 2',sans-serif;
-  --glow:0 0 24px rgba(0,229,255,0.15);--radius:12px;--radius2:18px;
+  --glow:0 0 40px rgba(0,212,255,0.12);--radius:10px;--radius2:16px;
+  --sidebar-w:220px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
@@ -237,10 +246,28 @@ tr:last-child td{border-bottom:none;}
 .map-stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
 .map-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-size:11px;text-align:center;flex:1;}
 .map-stat strong{display:block;font-size:17px;font-weight:800;color:var(--accent);}
+/* Voucher action more menu */
+.vc-more-item{display:block;width:100%;padding:9px 14px;background:none;border:none;color:var(--text);font-size:12px;text-align:left;cursor:pointer;font-family:var(--sans);transition:background .1s;}
+.vc-more-item:hover{background:var(--surface2);}
+.vc-more-item+.vc-more-item{border-top:1px solid var(--border);}
 /* Voucher code in messages */
 .vc-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);border-radius:6px;padding:3px 10px;font-family:monospace;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.08em;cursor:pointer;transition:all .15s;user-select:all;}
 .vc-chip:hover{background:rgba(0,229,255,.22);border-color:var(--accent);}
 .vc-chip-copy{font-size:10px;opacity:.6;}
+/* Router photos */
+.router-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:10px;}
+.router-photo-thumb{position:relative;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--surface2);}
+.router-photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .2s;}
+.router-photo-thumb:hover img{opacity:.8;}
+.router-photo-del{position:absolute;top:4px;right:4px;background:rgba(255,59,92,.85);color:#fff;border:none;border-radius:6px;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;}
+.router-photo-thumb:hover .router-photo-del{opacity:1;}
+.router-add-btn{aspect-ratio:1;border-radius:var(--radius);border:2px dashed var(--border2);background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:11px;gap:6px;transition:all .15s;}
+.router-add-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* Photo lightbox */
+.photo-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+.photo-lightbox img{max-width:92vw;max-height:75vh;border-radius:var(--radius2);object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.photo-lightbox-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;}
+.photo-lightbox-caption{color:rgba(255,255,255,.7);font-size:12px;text-align:center;}
 /* Notification items */
 .ni-voucher{border-left:2px solid var(--accent);}
 .ni-agent{border-left:2px solid #00ff9d;}
@@ -257,9 +284,131 @@ tr:last-child td{border-bottom:none;}
   #map-container{height:60vh;min-height:300px;}
   .map-sidebar{max-height:220px;}
 }
+
+/* ═══ REVAMP OVERRIDES ═══ */
+/* Sidebar */
+.sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#0a1322 0%,#070d1a 100%);border-right:1px solid var(--border);}
+.sb-header{padding:16px 14px;background:rgba(0,212,255,0.04);border-bottom:1px solid var(--border);}
+.brand-icon{background:linear-gradient(135deg,#00d4ff,#3b82f6);border-radius:12px;}
+.brand-name{font-size:14px;color:#00d4ff;letter-spacing:.08em;}
+.nav-link{padding:8px 10px;border-radius:8px;font-size:12px;color:#4d6a8a;margin-bottom:2px;}
+.nav-link.active{background:linear-gradient(90deg,rgba(0,212,255,.12),rgba(0,212,255,.04));color:#00d4ff;border:1px solid rgba(0,212,255,.18);font-weight:700;}
+.nav-link:hover{background:rgba(255,255,255,.04);color:#e2eeff;}
+.nav-sec{font-size:9px;color:#2a4060;letter-spacing:.16em;padding:12px 10px 4px;font-weight:700;}
+.nav-badge{background:linear-gradient(135deg,#00d4ff,#3b82f6);color:#000;font-size:8px;font-weight:800;padding:2px 7px;border-radius:20px;}
+/* Topbar */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:54px;}
+.topbar-title{font-size:15px;font-weight:800;letter-spacing:.01em;}
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:20px 22px;}
+.card::before{display:none;}
+.card-title{font-size:11px;color:var(--muted);letter-spacing:.12em;font-weight:700;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';display:inline-block;width:3px;height:12px;background:var(--accent);border-radius:2px;}
+/* Stats */
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;}
+.stat-card::after{height:3px;opacity:.7;border-radius:0 0 var(--radius2) var(--radius2);}
+.stat-value{font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-label{font-size:10px;letter-spacing:.12em;color:var(--muted);}
+/* Page header */
+.ph{padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px;}
+.pt{font-size:22px;font-weight:800;letter-spacing:-.01em;}
+.ps{font-size:12px;color:var(--muted);margin-top:4px;}
+/* Tables */
+th{font-size:10px;letter-spacing:.12em;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);font-weight:700;}
+td{padding:11px 14px;border-bottom:1px solid rgba(26,46,74,.6);font-size:12px;}
+tr:hover td{background:rgba(0,212,255,.025);}
+table{font-size:12px;}
+/* Buttons */
+.btn{border-radius:9px;font-size:12px;font-weight:700;letter-spacing:.02em;padding:8px 16px;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,#00d4ff,#3b82f6);color:#000;border:none;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,212,255,.3);}
+.btn-secondary{background:var(--surface2);border:1px solid var(--border2);color:var(--text);}
+.btn-secondary:hover{background:var(--surface3);border-color:var(--border2);}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text);background:var(--surface2);}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:8px;}
+.btn-icon{padding:7px;border-radius:8px;}
+/* Badges */
+.badge{padding:3px 10px;border-radius:6px;font-size:10px;letter-spacing:.06em;}
+.b-available{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2);}
+.b-sent{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+.b-used{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.2);}
+.b-expired{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+.b-active{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2);}
+.b-suspended{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+.b-delivered{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2);}
+.b-failed{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+.b-whatsapp{background:rgba(37,211,102,.1);color:#25d366;border:1px solid rgba(37,211,102,.2);}
+.b-sms{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+.b-voucher{background:rgba(0,212,255,.1);color:#00d4ff;border:1px solid rgba(0,212,255,.2);}
+/* Forms */
+.form-control{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 13px;font-size:13px;color:var(--text);}
+.form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.08);}
+.form-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;}
+/* Modal */
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;box-shadow:0 40px 100px rgba(0,0,0,.7);}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);border-radius:20px 20px 0 0;}
+.modal-title{font-size:16px;font-weight:800;}
+.modal-body{padding:22px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);}
+/* Code display */
+.code{font-family:var(--mono);color:#00d4ff;font-size:12px;font-weight:600;letter-spacing:.1em;background:rgba(0,212,255,.06);padding:2px 8px;border-radius:6px;}
+/* Voucher chip */
+.vc-chip{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:4px 12px;font-family:var(--mono);font-size:12px;font-weight:700;color:#00d4ff;letter-spacing:.1em;cursor:pointer;transition:all .15s;user-select:all;}
+.vc-chip:hover{background:rgba(0,212,255,.2);box-shadow:0 0 12px rgba(0,212,255,.2);}
+/* KPI cards */
+.kpi-card{display:flex;align-items:center;gap:16px;}
+.kpi-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.kpi-val{font-size:24px;font-weight:800;line-height:1.1;}
+.kpi-lbl{font-size:10px;color:var(--muted);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;}
+/* Select card */
+.sel-card{border-radius:10px;border:1px solid var(--border);background:var(--surface2);}
+.sel-card.selected{border-color:var(--accent);background:rgba(0,212,255,.06);}
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+/* Content padding */
+.content{padding:22px 24px;}
+/* Login */
+.login-box{border-radius:20px;border:1px solid var(--border2);background:var(--surface);}
+.login-box::before{background:linear-gradient(90deg,transparent,#00d4ff,#3b82f6,transparent);}
+/* Filter buttons */
+.fb{border-radius:8px;background:var(--surface2);border:1px solid var(--border);}
+.fb.active{background:rgba(0,212,255,.1);color:#00d4ff;border-color:rgba(0,212,255,.25);}
+/* Toasts */
+.toast{border-radius:12px;}
+/* Agent avatar */
+.av{border-radius:10px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(59,130,246,.15));border:1px solid rgba(0,212,255,.15);color:#00d4ff;}
+/* Notification dot */
+.nb-dot{background:var(--danger);}
+/* Body grid */
+body::before{background-image:linear-gradient(rgba(0,212,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.015) 1px,transparent 1px);background-size:48px 48px;}
+body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,246,.07),transparent 70%);}
+/* Dist mode tabs */
+#dist-mode-all,#dist-mode-one{transition:all .2s;}
+/* Router photos */
+.router-photo-thumb{border-radius:10px;border:1px solid var(--border);}
+.router-photo-del{border-radius:6px;}
+/* Profile grid */
+.pg{grid-template-columns:300px 1fr;}
+/* Improved empty state */
+.empty{padding:48px 24px;}
+.empty-icon{font-size:40px;opacity:.5;}
+.empty-title{font-size:15px;font-weight:700;margin-top:8px;}
+/* vc-more-menu */
+.vc-more-menu{border-radius:12px;border:1px solid var(--border2);background:var(--surface);}
+.vc-more-item{font-size:12px;padding:10px 16px;border-radius:0;}
+.vc-more-item:first-child{border-radius:12px 12px 0 0;}
+.vc-more-item:last-child{border-radius:0 0 12px 12px;}
+
 </style>
 </head>
 <body>
+
+<div id="toasts" class="toast-container"></div>
 
 <div id="login-screen">
   <div class="login-box">
@@ -298,6 +447,22 @@ tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
+<div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:101;align-items:center;justify-content:center;background:var(--bg);">
+  <div class="login-box" style="text-align:center;">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#0077ff);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px;">&#128272;</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:6px;">Welcome back</div>
+    <div id="lock-email" style="font-size:12px;color:#4a6380;margin-bottom:26px;">Use your fingerprint to unlock SciFi ISP</div>
+    <button id="lock-unlock-btn" type="button" onclick="doBiometricUnlock()"
+      style="width:100%;padding:12px;border-radius:12px;background:#00e5ff;color:#000;font-size:13px;font-weight:700;border:none;cursor:pointer;margin-bottom:12px;font-family:inherit;">
+      &#128272; Unlock with Fingerprint
+    </button>
+    <button type="button" onclick="lockUsePassword()"
+      style="width:100%;padding:10px;border-radius:12px;background:none;border:1px solid #1e3550;color:#8aa5c4;font-size:12px;cursor:pointer;font-family:inherit;">
+      Use Password Instead
+    </button>
+  </div>
+</div>
+
 <div id="app">
   <div class="sb-backdrop" id="sb-bd" onclick="closeSB()"></div>
   <aside class="sidebar" id="sidebar">
@@ -315,10 +480,12 @@ tr:last-child td{border-bottom:none;}
       <a class="nav-link active" onclick="goP('dashboard',this)"><span class="nav-icon">&#128202;</span>Dashboard</a>
       <a class="nav-link" onclick="goP('agents',this)"><span class="nav-icon">&#128101;</span>Agents<span class="nav-badge" id="nb-ag">0</span></a>
       <a class="nav-link" onclick="goP('vouchers',this)"><span class="nav-icon">&#127967;</span>Vouchers<span class="nav-badge" id="nb-vc">0</span></a>
+      <a class="nav-link" onclick="goP('faulty',this)"><span class="nav-icon">&#9888;&#65039;</span>Faulty<span class="nav-badge" id="nb-ft" style="background:var(--danger);">0</span></a>
       <div class="nav-sec">OPERATIONS</div>
       <a class="nav-link" onclick="goP('distribute',this)"><span class="nav-icon">&#128228;</span>Distribute</a>
       <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
       <a class="nav-link" onclick="goP('tracking',this)"><span class="nav-icon">&#128269;</span>Tracking</a>
+
       <div class="nav-sec">ANALYTICS</div>
       <a class="nav-link" onclick="goP('reports',this)"><span class="nav-icon">&#128200;</span>Reports</a>
       <div class="nav-sec">SYSTEM</div>
@@ -329,6 +496,7 @@ tr:last-child td{border-bottom:none;}
         <div class="user-av" id="u-av">A</div>
         <div><div class="user-name" id="u-nm">Admin</div><div class="user-role">SUPER ADMIN</div></div>
       </div>
+      <button class="btn-signout" style="background:none;border:1px solid var(--border2);color:var(--accent);margin-bottom:6px;" onclick="openBiometricModal()">&#128272; Fingerprint Unlock</button>
       <button class="btn-signout" onclick="doLogout()">&#9211; Sign Out</button>
     </div>
   </aside>
@@ -391,6 +559,7 @@ tr:last-child td{border-bottom:none;}
           <div><div class="pt">Voucher Management</div><div class="ps" id="vc-sub"></div></div>
           <div class="pa">
             <button class="btn btn-secondary" onclick="openBulkEdit()">&#9999; Bulk Edit</button>
+            <button class="btn btn-danger" onclick="bulkDeleteVouchers()">&#128465; Bulk Delete</button>
             <button class="btn btn-secondary" onclick="openBulkImport()">&#128229; Bulk Import</button>
             <button class="btn btn-primary" onclick="openAddVoucher()">&#10133; Add Voucher</button>
           </div>
@@ -464,21 +633,42 @@ tr:last-child td{border-bottom:none;}
 
         <!-- Step 1: Select agents -->
         <div id="ds1" class="card">
-          <div class="card-title">Step 1 &mdash; Select Agents &middot; <span style="color:var(--accent3);" id="dist-avail-count">0</span> vouchers available</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-            <select class="form-control" id="dr-reg" onchange="renderDAg()" style="width:150px;font-size:11px;"><option value="">All Regions</option></select>
-            <select class="form-control" id="dr-apt" onchange="renderDAg()" style="width:160px;font-size:11px;"><option value="">All Apartments</option></select>
-            <select class="form-control" id="dr-pkg-filter" onchange="renderDAg()" style="width:150px;font-size:11px;">
-              <option value="">Any Package</option>
-              <option value="Daily 1GB">Daily 1GB</option>
-              <option value="Weekly 10GB">Weekly 10GB</option>
-              <option value="Monthly 50GB">Monthly 50GB</option>
-            </select>
+          <div class="card-title">Step 1 &mdash; Select Recipients &nbsp;<span style="color:var(--accent3);font-size:11px;">(<span id="dist-avail-count">0</span> vouchers available)</span></div>
+
+          <!-- Mode toggle -->
+          <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <div class="sel-card selected" id="dist-mode-all" onclick="setDistMode('all')" style="flex:1;justify-content:center;font-size:12px;padding:9px;">&#128101; Multiple Agents</div>
+            <div class="sel-card" id="dist-mode-one" onclick="setDistMode('one')" style="flex:1;justify-content:center;font-size:12px;padding:9px;">&#128100; One Agent</div>
           </div>
-          <div id="dag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-height:260px;overflow-y:auto;margin-bottom:14px;"></div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;"><span id="dsa-cnt">0</span> agents selected</div>
-          <div style="display:flex;gap:8px;">
+
+          <!-- Single agent picker -->
+          <div id="dist-single-wrap" style="display:none;margin-bottom:14px;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Select Agent</label>
+              <select class="form-control" id="dist-single-agent" onchange="distSingleChanged()">
+                <option value="">— Choose an agent —</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Multi-agent filters & grid -->
+          <div id="dist-multi-wrap">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+              <select class="form-control" id="dr-reg" onchange="renderDAg()" style="width:150px;font-size:11px;"><option value="">All Regions</option></select>
+              <select class="form-control" id="dr-apt" onchange="renderDAg()" style="width:160px;font-size:11px;"><option value="">All Apartments</option></select>
+              <select class="form-control" id="dr-pkg-filter" onchange="renderDAg()" style="width:150px;font-size:11px;">
+                <option value="">Any Package</option>
+                <option value="Daily 1GB">Daily 1GB</option>
+                <option value="Weekly 10GB">Weekly 10GB</option>
+                <option value="Monthly 50GB">Monthly 50GB</option>
+              </select>
+            </div>
+            <div id="dag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-height:260px;overflow-y:auto;margin-bottom:10px;"></div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;"><span id="dsa-cnt">0</span> agents selected</div>
             <button class="btn btn-ghost btn-sm" onclick="dSelAllAg()">Select All</button>
+          </div>
+
+          <div style="margin-top:14px;">
             <button class="btn btn-primary" onclick="dStep(2)">Next &#8594;</button>
           </div>
         </div>
@@ -513,7 +703,7 @@ tr:last-child td{border-bottom:none;}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Message Template &mdash; variables: {VOUCHER_CODE} {DURATION} {SENT_TIME} {EXPIRY_DATE} {EXPIRY_TIME} {AGENT_NAME} {SUPPORT_CONTACT}</label>
+            <label class="form-label">Message Template &mdash; variables: {VOUCHER_CODE} {DURATION} {EXPIRY_DATE} {EXPIRY_TIME} {AGENT_NAME} {SUPPORT_CONTACT}</label>
             <textarea class="form-control" id="d-msg" rows="12" style="font-family:monospace;font-size:11px;line-height:1.6;"></textarea>
           </div>
           <div style="display:flex;gap:8px;">
@@ -736,96 +926,96 @@ tr:last-child td{border-bottom:none;}
         </div>
       </div>
 
+      <!-- ══ FAULTY VOUCHERS PAGE ══ -->
+      <div class="page" id="page-faulty">
+        <div class="ph">
+          <div><div class="pt">⚠️ Faulty Vouchers</div><div class="ps" id="faulty-sub">Vouchers reported as not working</div></div>
+          <div class="pa">
+            <button class="btn btn-secondary" onclick="refreshAll()">&#128260; Refresh</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Code</th><th>Package</th><th>Agent</th><th>Reason</th><th>Reported</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="faulty-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- Send Voucher to Agent Modal -->
-<div class="modal-overlay" id="m-send-voucher">
-  <div class="modal">
+<!-- Mark Faulty Modal -->
+<div class="modal-overlay" id="m-faulty">
+  <div class="modal" style="max-width:400px;">
     <div class="modal-header">
-      <div class="modal-title">&#128228; Send Voucher to Agent</div>
-      <button class="modal-close" onclick="closeM('m-send-voucher')">&#10005;</button>
+      <div class="modal-title">&#9888;&#65039; Mark Voucher as Faulty</div>
+      <button class="modal-close" onclick="closeM('m-faulty')">&#10005;</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="sv-voucher-id"/>
-      <input type="hidden" id="sv-agent-id"/>
-      <!-- Voucher info box -->
-      <div id="sv-voucher-info" style="background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:none;">
-        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px;">VOUCHER</div>
-        <div class="code" id="sv-vc-code" style="font-size:16px;letter-spacing:.1em;"></div>
-        <div id="sv-vc-info" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+      <div id="faulty-vc-info" style="background:rgba(255,59,92,.07);border:1px solid rgba(255,59,92,.2);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;">
+        <div style="font-size:10px;color:var(--muted);">VOUCHER</div>
+        <div class="code" id="faulty-vc-code" style="font-size:15px;color:var(--danger);"></div>
       </div>
-      <!-- Agent selector (shown when opening from voucher) -->
-      <div class="form-group" id="sv-agent-row">
-        <label class="form-label">Select Agent *</label>
-        <select class="form-control" id="sv-agent-sel" onchange="svAgentChanged()">
-          <option value="">— Choose agent —</option>
+      <input type="hidden" id="faulty-vc-id"/>
+      <div class="form-group">
+        <label class="form-label">Reason *</label>
+        <select class="form-control" id="faulty-reason-sel" onchange="document.getElementById('faulty-reason-other').style.display=this.value==='other'?'block':'none'">
+          <option value="">— Select reason —</option>
+          <option value="Already used">Already used by someone else</option>
+          <option value="Code not accepted">Code not accepted by router</option>
+          <option value="Expired before use">Expired before agent could use</option>
+          <option value="Wrong package">Wrong package activated</option>
+          <option value="Duplicate code">Duplicate code in system</option>
+          <option value="Agent claims not received">Agent claims not received</option>
+          <option value="other">Other (specify below)</option>
         </select>
       </div>
-      <!-- Voucher selector (shown when opening from agent profile) -->
-      <div class="form-group" id="sv-voucher-row" style="display:none;">
-        <label class="form-label">Select Voucher *</label>
-        <select class="form-control" id="sv-voucher-sel" onchange="svVoucherChanged()">
-          <option value="">— Choose available voucher —</option>
-        </select>
+      <div class="form-group" id="faulty-reason-other" style="display:none;">
+        <label class="form-label">Specify Reason</label>
+        <input class="form-control" id="faulty-reason-text" placeholder="Describe the issue..."/>
       </div>
-      <!-- Delivery method -->
       <div class="form-group">
-        <label class="form-label">Delivery Method</label>
-        <div style="display:flex;gap:8px;">
-          <div class="sel-card selected" id="sv-wa" onclick="setSVMethod('whatsapp')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128172; WhatsApp</div>
-          <div class="sel-card" id="sv-sms" onclick="setSVMethod('sms')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128241; SMS</div>
-        </div>
-      </div>
-      <!-- Message preview -->
-      <div class="form-group">
-        <label class="form-label">Message Preview</label>
-        <textarea class="form-control" id="sv-msg" rows="9" style="font-size:11px;font-family:monospace;line-height:1.6;"></textarea>
+        <label class="form-label">Additional Notes</label>
+        <textarea class="form-control" id="faulty-notes" rows="2" placeholder="Any extra details..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeM('m-send-voucher')">Cancel</button>
-      <button class="btn btn-primary" onclick="svSend()">&#128228; Send Now</button>
+      <button class="btn btn-secondary" onclick="closeM('m-faulty')">Cancel</button>
+      <button class="btn btn-danger" onclick="saveFaulty()">&#9888; Mark Faulty</button>
     </div>
   </div>
 </div>
 
-<!-- MODALS -->
+
+<!-- Add / Edit Agent Modal -->
 <div class="modal-overlay" id="m-agent">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="m-ag-title">Add Agent</div><button class="modal-close" onclick="closeM('m-agent')">&#10005;</button></div>
+    <div class="modal-header">
+      <div class="modal-title" id="m-ag-title">Add Agent</div>
+      <button class="modal-close" onclick="closeM('m-agent')">&#10005;</button>
+    </div>
     <div class="modal-body">
       <input type="hidden" id="ae-id"/>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);">
-        <div><div style="font-size:12px;font-weight:600;">&#128241; Import from Phone Book</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Auto-fill name &amp; phone from contacts</div></div>
-        <button class="btn btn-secondary btn-sm" onclick="pickContact()">Pick Contact</button>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="ae-name" placeholder="Agent full name"/></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="ae-phone" placeholder="+254..."/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="ae-name" placeholder="e.g. Tendai Moyo"/></div>
-        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="ae-phone" placeholder="+254 7XX XXX XXX" /></div>
+        <div class="form-group"><label class="form-label">WhatsApp Number</label><input class="form-control" id="ae-wa" placeholder="+254..."/></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="ae-email" placeholder="email@example.com"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-control" id="ae-wa" placeholder="+254 7XX XXX XXX" /></div>
-        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="ae-email" placeholder="agent@gmail.com"/></div>
+        <div class="form-group"><label class="form-label">Location / Address</label><input class="form-control" id="ae-loc" placeholder="e.g. Westlands, Nairobi"/></div>
+        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="ae-reg" placeholder="e.g. Nairobi"/></div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="ae-loc" placeholder="e.g. Nairobi CBD"/></div>
-        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="ae-reg" list="rl" placeholder="e.g. Nairobi"/><datalist id="rl">
-  <option value="Nairobi"><option value="Mombasa"><option value="Kisumu">
-  <option value="Nakuru"><option value="Eldoret"><option value="Thika">
-  <option value="Nyeri"><option value="Kisii"><option value="Nyanza">
-  <option value="Rift Valley"><option value="Central"><option value="Coast">
-  <option value="Western"><option value="Eastern"><option value="North Eastern">
-</datalist></div>
-      </div>
-      <div class="form-group"><label class="form-label">Apartment / Complex</label><input class="form-control" id="ae-apt" list="al" placeholder="e.g. Joina City, Eastlea Flats&#8230;"/><datalist id="al">
-  <option value="Jogoo House"><option value="Anniversary Towers">
-  <option value="Rahimtulla Tower"><option value="Times Tower">
-  <option value="Nation Centre"><option value="NSSF Building">
-  <option value="Lonrho House"><option value="UAP Tower">
-  <option value="Kencom House"><option value="Co-operative House">
-</datalist></div>
+      <div class="form-group"><label class="form-label">Apartment / Complex</label><input class="form-control" id="ae-apt" list="al" placeholder="e.g. Anniversary Towers"/><datalist id="al">
+        <option value="Jogoo House"><option value="Anniversary Towers"><option value="Rahimtulla Tower">
+        <option value="Times Tower"><option value="Nation Centre"><option value="NSSF Building">
+      </datalist></div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Role at Property</label>
@@ -850,27 +1040,34 @@ tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
+<!-- Add / Edit Voucher Modal -->
 <div class="modal-overlay" id="m-voucher">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="m-vc-title">Add Voucher</div><button class="modal-close" onclick="closeM('m-voucher')">&#10005;</button></div>
+    <div class="modal-header">
+      <div class="modal-title" id="m-vc-title">Add Voucher</div>
+      <button class="modal-close" onclick="closeM('m-voucher')">&#10005;</button>
+    </div>
     <div class="modal-body">
-      <div class="form-group"><label class="form-label">Voucher Code *</label><input class="form-control" id="av-code" placeholder="SCIFI-XXXX-XXXX" style="font-family:monospace;text-transform:uppercase;"/></div>
+      <input type="hidden" id="av-edit-id"/>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Package</label><select class="form-control" id="av-pkg"><option>Daily 1GB</option><option>Weekly 10GB</option><option>Monthly 50GB</option><option>Custom</option></select></div>
-        <div class="form-group"><label class="form-label">Duration (days)</label><select class="form-control" id="av-days"><option value="1">1 Day</option><option value="3">3 Days</option><option value="7" selected>7 Days</option><option value="14">14 Days</option><option value="30">30 Days</option></select></div>
+        <div class="form-group"><label class="form-label">Voucher Code *</label><input class="form-control" id="av-code" placeholder="e.g. SCIFI-AB12-CD34"/></div>
+        <div class="form-group"><label class="form-label">Package Name *</label><input class="form-control" id="av-pkg" placeholder="e.g. Daily 1GB"/></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Assign to Agent <span style="color:var(--muted);font-weight:400;">(optional — assign &amp; send immediately)</span></label>
-        <select class="form-control" id="av-agent"><option value="">— Unassigned (add to pool) —</option></select>
-      </div>
-      <div id="av-send-method-wrap" style="display:none;">
-        <div class="form-label" style="margin-bottom:6px;">Send via</div>
-        <div style="display:flex;gap:8px;">
-          <div class="sel-card selected" id="avm-wa" onclick="setAVM('whatsapp')" style="flex:1;justify-content:center;font-size:12px;">&#128172; WhatsApp</div>
-          <div class="sel-card" id="avm-sms" onclick="setAVM('sms')" style="flex:1;justify-content:center;font-size:12px;">&#128241; SMS</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Duration (days) *</label><input class="form-control" type="number" id="av-days" placeholder="7" min="1"/></div>
+        <div class="form-group"><label class="form-label">Assign Agent</label>
+          <select class="form-control" id="av-agent" onchange="avAgentChanged()">
+            <option value="">— Unassigned (pool) —</option>
+          </select>
         </div>
       </div>
-      <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);padding:10px;font-size:11px;color:var(--muted);margin-top:10px;">&#8505; Expiry is calculated automatically from the exact moment the voucher is sent.</div>
+      <div id="av-send-method-wrap" style="display:none;margin-bottom:14px;">
+        <label class="form-label">Send via</label>
+        <div style="display:flex;gap:8px;">
+          <div class="sel-card selected" id="avm-wa" onclick="setAVM('whatsapp')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128172; WhatsApp</div>
+          <div class="sel-card" id="avm-sms" onclick="setAVM('sms')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128241; SMS</div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeM('m-voucher')">Cancel</button>
@@ -879,31 +1076,63 @@ tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
+<!-- Bulk Import Modal -->
 <div class="modal-overlay" id="m-bulk-import">
-  <div class="modal modal-lg">
-    <div class="modal-header"><div class="modal-title">Bulk Import Vouchers</div><button class="modal-close" onclick="closeM('m-bulk-import')">&#10005;</button></div>
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#128452; Bulk Import Vouchers</div>
+      <button class="modal-close" onclick="closeM('m-bulk-import')">&#10005;</button>
+    </div>
     <div class="modal-body">
-      <div style="background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.8;">
-        &#128203; One code per line. Format options:<br/>
-        <span style="font-family:monospace;color:var(--accent);">CITQ-XZQB</span> &mdash; just the code (defaults: Standard package, 7 days)<br/>
-        <span style="font-family:monospace;color:var(--accent);">CITQ-XZQB, Weekly 10GB, 7</span> &mdash; with package and days
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Paste voucher codes below — one per line. Format: <code style="font-family:var(--mono);font-size:11px;background:rgba(0,212,255,.08);padding:2px 6px;border-radius:4px;">CODE,Package,Days</code> or just the code.</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Default Package</label><input class="form-control" id="bi-pkg" placeholder="Daily 1GB" value="Daily 1GB"/></div>
+        <div class="form-group"><label class="form-label">Default Duration (days)</label><input class="form-control" type="number" id="bi-days" placeholder="7" value="7"/></div>
       </div>
-      <div class="form-group"><label class="form-label">Paste Voucher Data</label><textarea class="form-control" id="bulk-data" rows="10" style="font-family:monospace;font-size:11px;" placeholder="SCIFI-AA11-BB22, Weekly 10GB, 7&#10;SCIFI-CC33-DD44, Monthly 50GB, 30"></textarea></div>
+      <div class="form-group"><label class="form-label">Voucher Codes *</label><textarea class="form-control" id="bi-codes" rows="10" placeholder="SCIFI-AB12-CD34&#10;SCIFI-EF56-GH78&#10;..."></textarea></div>
+      <div id="bi-preview" style="font-size:11px;color:var(--muted);"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeM('m-bulk-import')">Cancel</button>
-      <button class="btn btn-primary" onclick="doBulkImport()">&#128229; Import</button>
+      <button class="btn btn-primary" onclick="doBulkImport()">&#128452; Import</button>
     </div>
   </div>
 </div>
 
+<!-- Biometric App Lock Modal -->
+<div class="modal-overlay" id="m-biometric">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#128272; Fingerprint App Lock</div>
+      <button class="modal-close" onclick="closeM('m-biometric')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Unlock the installed app with your device's fingerprint or face instead of retyping your password each time. Requires the app to be opened over HTTPS.</div>
+      <div id="bio-status" style="font-size:12px;margin-bottom:16px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);"></div>
+      <button class="btn btn-primary btn-full" id="bio-enable-btn" onclick="enableBiometric()">&#128272; Enable Fingerprint Unlock</button>
+      <button class="btn btn-secondary btn-full" id="bio-disable-btn" style="margin-top:8px;display:none;" onclick="disableBiometric()">&#10005; Disable Fingerprint Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Edit Modal -->
 <div class="modal-overlay" id="m-bulk-edit">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Bulk Edit Selected Vouchers</div><button class="modal-close" onclick="closeM('m-bulk-edit')">&#10005;</button></div>
+    <div class="modal-header">
+      <div class="modal-title">&#9999;&#65039; Bulk Edit Selected Vouchers</div>
+      <button class="modal-close" onclick="closeM('m-bulk-edit')">&#10005;</button>
+    </div>
     <div class="modal-body">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;"><span id="be-cnt">0</span> available vouchers selected. Changes apply to all of them.</div>
-      <div class="form-group"><label class="form-label">Change Package</label><select class="form-control" id="be-pkg"><option value="">&#8212; No change &#8212;</option><option>Daily 1GB</option><option>Weekly 10GB</option><option>Monthly 50GB</option></select></div>
-      <div class="form-group"><label class="form-label">Change Duration</label><select class="form-control" id="be-days"><option value="">&#8212; No change &#8212;</option><option value="1">1 Day</option><option value="3">3 Days</option><option value="7">7 Days (1 Week)</option><option value="14">14 Days</option><option value="30">30 Days (1 Month)</option></select></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;"><span id="be-count">0</span> vouchers selected</div>
+      <div class="form-group"><label class="form-label">Package Name</label><input class="form-control" id="be-pkg" placeholder="Leave blank to keep current"/></div>
+      <div class="form-group"><label class="form-label">Duration (days)</label><input class="form-control" type="number" id="be-days" placeholder="Leave blank to keep current"/></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-control" id="be-status">
+          <option value="">Keep current</option>
+          <option value="available">Available</option>
+          <option value="disabled">Disabled</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeM('m-bulk-edit')">Cancel</button>
@@ -912,7 +1141,92 @@ tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
-<div class="toast-container" id="toasts"></div>
+<!-- Send Voucher to Agent Modal -->
+<div class="modal-overlay" id="m-send-voucher">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#128228; Send Voucher to Agent</div>
+      <button class="modal-close" onclick="closeM('m-send-voucher')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sv-voucher-id"/>
+      <input type="hidden" id="sv-agent-id"/>
+      <div id="sv-voucher-info" style="background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:none;">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:6px;">VOUCHER</div>
+        <div class="code" id="sv-vc-code" style="font-size:15px;letter-spacing:.1em;"></div>
+        <div id="sv-vc-info" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+      </div>
+      <div class="form-group" id="sv-agent-row">
+        <label class="form-label">Select Agent *</label>
+        <select class="form-control" id="sv-agent-sel" onchange="svAgentChanged()">
+          <option value="">— Choose agent —</option>
+        </select>
+      </div>
+      <div class="form-group" id="sv-voucher-row" style="display:none;">
+        <label class="form-label">Select Voucher *</label>
+        <select class="form-control" id="sv-voucher-sel" onchange="svVoucherChanged()">
+          <option value="">— Choose available voucher —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Method</label>
+        <div style="display:flex;gap:8px;">
+          <div class="sel-card selected" id="sv-wa" onclick="setSVMethod('whatsapp')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128172; WhatsApp</div>
+          <div class="sel-card" id="sv-sms" onclick="setSVMethod('sms')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128241; SMS</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message Preview <span style="color:var(--muted);font-size:9px;">(editable)</span></label>
+        <textarea class="form-control" id="sv-msg" rows="12" style="font-size:11px;font-family:var(--mono);line-height:1.7;"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-send-voucher')">Cancel</button>
+      <button class="btn btn-primary" onclick="svSend()">&#128228; Send Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resend Message Modal -->
+<div class="modal-overlay" id="m-resend">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#128260; Resend Message</div>
+      <button class="modal-close" onclick="closeM('m-resend')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="resend-agent-id"/>
+      <div id="resend-agent-info" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+        <div id="resend-av" class="av" style="flex-shrink:0;width:36px;height:36px;font-size:14px;"></div>
+        <div>
+          <div id="resend-agent-name" style="font-weight:700;font-size:13px;"></div>
+          <div id="resend-agent-phone" style="font-size:11px;color:var(--muted);"></div>
+        </div>
+      </div>
+      <div id="resend-vc-row" style="display:none;margin-bottom:12px;">
+        <label class="form-label">Voucher Code</label>
+        <div><span class="vc-chip" id="resend-vc-chip" onclick="copyVC(this.textContent.trim())"></span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Send Via</label>
+        <div style="display:flex;gap:8px;">
+          <div class="sel-card selected" id="rs-wa" onclick="setResendMethod('whatsapp')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128172; WhatsApp</div>
+          <div class="sel-card" id="rs-sms" onclick="setResendMethod('sms')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128241; SMS</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message <span style="color:var(--muted);font-size:10px;">(editable)</span></label>
+        <textarea class="form-control" id="resend-msg" rows="10" style="font-size:11px;font-family:var(--mono);line-height:1.6;"></textarea>
+      </div>
+      <div id="wa-mode-display-resend" style="font-size:11px;margin-top:-6px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-resend')">Cancel</button>
+      <button class="btn btn-primary" onclick="doResend()">&#128228; Send Now</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 /* ═══════════════════════════ CONFIG ═══════════════════════════ */
@@ -1060,7 +1374,144 @@ document.addEventListener('DOMContentLoaded',function(){
   var pp=document.getElementById('li-pass');
   if(ep) ep.addEventListener('keydown',function(e){if(e.key==='Enter' && pp) pp.focus();});
   if(pp) pp.addEventListener('keydown',function(e){if(e.key==='Enter') doLogin();});
+  initAuthFlow();
 });
+
+/* ═══════════════ BIOMETRIC APP LOCK (WebAuthn) ═══════════════ */
+const BIO_CRED_KEY='scifi_bio_cred', BIO_EMAIL_KEY='scifi_bio_email';
+
+function bioStored(){try{return JSON.parse(localStorage.getItem(BIO_CRED_KEY)||'null');}catch(e){return null;}}
+
+async function bioAvailable(){
+  if(!window.PublicKeyCredential||!navigator.credentials) return false;
+  try{return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();}catch(e){return false;}
+}
+function b64urlToBuf(b64url){
+  var pad='='.repeat((4-b64url.length%4)%4);
+  var b64=(b64url+pad).replace(/-/g,'+').replace(/_/g,'/');
+  var str=atob(b64),buf=new Uint8Array(str.length);
+  for(var i=0;i<str.length;i++)buf[i]=str.charCodeAt(i);
+  return buf.buffer;
+}
+function bufToB64url(buf){
+  var bytes=new Uint8Array(buf),str='';
+  for(var i=0;i<bytes.length;i++)str+=String.fromCharCode(bytes[i]);
+  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function renderBioStatus(){
+  var stored=bioStored();
+  var statusEl=document.getElementById('bio-status');
+  var enBtn=document.getElementById('bio-enable-btn');
+  var disBtn=document.getElementById('bio-disable-btn');
+  if(!statusEl) return;
+  var avail=await bioAvailable();
+  if(!avail){
+    statusEl.innerHTML='&#9888;&#65039; Fingerprint/biometric unlock isn\'t available in this browser or on this device (needs HTTPS + a fingerprint/face sensor).';
+    if(enBtn)enBtn.style.display='none';
+    if(disBtn)disBtn.style.display=stored?'block':'none';
+    return;
+  }
+  if(stored){
+    statusEl.innerHTML='&#9989; Fingerprint unlock is <strong style="color:var(--accent3);">enabled</strong> on this device for <strong>'+(localStorage.getItem(BIO_EMAIL_KEY)||'this account')+'</strong>.';
+    if(enBtn)enBtn.style.display='none';
+    if(disBtn)disBtn.style.display='block';
+  }else{
+    statusEl.innerHTML='Fingerprint unlock is not set up on this device yet.';
+    if(enBtn)enBtn.style.display='block';
+    if(disBtn)disBtn.style.display='none';
+  }
+}
+function openBiometricModal(){openM('m-biometric');renderBioStatus();}
+async function enableBiometric(){
+  if(!curUser){toast('Sign in first','warning');return;}
+  if(!(await bioAvailable())){toast('Fingerprint unlock is not available on this device/browser','error');return;}
+  try{
+    var challenge=crypto.getRandomValues(new Uint8Array(32));
+    var userId=new TextEncoder().encode(curUser.id||curUser.email||'admin');
+    var cred=await navigator.credentials.create({publicKey:{
+      challenge:challenge,
+      rp:{name:'SciFi ISP',id:location.hostname},
+      user:{id:userId,name:curUser.email||'admin',displayName:curUser.email||'Admin'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},
+      timeout:60000,
+      attestation:'none'
+    }});
+    if(!cred) throw new Error('No credential created');
+    localStorage.setItem(BIO_CRED_KEY,JSON.stringify({id:bufToB64url(cred.rawId)}));
+    localStorage.setItem(BIO_EMAIL_KEY,curUser.email||'');
+    toast('Fingerprint unlock enabled on this device','success');
+    renderBioStatus();
+  }catch(e){
+    console.error('WebAuthn register error:',e);
+    toast('Could not enable fingerprint unlock: '+(e.message||'unknown error'),'error');
+  }
+}
+function disableBiometric(){
+  localStorage.removeItem(BIO_CRED_KEY);
+  localStorage.removeItem(BIO_EMAIL_KEY);
+  toast('Fingerprint unlock disabled','warning');
+  renderBioStatus();
+}
+async function tryBiometricUnlock(){
+  var stored=bioStored();
+  if(!stored||!(await bioAvailable())) return false;
+  try{
+    var challenge=crypto.getRandomValues(new Uint8Array(32));
+    var assertion=await navigator.credentials.get({publicKey:{
+      challenge:challenge,
+      allowCredentials:[{id:b64urlToBuf(stored.id),type:'public-key'}],
+      userVerification:'required',
+      timeout:60000
+    }});
+    return !!assertion;
+  }catch(e){
+    console.warn('Biometric unlock cancelled/failed:',e);
+    return false;
+  }
+}
+function showLockScreen(email){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('lock-email').textContent=email?('Unlock for '+email):'Use your fingerprint to unlock SciFi ISP';
+  document.getElementById('lock-screen').style.display='flex';
+  setTimeout(doBiometricUnlock,300);
+}
+async function doBiometricUnlock(){
+  var btn=document.getElementById('lock-unlock-btn');
+  btn.innerHTML='&#8987; Waiting for fingerprint&hellip;';btn.disabled=true;
+  var ok=await tryBiometricUnlock();
+  btn.innerHTML='&#128272; Unlock with Fingerprint';btn.disabled=false;
+  if(ok){
+    document.getElementById('lock-screen').style.display='none';
+    bootApp();
+  }else{
+    toast('Fingerprint not recognized — try again or use password','warning');
+  }
+}
+function lockUsePassword(){
+  document.getElementById('lock-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+async function initAuthFlow(){
+  var waited=0;
+  while(!sbClient && waited<3000){await new Promise(function(r){setTimeout(r,150);});waited+=150;}
+  if(!sbClient) return; // no network/CDN — normal login screen stays visible
+  try{
+    var result=await sbClient.auth.getSession();
+    var session=result&&result.data?result.data.session:null;
+    if(session&&session.user){
+      curUser=session.user;isDemo=false;
+      var stored=bioStored();
+      var storedEmail=localStorage.getItem(BIO_EMAIL_KEY);
+      if(stored&&storedEmail&&storedEmail===session.user.email){
+        showLockScreen(session.user.email);
+      }else{
+        bootApp();
+      }
+    }
+  }catch(e){console.warn('Session restore error:',e);}
+}
 
 /* ═══════════════════════ DATA LAYER ══════════════════════════ */
 async function dbGet(t){
@@ -1124,7 +1575,7 @@ function calcExp(sentAt,days){if(!sentAt||!days)return null;const d=new Date(sen
 function fD(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
 function fDT(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 function expBadge(exp){if(!exp)return'';const d=(new Date(exp)-new Date())/(864e5);if(d<0)return'<span class="eb eb-exp">Expired</span>';if(d<3)return`<span class="eb eb-warn">&#9888; ${Math.ceil(d)}d left</span>`;return`<span class="eb eb-ok">&#10003; ${Math.ceil(d)}d left</span>`;}
-function bdg(s){const m={available:'b-available',sent:'b-sent',used:'b-used',expired:'b-expired',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}">${s.replace(/_/g,' ').toUpperCase()}</span>`;}
+function bdg(s){const m={available:'b-available',sent:'b-sent',used:'b-used',expired:'b-expired',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',faulty:'b-expired',resend:'b-sent',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}" style="${s==='faulty'?'background:rgba(255,59,92,.15);color:var(--danger);border-color:rgba(255,59,92,.3);':''}">${s.replace(/_/g,' ').toUpperCase()}</span>`;}
 function av(n,big=''){return`<div class="av ${big}" style="flex-shrink:0;">${n[0].toUpperCase()}</div>`;}
 
 /* ═══════════════════ FILTER DROPDOWNS ══════════════════════ */
@@ -1182,6 +1633,7 @@ function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:
 async function refreshAll(){
   S.agents=await dbGet('agents');S.vouchers=await dbGet('vouchers');S.comms=await dbGet('communications');
   renderDash();renderAgents();renderVouchers();renderTrk();renderCmLog();renderReports();
+  renderFaulty();
   updateBadges();popFilters();initDist();initCmAg();
 }
 
@@ -1191,10 +1643,11 @@ function goP(id,el){
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   if(el)el.classList.add('active');
-  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'WhatsApp Settings',maps:'Agent Map'};
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'WhatsApp Settings',faulty:'Faulty Vouchers',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
   if(window.innerWidth<=900)closeSB();
   if(id==='settings') setTimeout(()=>{try{renderWAStatus();}catch(e){}},50);
+  if(id==='faulty') setTimeout(renderFaulty,50);
 }
 function toggleSB(){const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');s.classList.toggle('open');b.classList.toggle('open',s.classList.contains('open'));}
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-bd').classList.remove('open');}
@@ -1372,6 +1825,24 @@ function openProf(id){
           <button class="btn btn-ghost" onclick="openSetLoc('${a.id}')">&#128204; Location</button>
         </div>
       </div>
+
+      <!-- Router Photos Card -->
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="card-title" style="margin:0;">&#128247; Router / Equipment Photos</div>
+          <label style="cursor:pointer;" title="Add photo">
+            <input type="file" accept="image/*" multiple style="display:none;" onchange="addRouterPhotos('${a.id}',this)"/>
+            <span class="btn btn-secondary" style="font-size:11px;padding:5px 12px;">&#10133; Add Photo</span>
+          </label>
+        </div>
+        <div id="router-photos-loading-${a.id}" style="display:flex;align-items:center;justify-content:center;padding:20px;gap:8px;color:var(--muted);font-size:12px;">
+          &#128260; Loading photos...
+        </div>
+        <div class="router-photo-grid" id="router-photos-${a.id}"></div>
+        <div id="router-photos-empty-${a.id}" style="display:none;font-size:12px;color:var(--muted);padding:12px 0;text-align:center;">
+          &#128247; No photos yet — add router/equipment images for maintenance reference.
+        </div>
+      </div>
       <div class="card">
         <div class="card-title">Stats</div>
         <div class="dr"><span class="dk">Vouchers Received</span><strong style="color:var(--accent);">${aV.length}</strong></div>
@@ -1395,6 +1866,8 @@ function openProf(id){
       </div></div>
     </div>`;
   goP('agent-profile',null);
+  // Load router photos asynchronously after profile renders
+  setTimeout(()=>refreshRouterPhotoUI(a.id), 100);
 }
 
 /* ════════════════════════ VOUCHERS ═════════════════════════ */
@@ -1427,20 +1900,42 @@ function renderVouchers(){
       '<td style="font-size:11px;color:var(--muted);">'+(addedDT&&(v.created_at)?('<span style="color:var(--accent3);">'+new Date(addedDT).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</span>'):'—')+'</td>'+
       '<td>'+(v.expires_at?'<span style="font-size:11px;">'+fDT(v.expires_at)+'</span> '+expBadge(v.expires_at):'<span style="color:var(--muted);font-size:10px;">On send</span>')+'</td>'+
       '<td>'+(ag?'<div style="display:flex;align-items:center;gap:6px;">'+av(ag.full_name)+'<span style="font-size:12px;">'+ag.full_name+'</span></div>':'<span style="color:var(--muted);">—</span>')+'</td>'+
-      '<td>'+bdg(v.status)+'</td>'+
+      '<td>'+bdg(v.status)+(v.fault_reason?'<div style="font-size:9px;color:var(--danger);margin-top:2px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+v.fault_reason+'">⚠ '+v.fault_reason+'</div>':'')+'</td>'+
       '<td>'+
-        '<div class="vc-actions" style="display:flex;gap:4px;">'+
-          '<button class="btn btn-ghost btn-icon btn-sm vcact" data-act="view" data-id="'+v.id+'" title="View">&#128065;</button>'+
-          (v.status==="available"?'<button class="btn btn-primary btn-sm vcact" data-act="sendto" data-id="'+v.id+'" title="Send to Agent" style="font-size:10px;padding:4px 8px;gap:4px;">&#128228; Send</button>':'')+
-          (v.status==="available"?'<button class="btn btn-ghost btn-icon btn-sm vcact" data-act="edit" data-id="'+v.id+'" title="Edit">&#9999;</button>':'')+
-          (v.status==="available"?'<button class="vcact" data-act="disable" data-id="'+v.id+'" title="Disable" style="background:rgba(255,184,0,.15);color:var(--warn);border:none;border-radius:8px;padding:6px;cursor:pointer;font-size:13px;">&#128274;</button>':'')+
-          (v.status==="sent"?'<button class="btn btn-ghost btn-icon btn-sm vcact" data-act="used" data-id="'+v.id+'" title="Mark Used">&#9989;</button>':'')+
-          '<button class="btn btn-danger btn-icon btn-sm vcact" data-act="delete" data-id="'+v.id+'" title="Delete">&#128465;</button>'+
+        '<div class="vc-actions" style="display:flex;gap:3px;align-items:center;flex-wrap:nowrap;">'+
+          (v.status==="available"?'<button class="btn btn-primary btn-sm vcact" data-act="sendto" data-id="'+v.id+'" style="font-size:10px;padding:4px 9px;white-space:nowrap;">&#128228; Send</button>':'')+
+          (v.status==="sent"?'<button class="btn btn-ghost btn-sm vcact" data-act="resendvc" data-id="'+v.id+'" style="font-size:10px;padding:4px 7px;white-space:nowrap;">&#128260; Resend</button>':'')+
+          (v.status==="faulty"?'<button class="vcact" data-act="restore" data-id="'+v.id+'" style="background:rgba(0,255,157,.1);color:var(--accent3);border:1px solid rgba(0,255,157,.2);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:10px;white-space:nowrap;">&#9654; Restore</button>':'')+
+          '<button class="btn btn-ghost btn-icon btn-sm vcact" data-act="view" data-id="'+v.id+'" title="View" style="padding:5px 6px;">&#128065;</button>'+
+          '<div class="vc-more-wrap" style="position:relative;display:inline-block;">'+
+            '<button class="btn btn-ghost btn-icon btn-sm" title="More" style="padding:5px 7px;font-size:14px;" onclick="toggleVCMore(this)">&#8942;</button>'+
+            '<div class="vc-more-menu" style="display:none;position:absolute;right:0;top:110%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);min-width:155px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.5);overflow:hidden;">'+
+              (v.status==="available"?'<button class="vc-more-item vcact" data-act="edit" data-id="'+v.id+'">&#9999;&#xFE0F; Edit</button>':'')+
+              (v.status==="available"?'<button class="vc-more-item vcact" data-act="disable" data-id="'+v.id+'">&#128274; Disable</button>':'')+
+              (v.status==="sent"?'<button class="vc-more-item vcact" data-act="used" data-id="'+v.id+'">&#9989; Mark Used</button>':'')+
+              (v.status!=="faulty"?'<button class="vc-more-item vcact" data-act="faulty" data-id="'+v.id+'" style="color:var(--danger);">&#9888; Mark Faulty</button>':'')+
+              '<button class="vc-more-item vcact" data-act="delete" data-id="'+v.id+'" style="color:var(--danger);">&#128465; Delete</button>'+
+            '</div>'+
+          '</div>'+
         '</div>'+
       '</td>'+
     '</tr>';
   }).join(''):'<tr><td colspan="10"><div class="empty"><div class="empty-icon">&#127967;</div><div class="empty-title">No vouchers</div></div></td></tr>';
 }
+function toggleVCMore(btn){
+  // Close all other open menus first
+  document.querySelectorAll('.vc-more-menu').forEach(m=>{
+    if(m!==btn.nextElementSibling) m.style.display='none';
+  });
+  const menu=btn.nextElementSibling;
+  menu.style.display=menu.style.display==='block'?'none':'block';
+}
+// Close menus when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.vc-more-wrap')) {
+    document.querySelectorAll('.vc-more-menu').forEach(m=>m.style.display='none');
+  }
+});
 function togVC(id,cb){if(cb.checked)selV.add(id);else selV.delete(id);}
 function selAllV(cb){document.querySelectorAll('.vcb').forEach(b=>{b.checked=cb.checked;if(cb.checked)selV.add(b.value);else selV.delete(b.value);});}
 
@@ -1519,7 +2014,7 @@ function svBuildMsg(agent,voucher){
   const days=parseInt(voucher.duration_days)||7;
   const exp=calcExp(now.toISOString(),days);
   return DTPL
-    .replace(/{AGENT_NAME}/g,agent.full_name)
+    .replace(/{AGENT_NAME}/g,(agent.full_name&&agent.full_name.trim())||'Agent')
     .replace(/{VOUCHER_CODE}/g,voucher.voucher_code)
     .replace(/{DURATION}/g,daysToText(days))
     .replace(/{SENT_TIME}/g,now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}))
@@ -1610,6 +2105,9 @@ async function svSend(){
     if(_svMethod==='whatsapp'){
       try{ await sendWhatsApp(agent.whatsapp_number||agent.phone, msg, 0); }
       catch(e){ toast('Message send error: '+e.message,'warning'); }
+    } else if(_svMethod==='sms'){
+      try{ await sendSMS(agent.phone||agent.whatsapp_number, msg, 0); }
+      catch(e){ toast('SMS error: '+e.message,'warning'); }
     }
     toast('Voucher sent to '+agent.full_name+'!','success');
     closeM('m-send-voucher');
@@ -1775,38 +2273,75 @@ async function doBulkEdit(){
   for(const id of av){const p={};if(pkg)p.package_name=pkg;if(days)p.duration_days=parseInt(days);await dbUpd('vouchers',id,p);}
   toast(`Updated ${av.length} vouchers`,'success');selV.clear();closeM('m-bulk-edit');await refreshAll();
 }
+async function bulkDeleteVouchers(){
+  const ids=[...selV];
+  if(!ids.length){toast('Select vouchers first','warning');return;}
+  if(!confirm(`Delete ${ids.length} selected voucher(s)? This cannot be undone.`)) return;
+  for(const id of ids){await dbDel('vouchers',id);}
+  toast(`${ids.length} voucher(s) deleted`,'warning');
+  addNotif('🎫 '+ids.length+' vouchers bulk deleted','voucher');
+  selV.clear();
+  const vca=document.getElementById('vca'); if(vca) vca.checked=false;
+  await refreshAll();
+}
 
 /* ═══════════════════════ DISTRIBUTE ════════════════════════ */
-const DTPL=`Dear {AGENT_NAME} 👋
+const DTPL=`Thank you for choosing SciFi Networks.
 
-Your SciFi ISP voucher is ready! 🌐
+Your Internet Voucher:
 
-┌─────────────────────────┐
-│  🔑 *VOUCHER CODE*        │
-│                         │
-│  *{VOUCHER_CODE}*         │
-│                         │
-│  👆 Tap & hold to copy  │
-└─────────────────────────┘
+{VOUCHER_CODE}
 
-📦 *Package:*  {DURATION}
-⏱ *Activated:* {SENT_TIME}
-⏳ *Expires:*   {EXPIRY_DATE} at {EXPIRY_TIME}
+Need assistance? Our support team is here to help.
 
-💡 _To use: connect to SciFi WiFi → enter code above when prompted._
-
-Support: 📞 {SUPPORT_CONTACT}
-
-SciFi ISP 🚀`;
+📞 Call/WhatsApp: 0110 554 040`;
 
 // assignments: [{agentId, voucherId}]
 // DS is declared in STATE block above
+
+let _distMode = 'all'; // 'all' | 'one'
+
+function setDistMode(mode){
+  _distMode = mode;
+  document.getElementById('dist-mode-all').classList.toggle('selected', mode==='all');
+  document.getElementById('dist-mode-one').classList.toggle('selected', mode==='one');
+  document.getElementById('dist-single-wrap').style.display = mode==='one' ? 'block' : 'none';
+  document.getElementById('dist-multi-wrap').style.display  = mode==='all' ? 'block' : 'none';
+  if(mode==='one'){
+    // Populate single agent dropdown
+    const sel = document.getElementById('dist-single-agent');
+    sel.innerHTML = '<option value="">— Choose an agent —</option>' +
+      S.agents.filter(a=>a.status==='active').map(a=>`<option value="${a.id}">${a.full_name} · ${a.region||a.phone}</option>`).join('');
+    DS.agents = [];
+    document.getElementById('dsa-cnt').textContent = '0';
+  } else {
+    renderDAg();
+  }
+}
+
+function distSingleChanged(){
+  const id = document.getElementById('dist-single-agent').value;
+  DS.agents = id ? [id] : [];
+  document.getElementById('dsa-cnt').textContent = DS.agents.length;
+}
+
+function dDeselectAll(){
+  DS.agents=[];
+  document.querySelectorAll('.dac-cb').forEach(c=>c.checked=false);
+  document.querySelectorAll('.sel-card[id^="dac-"]').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('dsa-cnt').textContent='0';
+}
 
 function initDist(){
   var avCount=S.vouchers.filter(function(v){return v.status==='available';}).length;
   var el=document.getElementById('dist-avail-count'); if(el) el.textContent=avCount;
   renderDAg();
   var msgEl=document.getElementById('d-msg'); if(msgEl&&!msgEl.value) msgEl.value=DTPL;
+  // Populate single-agent dropdown if already in one mode
+  if(_distMode==='one'){
+    const sel=document.getElementById('dist-single-agent');
+    if(sel) sel.innerHTML='<option value="">— Choose an agent —</option>'+S.agents.filter(a=>a.status==='active').map(a=>`<option value="${a.id}">${a.full_name} · ${a.region||a.phone}</option>`).join('');
+  }
 }
 
 function renderDAg(){
@@ -1957,7 +2492,7 @@ async function dSend(){
       .replace(/{SENT_TIME}/g,fDT(now))
       .replace(/{EXPIRY_DATE}/g,expDate)
       .replace(/{EXPIRY_TIME}/g,expTime)
-      .replace(/{AGENT_NAME}/g,a.full_name)
+      .replace(/{AGENT_NAME}/g,(a.full_name&&a.full_name.trim())||'Agent')
       .replace(/{SUPPORT_CONTACT}/g,SUPPORT);
 
     // Update voucher in DB
@@ -1974,6 +2509,14 @@ async function dSend(){
       }catch(e){
         failed++;commStatus='failed';
         toast('Failed to send to '+a.full_name+': '+e.message,'error');
+      }
+    } else if(DS.method==='sms'){
+      try{
+        await sendSMS(a.phone||a.whatsapp_number,msg,i);
+        sent++;
+      }catch(e){
+        failed++;commStatus='failed';
+        toast('SMS failed for '+a.full_name+': '+e.message,'error');
       }
     } else {
       sent++;
@@ -1992,7 +2535,10 @@ async function dSend(){
   addNotif('🎫 '+msg2,'voucher');
 
   if(DS.method==='whatsapp'&&!hasMetaAPI()){
-    setTimeout(()=>toast('\ud83d\udcf1 Tap Send in each WhatsApp window that opened','info'),1500);
+    setTimeout(()=>toast('📱 Tap Send in each WhatsApp window that opened','info'),1500);
+  }
+  if(DS.method==='sms'){
+    setTimeout(()=>toast('📱 Tap Send in each SMS window that opened','info'),1500);
   }
 
   btn.innerHTML='&#128228; Send Now';btn.disabled=false;
@@ -2016,13 +2562,16 @@ async function sendSingleVoucher(voucher, agent, method){
     .replace(/{SENT_TIME}/g,fDT(now))
     .replace(/{EXPIRY_DATE}/g,expDate)
     .replace(/{EXPIRY_TIME}/g,expTime)
-    .replace(/{AGENT_NAME}/g,agent.full_name)
+    .replace(/{AGENT_NAME}/g,(agent.full_name&&agent.full_name.trim())||'Agent')
     .replace(/{SUPPORT_CONTACT}/g,SUPPORT);
   await dbUpd('vouchers',voucher.id,{status:'sent',assigned_agent_id:agent.id,sent_at:now,expires_at:exp});
   let commStatus='delivered';
   if(method==='whatsapp'){
     try{ await sendWhatsApp(agent.whatsapp_number||agent.phone,msg,0); }
     catch(e){ commStatus='failed'; toast('Send failed: '+e.message,'error'); }
+  } else if(method==='sms'){
+    try{ await sendSMS(agent.phone||agent.whatsapp_number,msg,0); }
+    catch(e){ commStatus='failed'; toast('SMS failed: '+e.message,'error'); }
   }
   await dbIns('communications',{id:uid(),agent_id:agent.id,message_type:'voucher',delivery_method:method,message_content:msg,status:commStatus,sent_at:now});
   if(commStatus==='delivered') toast('✅ Voucher '+voucher.voucher_code+' sent to '+agent.full_name,'success');
@@ -2089,6 +2638,14 @@ async function sendComm(){
         failed++;status='failed';
         toast('Failed to send to '+a.full_name+': '+e.message,'error');
       }
+    } else if(cmMethod==='sms'){
+      try{
+        await sendSMS(a.phone||a.whatsapp_number, cnt, i);
+        sent++;
+      }catch(e){
+        failed++;status='failed';
+        toast('SMS failed for '+a.full_name+': '+e.message,'error');
+      }
     } else {
       sent++;
     }
@@ -2098,9 +2655,12 @@ async function sendComm(){
 
   const summary=cmSel.length+' agent(s)';
   if(failed===0){
-    toast('\u2705 Message sent to '+summary+' via '+cmMethod.toUpperCase(),'success');
+    toast('✅ Message sent to '+summary+' via '+cmMethod.toUpperCase(),'success');
     if(cmMethod==='whatsapp'&&!hasMetaAPI()){
-      setTimeout(()=>toast('\ud83d\udcf1 Tap SEND in each WhatsApp window that opened','info'),1200);
+      setTimeout(()=>toast('📱 Tap SEND in each WhatsApp window that opened','info'),1200);
+    }
+    if(cmMethod==='sms'){
+      setTimeout(()=>toast('📱 Tap Send in each SMS window that opened','info'),1200);
     }
   } else {
     toast('\u26a0\ufe0f '+sent+' sent, '+failed+' failed','warning');
@@ -2169,7 +2729,13 @@ function renderTrk(){
     return true;
   });
 
-  var cntEl=document.getElementById('trk-count');
+  // Sort: latest activity first — sent vouchers by sent_at desc, then unsent by created_at desc
+  list.sort(function(a,b){
+    var da = a.sent_at||a.created_at||'';
+    var db = b.sent_at||b.created_at||'';
+    return new Date(db)-new Date(da);
+  });
+  var cntEl = document.getElementById('trk-count');
   if(cntEl) cntEl.textContent=list.length;
 
   document.getElementById('trk-body').innerHTML=list.length?list.map(function(v){
@@ -2420,6 +2986,9 @@ document.addEventListener('DOMContentLoaded',function(){
     else if(act==='used')    markVoucherUsed(id);
     else if(act==='delete')  deleteVoucher(id);
     else if(act==='sendto')  openSendToAgent(id);
+    else if(act==='resendvc') resendVoucher(id);
+    else if(act==='faulty')  openMarkFaulty(id);
+    else if(act==='restore') restoreVoucher(id);
   });
 });
 
@@ -2603,9 +3172,22 @@ async function sendViaMetaAPI(phone, message){
   return data;
 }
 
-/* ════════════════════════════════════════════════════════════
-   RESEND MESSAGE
-   ════════════════════════════════════════════════════════════ */
+/**
+ * sendSMS(phone, message, delayIndex)
+ * Opens the native SMS app with a pre-filled message via sms: URI scheme.
+ * Works on Android and iOS — user just taps Send.
+ */
+async function sendSMS(phone, message, delayIndex=0){
+  let num = (phone||'').replace(/\D/g,'');
+  if(!num) throw new Error('No phone number');
+  // Ensure international format for sms: URI
+  if(num.startsWith('0')) num = '254' + num.slice(1);
+  if(num.length===9) num = '254' + num;
+  const encoded = encodeURIComponent(message);
+  const url = `sms:+${num}?body=${encoded}`;
+  await new Promise(r => setTimeout(r, delayIndex * 700));
+  window.open(url, '_self');
+}
 let _resendMethod = 'whatsapp';
 
 function setResendMethod(m){
@@ -2674,6 +3256,8 @@ async function doResend(){
   try{
     if(_resendMethod === 'whatsapp'){
       await sendWhatsApp(a.whatsapp_number || a.phone, msg, 0);
+    } else if(_resendMethod === 'sms'){
+      await sendSMS(a.phone || a.whatsapp_number, msg, 0);
     }
     // Log the resend
     const now = new Date().toISOString();
@@ -2697,7 +3281,284 @@ async function doResend(){
   }
 }
 
-/* ════════════════════════ BOOT ════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   FAULTY VOUCHERS
+   ═══════════════════════════════════════════════════════════ */
+function renderFaulty(){
+  const faulty = S.vouchers.filter(v=>v.status==='faulty');
+  const sub = document.getElementById('faulty-sub');
+  if(sub) sub.textContent = faulty.length+' faulty voucher(s) on record';
+  const nb = document.getElementById('nb-ft');
+  if(nb){ nb.textContent=faulty.length; nb.style.display=faulty.length?'inline-flex':'none'; }
+  const body = document.getElementById('faulty-body');
+  if(!body) return;
+  body.innerHTML = faulty.length ? faulty.map(v=>{
+    const ag = S.agents.find(a=>a.id===v.assigned_agent_id);
+    return `<tr>
+      <td class="code" style="color:var(--danger);">${v.voucher_code}</td>
+      <td>${v.package_name}</td>
+      <td>${ag?ag.full_name:'—'}</td>
+      <td style="font-size:11px;color:var(--danger);">${v.fault_reason||'—'}</td>
+      <td style="font-size:11px;">${fD(v.fault_at||v.created_at)}</td>
+      <td>${bdg('faulty')}</td>
+      <td><div style="display:flex;gap:4px;">
+        <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 8px;" onclick="restoreVoucher('${v.id}')">&#9654; Restore</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteVoucher('${v.id}')">&#128465;</button>
+      </div></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="7"><div class="empty"><div class="empty-icon">&#9989;</div><div class="empty-title">No faulty vouchers</div></div></td></tr>`;
+}
+
+function openMarkFaulty(id){
+  const v = S.vouchers.find(x=>x.id===id);
+  if(!v) return;
+  document.getElementById('faulty-vc-id').value = id;
+  document.getElementById('faulty-vc-code').textContent = v.voucher_code;
+  document.getElementById('faulty-reason-sel').value = '';
+  document.getElementById('faulty-reason-text').value = '';
+  document.getElementById('faulty-notes').value = '';
+  document.getElementById('faulty-reason-other').style.display='none';
+  openM('m-faulty');
+}
+
+async function saveFaulty(){
+  const id = document.getElementById('faulty-vc-id').value;
+  const sel = document.getElementById('faulty-reason-sel').value;
+  const other = document.getElementById('faulty-reason-text').value.trim();
+  const notes = document.getElementById('faulty-notes').value.trim();
+  if(!sel){ toast('Select a reason','warning'); return; }
+  const reason = sel==='other' ? (other||'Other') : sel;
+  const fullReason = notes ? reason+' — '+notes : reason;
+  await dbUpd('vouchers', id, {status:'faulty', fault_reason:fullReason, fault_at:new Date().toISOString()});
+  const v = S.vouchers.find(x=>x.id===id);
+  addNotif('⚠️ Voucher '+(v?.voucher_code||id)+' marked faulty: '+reason,'voucher');
+  toast('Voucher marked as faulty','warning');
+  closeM('m-faulty');
+  await refreshAll();
+}
+
+async function restoreVoucher(id){
+  if(!confirm('Restore this voucher to Available status?')) return;
+  await dbUpd('vouchers', id, {status:'available', fault_reason:null, fault_at:null});
+  const v = S.vouchers.find(x=>x.id===id);
+  addNotif('✅ Voucher '+(v?.voucher_code||id)+' restored to available','voucher');
+  toast('Voucher restored','success');
+  await refreshAll();
+}
+
+/* resend a sent voucher's message to the agent */
+async function resendVoucher(id){
+  const v = S.vouchers.find(x=>x.id===id);
+  if(!v){ toast('Voucher not found','error'); return; }
+  if(!v.assigned_agent_id){ toast('No agent assigned to this voucher','warning'); return; }
+  // Find the original comm message
+  const comm = S.comms.find(c=>c.agent_id===v.assigned_agent_id && c.message_content?.includes(v.voucher_code));
+  if(comm){
+    openResend(comm.id);
+  } else {
+    // Build fresh message
+    const agent = S.agents.find(a=>a.id===v.assigned_agent_id);
+    if(!agent){ toast('Agent not found','error'); return; }
+    const days = parseInt(v.duration_days)||7;
+    const exp = calcExp(new Date().toISOString(), days);
+    const msg = DTPL
+      .replace(/{VOUCHER_CODE}/g, v.voucher_code)
+      .replace(/{DURATION}/g, daysToText(days))
+      .replace(/{SENT_TIME}/g, new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}))
+      .replace(/{EXPIRY_DATE}/g, exp?new Date(exp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—')
+      .replace(/{EXPIRY_TIME}/g, exp?new Date(exp).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'—')
+      .replace(/{SUPPORT_CONTACT}/g, SUPPORT)
+      .replace(/{AGENT_NAME}/g, (agent.full_name&&agent.full_name.trim())||'Agent');
+    // Inject into resend modal directly
+    document.getElementById('resend-agent-id').value = agent.id;
+    const avEl=document.getElementById('resend-av'); if(avEl) avEl.textContent=agent.full_name[0];
+    document.getElementById('resend-agent-name').textContent=agent.full_name;
+    document.getElementById('resend-agent-phone').textContent=agent.whatsapp_number||agent.phone||'';
+    const vcRow=document.getElementById('resend-vc-row'); const vcChipEl=document.getElementById('resend-vc-chip');
+    if(vcRow&&vcChipEl){ vcRow.style.display='block'; vcChipEl.textContent=v.voucher_code; }
+    _resendMethod='whatsapp';
+    document.getElementById('rs-wa').classList.add('selected');
+    document.getElementById('rs-sms').classList.remove('selected');
+    document.getElementById('resend-msg').value=msg;
+    updateResendModeHint();
+    openM('m-resend');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ROUTER PHOTOS — Supabase Storage (bucket: router-photos)
+   Falls back to localStorage in demo mode.
+   Create bucket "router-photos" (public) in Supabase dashboard.
+   ═══════════════════════════════════════════════════════════ */
+
+const PHOTO_BUCKET = 'router-photos';
+
+function _lsGetPhotos(agentId){
+  try{ return JSON.parse(localStorage.getItem('router_photos_'+agentId)||'[]'); }
+  catch(e){ return []; }
+}
+function _lsSavePhotos(agentId,photos){
+  try{ localStorage.setItem('router_photos_'+agentId,JSON.stringify(photos)); }
+  catch(e){ toast('Local storage full','warning'); }
+}
+
+async function getRouterPhotos(agentId){
+  if(isDemo||!sbClient) return _lsGetPhotos(agentId);
+  try{
+    const {data,error}=await sbClient.storage.from(PHOTO_BUCKET).list(agentId+'/',{sortBy:{column:'created_at',order:'desc'}});
+    if(error||!data) return _lsGetPhotos(agentId);
+    return data.filter(f=>f.name!=='.emptyFolderPlaceholder').map(f=>({
+      id:agentId+'/'+f.name, name:f.name,
+      url:sbClient.storage.from(PHOTO_BUCKET).getPublicUrl(agentId+'/'+f.name).data.publicUrl,
+      ts:f.created_at
+    }));
+  }catch(e){ return _lsGetPhotos(agentId); }
+}
+
+async function uploadRouterPhoto(agentId,base64Data,filename){
+  if(isDemo||!sbClient){
+    const photos=_lsGetPhotos(agentId);
+    const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString()};
+    photos.unshift(entry); _lsSavePhotos(agentId,photos); return entry;
+  }
+  try{
+    const res=await fetch(base64Data); const blob=await res.blob();
+    const path=agentId+'/'+Date.now()+'_'+filename.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const {error}=await sbClient.storage.from(PHOTO_BUCKET).upload(path,blob,{contentType:blob.type,upsert:false});
+    if(error) throw error;
+    const url=sbClient.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+    return {id:path,name:filename,url,ts:new Date().toISOString()};
+  }catch(e){
+    const photos=_lsGetPhotos(agentId);
+    const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString()};
+    photos.unshift(entry); _lsSavePhotos(agentId,photos);
+    toast('Saved locally (create "router-photos" bucket in Supabase)','warning');
+    return entry;
+  }
+}
+
+async function deleteRouterPhotoById(agentId,photoId,isStoragePath){
+  if(isDemo||!sbClient||!isStoragePath){
+    const photos=_lsGetPhotos(agentId);
+    const idx=photos.findIndex(p=>p.id===photoId);
+    if(idx>-1){photos.splice(idx,1);_lsSavePhotos(agentId,photos);}
+    return;
+  }
+  try{ await sbClient.storage.from(PHOTO_BUCKET).remove([photoId]); }
+  catch(e){ console.warn('Delete error:',e); }
+}
+
+let _currentPhotos=[];
+
+function renderRouterPhotosHTML(agentId,photos){
+  if(!photos||!photos.length) return '';
+  return photos.map((p,i)=>{
+    const src=p.url||p.data||'';
+    return `<div class="router-photo-thumb" onclick="openPhotoLightbox('${agentId}',${i})" title="${p.name||'Photo'}">
+      <img src="${src}" alt="${p.name||'Photo '+(i+1)}" loading="lazy"/>
+      <button class="router-photo-del" onclick="event.stopPropagation();delPhoto('${agentId}','${p.id}',${!!(p.url&&!p.url.startsWith('data:'))})" title="Delete">&#10005;</button>
+    </div>`;
+  }).join('');
+}
+
+async function refreshRouterPhotoUI(agentId){
+  const grid=document.getElementById('router-photos-'+agentId);
+  const empty=document.getElementById('router-photos-empty-'+agentId);
+  const loadEl=document.getElementById('router-photos-loading-'+agentId);
+  if(!grid) return;
+  if(loadEl) loadEl.style.display='flex';
+  _currentPhotos=await getRouterPhotos(agentId);
+  if(loadEl) loadEl.style.display='none';
+  grid.innerHTML=renderRouterPhotosHTML(agentId,_currentPhotos);
+  if(empty) empty.style.display=_currentPhotos.length?'none':'block';
+}
+
+async function addRouterPhotos(agentId,input){
+  const files=Array.from(input.files); if(!files.length) return;
+  const loadEl=document.getElementById('router-photos-loading-'+agentId);
+  if(loadEl) loadEl.style.display='flex';
+  let added=0;
+  for(const file of files){
+    try{ const c=await compressImage(file,1400,0.85); await uploadRouterPhoto(agentId,c,file.name); added++; }
+    catch(e){ toast('Could not process: '+file.name,'warning'); }
+  }
+  await refreshRouterPhotoUI(agentId);
+  addNotif('📷 '+added+' photo(s) added for '+(S.agents.find(a=>a.id===agentId)?.full_name||agentId),'agent');
+  toast(added+' photo(s) saved','success');
+  input.value='';
+}
+
+async function delPhoto(agentId,photoId,isStoragePath){
+  if(!confirm('Delete this photo?')) return;
+  await deleteRouterPhotoById(agentId,photoId,isStoragePath);
+  await refreshRouterPhotoUI(agentId);
+  if(document.getElementById('photo-lightbox')) closeLightbox();
+  toast('Photo deleted','warning');
+}
+
+function compressImage(file,maxPx,quality){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+        canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=reject; img.src=e.target.result;
+    };
+    reader.onerror=reject; reader.readAsDataURL(file);
+  });
+}
+
+/* Photo lightbox */
+let _lbPhotos=[],_lbIdx=0,_lbAgentId='';
+function openPhotoLightbox(agentId,idx){
+  _lbAgentId=agentId;_lbPhotos=[..._currentPhotos];_lbIdx=idx;showLightbox();
+}
+function showLightbox(){
+  const p=_lbPhotos[_lbIdx];if(!p)return;
+  const existing=document.getElementById('photo-lightbox');if(existing)existing.remove();
+  const src=p.url||p.data||'';
+  const ts=p.ts?new Date(p.ts).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+  const lb=document.createElement('div');lb.id='photo-lightbox';
+  lb.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
+  lb.innerHTML=`
+    <button onclick="closeLightbox()" style="position:absolute;top:16px;right:18px;background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;">&#10005;</button>
+    <div style="display:flex;align-items:center;gap:14px;max-width:94vw;">
+      <button onclick="lbPrev()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:50%;width:42px;height:42px;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&lsaquo;</button>
+      <img src="${src}" style="max-width:80vw;max-height:68vh;border-radius:14px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.8);" onclick="event.stopPropagation()"/>
+      <button onclick="lbNext()" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:50%;width:42px;height:42px;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&rsaquo;</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;color:rgba(255,255,255,.6);font-size:12px;">
+      <span>${p.name||'Photo'}</span>
+      ${ts?'<span style="opacity:.4;">·</span><span>'+ts+'</span>':''}
+      <span style="opacity:.35;">${_lbIdx+1} / ${_lbPhotos.length}</span>
+      <button onclick="downloadRouterPhoto()" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:11px;cursor:pointer;">&#11015; Save</button>
+      <button onclick="delPhoto('${_lbAgentId}','${p.id}',${!!(p.url&&!p.url.startsWith('data:'))})" style="background:rgba(239,68,68,.2);color:#f87171;border:none;border-radius:8px;padding:5px 14px;font-size:11px;cursor:pointer;">&#128465; Delete</button>
+    </div>`;
+  lb.addEventListener('click',e=>{if(e.target===lb)closeLightbox();});
+  document.body.appendChild(lb);
+  document.addEventListener('keydown',_lbKeyHandler);
+}
+function closeLightbox(){const lb=document.getElementById('photo-lightbox');if(lb)lb.remove();document.removeEventListener('keydown',_lbKeyHandler);}
+function _lbKeyHandler(e){if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft')lbPrev();if(e.key==='ArrowRight')lbNext();}
+function lbPrev(){_lbIdx=(_lbIdx-1+_lbPhotos.length)%_lbPhotos.length;showLightbox();}
+function lbNext(){_lbIdx=(_lbIdx+1)%_lbPhotos.length;showLightbox();}
+function downloadRouterPhoto(){
+  const p=_lbPhotos[_lbIdx];if(!p)return;
+  if(p.url&&!p.url.startsWith('data:')){window.open(p.url,'_blank');}
+  else{const a=document.createElement('a');a.href=p.data||p.url;a.download=p.name||'photo.jpg';a.click();}
+}
+function deleteRouterPhoto(agentId,index){delPhoto(agentId,(_currentPhotos[index]||{}).id||String(index),!!((_currentPhotos[index]||{}).url&&!(_currentPhotos[index]||{}).url.startsWith('data:')));}
+
+/* ═══════════════════════════════════════════════════════════
+   BOOT
+   ═══════════════════════════════════════════════════════════ */
+
 function tryInit(){
   if(typeof window['supabase']!=='undefined'&&window['supabase'].createClient){
     initSB();
