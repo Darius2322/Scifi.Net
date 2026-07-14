@@ -485,18 +485,22 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <a class="nav-link" onclick="goP('distribute',this)"><span class="nav-icon">&#128228;</span>Distribute</a>
       <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
       <a class="nav-link" onclick="goP('tracking',this)"><span class="nav-icon">&#128269;</span>Tracking</a>
+      <a class="nav-link" onclick="goP('routers',this)"><span class="nav-icon">&#128225;</span>Routers</a>
+
+      <div class="nav-sec">CUSTOMERS</div>
+      <a class="nav-link" onclick="goP('pppoe',this)"><span class="nav-icon">&#128421;&#65039;</span>PPPoE Customers</a>
+      <a class="nav-link" onclick="goP('random',this)"><span class="nav-icon">&#127919;</span>Random Voucher</a>
 
       <div class="nav-sec">ANALYTICS</div>
       <a class="nav-link" onclick="goP('reports',this)"><span class="nav-icon">&#128200;</span>Reports</a>
       <div class="nav-sec">SYSTEM</div>
-      <a class="nav-link" onclick="goP('settings',this)"><span class="nav-icon">&#9881;&#65039;</span>WA Settings</a>
+      <a class="nav-link" onclick="goP('settings',this)"><span class="nav-icon">&#9881;&#65039;</span>Settings</a>
     </nav>
     <div class="sb-footer">
       <div class="user-row">
         <div class="user-av" id="u-av">A</div>
         <div><div class="user-name" id="u-nm">Admin</div><div class="user-role">SUPER ADMIN</div></div>
       </div>
-      <button class="btn-signout" style="background:none;border:1px solid var(--border2);color:var(--accent);margin-bottom:6px;" onclick="openBiometricModal()">&#128272; Fingerprint Unlock</button>
       <button class="btn-signout" onclick="doLogout()">&#9211; Sign Out</button>
     </div>
   </aside>
@@ -821,7 +825,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
               <thead><tr>
                 <th>Code</th><th>Package</th><th>Duration</th>
                 <th>Agent</th><th>Phone</th><th>Region</th>
-                <th>Method</th><th>Sent</th><th>Expires</th><th>Status</th>
+                <th>Method</th><th>Sent</th><th>Expires</th><th>Status</th><th>Actions</th>
               </tr></thead>
               <tbody id="trk-body"></tbody>
             </table>
@@ -944,6 +948,115 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         </div>
       </div>
 
+      <div class="page" id="page-routers">
+        <div class="ph">
+          <div><div class="pt">&#128225; Routers</div><div class="ps">Router / equipment photos for every agent, in one place</div></div>
+          <div class="pa">
+            <button class="btn btn-secondary" onclick="renderRoutersPage()">&#128260; Refresh</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input class="form-control" id="rt-search" placeholder="&#128269; Search by name, phone, region..." style="flex:2;min-width:200px;" oninput="renderRoutersPage()"/>
+          <select class="form-control" id="rt-region-filter" style="flex:1;min-width:140px;" onchange="renderRoutersPage()"><option value="">All Regions</option></select>
+          <select class="form-control" id="rt-photo-filter" style="flex:1;min-width:140px;" onchange="renderRoutersPage()">
+            <option value="">All Routers</option>
+            <option value="has">With Photos</option>
+            <option value="none">No Photos Yet</option>
+          </select>
+        </div>
+        <div id="routers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;"></div>
+      </div>
+
+      <div class="page" id="page-settings">
+        <div class="ph">
+          <div><div class="pt">&#9881;&#65039; Settings</div><div class="ps">App lock and WhatsApp delivery configuration</div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#128272; Fingerprint App Lock</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Unlock the installed app with your device's fingerprint or face instead of retyping your password each time. Requires the app to be opened over HTTPS, and a screen lock (PIN/pattern/fingerprint) set up on this device.</div>
+          <div id="bio-status" style="font-size:12px;margin-bottom:16px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);"></div>
+          <button class="btn btn-primary" id="bio-enable-btn" onclick="enableBiometric()">&#128272; Enable Fingerprint Unlock</button>
+          <button class="btn btn-secondary" id="bio-disable-btn" style="margin-left:8px;display:none;" onclick="disableBiometric()">&#10005; Disable Fingerprint Unlock</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">&#128172; WhatsApp API (Meta Cloud API)</div>
+          <div id="wa-status-banner" style="margin-bottom:16px;"></div>
+          <div class="form-group">
+            <label class="form-label">Phone Number ID</label>
+            <input class="form-control" id="cfg-phone-id" placeholder="e.g. 109876543210987"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Permanent Access Token</label>
+            <div style="position:relative;">
+              <input class="form-control" type="password" id="cfg-token" placeholder="EAAG..." style="padding-right:44px;"/>
+              <button type="button" onclick="toggleCfgToken()" style="position:absolute;right:0;top:0;bottom:0;width:40px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;">&#128065;</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="saveWAConfig()">&#128190; Save</button>
+            <button class="btn btn-ghost" onclick="clearWAConfig()">&#10005; Clear</button>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:16px;">
+            <div class="card-title" style="font-size:12px;">Send a Test Message</div>
+            <div class="form-group">
+              <label class="form-label">Test Phone Number</label>
+              <input class="form-control" id="cfg-test-num" placeholder="e.g. 254712345678"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Test Message</label>
+              <input class="form-control" id="cfg-test-msg" placeholder="SciFi ISP: API test OK"/>
+            </div>
+            <button class="btn btn-secondary" onclick="testWAConfig()">&#128228; Send Test</button>
+          </div>
+          <div id="wa-mode-display" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-pppoe">
+        <div class="ph">
+          <div><div class="pt">&#128421;&#65039; PPPoE Customers</div><div class="ps" id="pppoe-sub">Directly-connected customers billed monthly, not by voucher</div></div>
+          <div class="pa">
+            <button class="btn btn-primary" onclick="openAddPppoe()">&#10133; Add Customer</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input class="form-control" id="pp-search" placeholder="&#128269; Search by name, phone, username..." style="flex:2;min-width:200px;" oninput="renderPppoe()"/>
+          <select class="form-control" id="pp-status-filter" style="flex:1;min-width:140px;" onchange="renderPppoe()">
+            <option value="">All Statuses</option>
+            <option value="paid">Paid (this month)</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
+        <div class="card"><div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Customer</th><th>Phone</th><th>Username</th><th>Router / Region</th>
+              <th>Monthly Fee</th><th>Last Paid</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="pppoe-body"></tbody>
+          </table>
+        </div></div>
+      </div>
+
+      <div class="page" id="page-random">
+        <div class="ph">
+          <div><div class="pt">&#127919; Random Customer Voucher</div><div class="ps">Ad-hoc voucher sends for walk-ins or exceptions — paid but didn't connect, lost code, etc.</div></div>
+          <div class="pa">
+            <button class="btn btn-primary" onclick="openRandomSend()">&#128228; Send Voucher</button>
+          </div>
+        </div>
+        <div class="card"><div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Date</th><th>Customer</th><th>Phone</th><th>Voucher</th><th>Reason</th><th>Method</th>
+            </tr></thead>
+            <tbody id="random-body"></tbody>
+          </table>
+        </div></div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1000,6 +1113,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
     </div>
     <div class="modal-body">
       <input type="hidden" id="ae-id"/>
+      <button type="button" class="btn btn-secondary btn-full" onclick="pickContact()" style="margin-bottom:14px;">&#128101; Pick from Contacts</button>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="ae-name" placeholder="Agent full name"/></div>
         <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="ae-phone" placeholder="+254..."/></div>
@@ -1016,19 +1130,23 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <option value="Jogoo House"><option value="Anniversary Towers"><option value="Rahimtulla Tower">
         <option value="Times Tower"><option value="Nation Centre"><option value="NSSF Building">
       </datalist></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Role at Property</label>
-          <select class="form-control" id="ae-role">
-            <option value="">— Select role —</option>
-            <option value="tenant">Tenant</option>
-            <option value="caretaker">Caretaker</option>
-            <option value="landlord">Landlord</option>
-          </select>
-        </div>
+      <div class="form-group">
+        <label class="form-label">Role at Property</label>
+        <select class="form-control" id="ae-role">
+          <option value="">— Select role —</option>
+          <option value="tenant">Tenant</option>
+          <option value="caretaker">Caretaker</option>
+          <option value="landlord">Landlord</option>
+        </select>
+      </div>
+      <div class="form-row" id="ae-contact-block" style="display:none;">
         <div class="form-group">
           <label class="form-label" id="ae-contact-label">Landlord / Caretaker Name</label>
           <input class="form-control" id="ae-contact" placeholder="Name of landlord or caretaker"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="ae-contact-phone-label">Landlord / Caretaker Number</label>
+          <input class="form-control" id="ae-contact-phone" placeholder="+254..."/>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="ae-notes" rows="2"></textarea></div>
@@ -1089,7 +1207,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <div class="form-group"><label class="form-label">Default Package</label><input class="form-control" id="bi-pkg" placeholder="Daily 1GB" value="Daily 1GB"/></div>
         <div class="form-group"><label class="form-label">Default Duration (days)</label><input class="form-control" type="number" id="bi-days" placeholder="7" value="7"/></div>
       </div>
-      <div class="form-group"><label class="form-label">Voucher Codes *</label><textarea class="form-control" id="bi-codes" rows="10" placeholder="SCIFI-AB12-CD34&#10;SCIFI-EF56-GH78&#10;..."></textarea></div>
+      <div class="form-group"><label class="form-label">Voucher Codes *</label><textarea class="form-control" id="bi-codes" rows="10" placeholder="SCIFI-AB12-CD34&#10;SCIFI-EF56-GH78&#10;..." oninput="updateBulkPreview()"></textarea></div>
       <div id="bi-preview" style="font-size:11px;color:var(--muted);"></div>
     </div>
     <div class="modal-footer">
@@ -1099,18 +1217,112 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
   </div>
 </div>
 
-<!-- Biometric App Lock Modal -->
-<div class="modal-overlay" id="m-biometric">
+<!-- PPPoE Customer Modal -->
+<div class="modal-overlay" id="m-pppoe">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">&#128272; Fingerprint App Lock</div>
-      <button class="modal-close" onclick="closeM('m-biometric')">&#10005;</button>
+      <div class="modal-title" id="m-pp-title">Add PPPoE Customer</div>
+      <button class="modal-close" onclick="closeM('m-pppoe')">&#10005;</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Unlock the installed app with your device's fingerprint or face instead of retyping your password each time. Requires the app to be opened over HTTPS.</div>
-      <div id="bio-status" style="font-size:12px;margin-bottom:16px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);"></div>
-      <button class="btn btn-primary btn-full" id="bio-enable-btn" onclick="enableBiometric()">&#128272; Enable Fingerprint Unlock</button>
-      <button class="btn btn-secondary btn-full" id="bio-disable-btn" style="margin-top:8px;display:none;" onclick="disableBiometric()">&#10005; Disable Fingerprint Unlock</button>
+      <input type="hidden" id="pp-id"/>
+      <button type="button" class="btn btn-secondary btn-full" onclick="pickContactForPppoe()" style="margin-bottom:14px;">&#128101; Pick from Contacts</button>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="pp-name" placeholder="Customer full name"/></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="pp-phone" placeholder="+254..."/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">WhatsApp Number</label><input class="form-control" id="pp-wa" placeholder="+254..."/></div>
+        <div class="form-group"><label class="form-label">PPPoE Username</label><input class="form-control" id="pp-username" placeholder="e.g. grace.wanjiru"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="pp-region" placeholder="e.g. Nairobi"/></div>
+        <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="pp-location" placeholder="e.g. Kilimani"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Router (Agent)</label><select class="form-control" id="pp-router"><option value="">— None —</option></select></div>
+        <div class="form-group"><label class="form-label">Monthly Fee (KES)</label><input class="form-control" type="number" id="pp-fee" placeholder="2500"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="pp-notes" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-pppoe')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePppoe()">&#10003; Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Random / PPPoE Voucher Send Modal -->
+<div class="modal-overlay" id="m-random-send">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m-rs-title">&#127919; Send Voucher</div>
+      <button class="modal-close" onclick="closeM('m-random-send')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rs2-source" value="walkin"/>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Customer Name</label><input class="form-control" id="rs2-name" placeholder="Optional"/></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="rs2-phone" placeholder="+254..."/></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Voucher *</label>
+        <select class="form-control" id="rs2-voucher"><option value="">— Select an available voucher —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason</label>
+        <select class="form-control" id="rs2-reason" onchange="document.getElementById('rs2-reason-other').style.display=this.value==='other'?'block':'none'">
+          <option value="Paid but did not connect">Paid but didn't connect</option>
+          <option value="Router/device issue">Router / device issue</option>
+          <option value="Lost original voucher">Lost original voucher</option>
+          <option value="PPPoE top-up">PPPoE top-up</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group" id="rs2-reason-other" style="display:none;">
+        <label class="form-label">Describe reason</label>
+        <input class="form-control" id="rs2-reason-text" placeholder="Describe the reason..."/>
+      </div>
+      <div class="form-row">
+        <div class="sel-card selected" id="rs2-wa" onclick="setRs2Method('whatsapp')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128172; WhatsApp</div>
+        <div class="sel-card" id="rs2-sms" onclick="setRs2Method('sms')" style="flex:1;justify-content:center;font-size:11px;padding:8px;">&#128241; SMS</div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="rs2-notes" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-random-send')">Cancel</button>
+      <button class="btn btn-primary" onclick="doRandomSend()">&#128228; Send Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Router Detail Modal -->
+<div class="modal-overlay" id="m-router-detail">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">&#128225; Router Details</div>
+      <button class="modal-close" onclick="closeM('m-router-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div id="rd-av"></div>
+        <div style="min-width:0;">
+          <div id="rd-name" style="font-weight:700;font-size:15px;"></div>
+          <div id="rd-meta" style="font-size:12px;color:var(--muted);"></div>
+        </div>
+      </div>
+      <div id="rd-photo-count" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
+      <div id="rd-photo-grid" class="router-photo-grid"></div>
+      <div style="margin-top:14px;">
+        <label class="btn btn-secondary btn-full" style="cursor:pointer;">
+          &#128247; Add Photo(s)
+          <input type="file" id="rd-file-input" accept="image/*" multiple style="display:none;" onchange="handleRouterUploadFromModal(event)"/>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-router-detail');openProf(_rdAgentId)">&#128100; Full Agent Profile</button>
+      <button class="btn btn-primary" onclick="closeM('m-router-detail')">Done</button>
     </div>
   </div>
 </div>
@@ -1297,6 +1509,13 @@ let DB={
     {id:4,text:'👤 Agent Farai Ncube suspended',time:'Yesterday',read:true,type:'agent',icon:'👤'},
     {id:5,text:'📍 Agent Rutendo Dziva pinned on map',time:'2 days ago',read:true,type:'map',icon:'📍'},
     {id:6,text:'🎫 5 vouchers sent — batch distribute completed',time:'2 days ago',read:true,type:'voucher',icon:'🎫'},
+  ],
+  pppoe:[
+    {id:'p1',full_name:'Grace Wanjiru',phone:'+254766789012',whatsapp_number:'+254766789012',username:'grace.wanjiru',region:'Nairobi',location:'Kilimani',router_agent_id:'a1',monthly_fee:2500,last_pay:'2025-06-18',status:'active',notes:'',created_at:'2024-06-01T08:00:00Z'},
+    {id:'p2',full_name:'Brian Otieno',phone:'+254777890123',whatsapp_number:'+254777890123',username:'brian.otieno',region:'Nyanza',location:'Milimani',router_agent_id:'a3',monthly_fee:2000,last_pay:'2025-05-02',status:'active',notes:'Often pays late',created_at:'2024-07-15T08:00:00Z'},
+  ],
+  randomSends:[
+    {id:'r1',customer_name:'Walk-in customer',phone:'+254788901234',voucher_code:'SCIFI-U1V2-W3X4',reason:'Paid but did not connect',delivery_method:'whatsapp',notes:'',sent_at:'2025-06-10T12:00:00Z'},
   ]
 };
 
@@ -1433,8 +1652,8 @@ async function enableBiometric(){
       rp:{name:'SciFi ISP',id:location.hostname},
       user:{id:userId,name:curUser.email||'admin',displayName:curUser.email||'Admin'},
       pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},
-      timeout:60000,
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged',requireResidentKey:false},
+      timeout:30000,
       attestation:'none'
     }});
     if(!cred) throw new Error('No credential created');
@@ -1444,7 +1663,10 @@ async function enableBiometric(){
     renderBioStatus();
   }catch(e){
     console.error('WebAuthn register error:',e);
-    toast('Could not enable fingerprint unlock: '+(e.message||'unknown error'),'error');
+    var hint=(e.name==='NotAllowedError')
+      ? 'Make sure your device has a screen lock (PIN, pattern, fingerprint, or face) set up in your phone Settings, then try again — and stay on this screen until the prompt appears.'
+      : (e.message||'Unknown error');
+    toast('Could not enable fingerprint unlock: '+hint,'error');
   }
 }
 function disableBiometric(){
@@ -1462,7 +1684,7 @@ async function tryBiometricUnlock(){
       challenge:challenge,
       allowCredentials:[{id:b64urlToBuf(stored.id),type:'public-key'}],
       userVerification:'required',
-      timeout:60000
+      timeout:30000
     }});
     return !!assertion;
   }catch(e){
@@ -1519,10 +1741,12 @@ async function dbGet(t){
     if(t==='agents')return[...DB.agents];
     if(t==='vouchers')return[...DB.vouchers];
     if(t==='communications')return[...DB.comms];
+    if(t==='pppoe_customers')return[...DB.pppoe];
+    if(t==='random_sends')return[...DB.randomSends];
     return[];
   }
   try{
-    const orderCol=t==='agents'?'created_at':t==='vouchers'?'date_added':'sent_at';
+    const orderCol=t==='agents'?'created_at':t==='vouchers'?'date_added':t==='pppoe_customers'?'created_at':t==='random_sends'?'sent_at':'sent_at';
     const{data,error}=await sbClient.from(t).select('*').order(orderCol,{ascending:false});
     if(error){
       // If column doesn't exist fall back to id ordering
@@ -1538,6 +1762,8 @@ async function dbIns(t,row){
     if(t==='agents')DB.agents.push(row);
     if(t==='vouchers')DB.vouchers.push(row);
     if(t==='communications')DB.comms.push(row);
+    if(t==='pppoe_customers')DB.pppoe.push(row);
+    if(t==='random_sends')DB.randomSends.push(row);
     return row;
   }
   const{data,error}=await sbClient.from(t).insert(row).select().single();
@@ -1548,21 +1774,40 @@ async function dbIns(t,row){
   return data;
 }
 async function dbUpd(t,id,patch){
-  if(isDemo){if(t==='agents')DB.agents=DB.agents.map(r=>r.id===id?{...r,...patch}:r);if(t==='vouchers')DB.vouchers=DB.vouchers.map(r=>r.id===id?{...r,...patch}:r);return;}
+  if(isDemo){
+    if(t==='agents')DB.agents=DB.agents.map(r=>r.id===id?{...r,...patch}:r);
+    if(t==='vouchers')DB.vouchers=DB.vouchers.map(r=>r.id===id?{...r,...patch}:r);
+    if(t==='pppoe_customers')DB.pppoe=DB.pppoe.map(r=>r.id===id?{...r,...patch}:r);
+    if(t==='random_sends')DB.randomSends=DB.randomSends.map(r=>r.id===id?{...r,...patch}:r);
+    return;
+  }
   const{error}=await sbClient.from(t).update(patch).eq('id',id);if(error)throw error;
 }
 async function dbDel(t,id){
-  if(isDemo){if(t==='agents')DB.agents=DB.agents.filter(r=>r.id!==id);if(t==='vouchers')DB.vouchers=DB.vouchers.filter(r=>r.id!==id);return;}
+  if(isDemo){
+    if(t==='agents')DB.agents=DB.agents.filter(r=>r.id!==id);
+    if(t==='vouchers')DB.vouchers=DB.vouchers.filter(r=>r.id!==id);
+    if(t==='pppoe_customers')DB.pppoe=DB.pppoe.filter(r=>r.id!==id);
+    if(t==='random_sends')DB.randomSends=DB.randomSends.filter(r=>r.id!==id);
+    return;
+  }
   await sbClient.from(t).delete().eq('id',id);
 }
 
 /* ═══════════════════════════ STATE ═══════════════════════════ */
-let S={agents:[],vouchers:[],comms:[]};
+let S={agents:[],vouchers:[],comms:[],pppoe:[],randomSends:[]};
 let DS={agents:[],assignments:[],method:'whatsapp',step:1};
 let cmMethod='whatsapp',cmSel=[],selV=new Set(),vFilt='all';
 let charts={},curUser=null;
 
 /* ═══════════════════════════ HELPERS ════════════════════════ */
+function normPhone(p){
+  if(!p) return '';
+  var digits=String(p).replace(/\D/g,'');
+  digits=digits.replace(/^0+/,''); // drop leading 0 (local format)
+  if(digits.length>9) digits=digits.slice(-9); // compare last 9 digits (drops country code)
+  return digits;
+}
 function uid(){
   // Generate a proper RFC4122 UUID v4 for Supabase
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
@@ -1632,22 +1877,30 @@ function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:
 /* ════════════════════════ REFRESH ═══════════════════════════ */
 async function refreshAll(){
   S.agents=await dbGet('agents');S.vouchers=await dbGet('vouchers');S.comms=await dbGet('communications');
+  S.pppoe=await dbGet('pppoe_customers');S.randomSends=await dbGet('random_sends');
   renderDash();renderAgents();renderVouchers();renderTrk();renderCmLog();renderReports();
   renderFaulty();
   updateBadges();popFilters();initDist();initCmAg();
+  try{renderPppoe();}catch(e){console.warn(e);}
+  try{renderRandomSends();}catch(e){console.warn(e);}
 }
 
 /* ═══════════════════════ NAVIGATION ════════════════════════ */
 function goP(id,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+  var pageEl=document.getElementById('page-'+id);
+  if(!pageEl){console.warn('goP: no page for',id);return;}
+  pageEl.classList.add('active');
   if(el)el.classList.add('active');
-  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'WhatsApp Settings',faulty:'Faulty Vouchers',packages:'Packages',payments:'Payments',expenses:'Expenses'};
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','pppoe':'PPPoE Customers','random':'Random Customer Voucher',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
   if(window.innerWidth<=900)closeSB();
-  if(id==='settings') setTimeout(()=>{try{renderWAStatus();}catch(e){}},50);
+  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();}catch(e){console.warn(e);}},50);
   if(id==='faulty') setTimeout(renderFaulty,50);
+  if(id==='routers') setTimeout(()=>{try{renderRoutersPage();}catch(e){console.warn(e);}},50);
+  if(id==='pppoe') setTimeout(()=>{try{renderPppoe();}catch(e){console.warn(e);}},50);
+  if(id==='random') setTimeout(()=>{try{renderRandomSends();}catch(e){console.warn(e);}},50);
 }
 function toggleSB(){const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');s.classList.toggle('open');b.classList.toggle('open',s.classList.contains('open'));}
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-bd').classList.remove('open');}
@@ -1690,14 +1943,21 @@ function renderAgents(){
     return`<tr><td><div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openProf('${a.id}')">${av(a.full_name)}<div><div style="font-weight:600;">${a.full_name}</div><div style="font-size:10px;color:var(--muted);">${a.email||''}</div></div></div></td><td style="font-family:monospace;font-size:11px;">${a.phone}</td><td>${a.region||'&#8212;'}</td><td style="font-size:11px;">${a.apartment||'&#8212;'}</td><td style="font-size:11px;color:var(--muted);">${a.date_joined||''}</td><td style="color:var(--accent);font-weight:700;">${vc}</td><td>${bdg(a.status)}</td><td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-icon btn-sm" onclick="openProf('${a.id}')">&#128065;</button><button class="btn btn-ghost btn-icon btn-sm" onclick="editAg('${a.id}')">&#9999;</button><button class="btn btn-ghost btn-icon btn-sm" onclick="togSt('${a.id}')">${a.status==='active'?'&#128274;':'&#9989;'}</button><button class="btn btn-danger btn-icon btn-sm" onclick="delAg('${a.id}')">&#128465;</button></div></td></tr>`;
   }).join(''):`<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No agents found</div></div></td></tr>`;
 }
-function openAddAgent(){document.getElementById('m-ag-title').textContent='Add Agent';document.getElementById('ae-id').value='';['ae-name','ae-phone','ae-wa','ae-email','ae-loc','ae-reg','ae-apt','ae-notes','ae-contact'].forEach(id=>document.getElementById(id).value='');document.getElementById('ae-role').value='';openM('m-agent');}
-// Update contact label based on role
+function openAddAgent(){document.getElementById('m-ag-title').textContent='Add Agent';document.getElementById('ae-id').value='';['ae-name','ae-phone','ae-wa','ae-email','ae-loc','ae-reg','ae-apt','ae-notes','ae-contact','ae-contact-phone'].forEach(id=>document.getElementById(id).value='');document.getElementById('ae-role').value='';document.getElementById('ae-contact-block').style.display='none';openM('m-agent');}
+// Update contact label + visibility based on role
+function updateContactBlock(v){
+  const block=document.getElementById('ae-contact-block');
+  const lbl=document.getElementById('ae-contact-label');
+  const phLbl=document.getElementById('ae-contact-phone-label');
+  if(!block) return;
+  block.style.display=v?'flex':'none';
+  const nameTxt=v==='tenant'?'Landlord / Caretaker Name':v==='caretaker'?'Landlord Name':v==='landlord'?'Caretaker / Agent Name':'Landlord / Caretaker Name';
+  const phTxt=v==='tenant'?'Landlord / Caretaker Number':v==='caretaker'?'Landlord Number':v==='landlord'?'Caretaker / Agent Number':'Landlord / Caretaker Number';
+  if(lbl)lbl.textContent=nameTxt;
+  if(phLbl)phLbl.textContent=phTxt;
+}
 document.addEventListener('change',function(e){
-  if(e.target.id==='ae-role'){
-    const v=e.target.value;
-    const lbl=document.getElementById('ae-contact-label');
-    if(lbl) lbl.textContent=v==='tenant'?'Landlord / Caretaker Name':v==='caretaker'?'Landlord Name':v==='landlord'?'Caretaker / Agent Name':'Landlord / Caretaker Name';
-  }
+  if(e.target.id==='ae-role') updateContactBlock(e.target.value);
 });
 function editAg(id){
   const a=S.agents.find(x=>x.id===id);if(!a)return;
@@ -1713,9 +1973,8 @@ function editAg(id){
   document.getElementById('ae-notes').value=a.notes||'';
   document.getElementById('ae-role').value=a.role||'';
   document.getElementById('ae-contact').value=a.contact_name||'';
-  // Update contact label
-  const lbl=document.getElementById('ae-contact-label');
-  if(lbl){const v=a.role||'';lbl.textContent=v==='tenant'?'Landlord / Caretaker Name':v==='caretaker'?'Landlord Name':v==='landlord'?'Caretaker / Agent Name':'Landlord / Caretaker Name';}
+  document.getElementById('ae-contact-phone').value=a.contact_phone||'';
+  updateContactBlock(a.role||'');
   openM('m-agent');
 }
 async function pickContact(){
@@ -1728,10 +1987,13 @@ async function saveAgent(){
   const phone=document.getElementById('ae-phone').value.trim();
   if(!name){toast('Full name is required','error');return;}
   if(!phone){toast('Phone number is required','error');return;}
+  const dupe=S.agents.find(a=>a.id!==id&&normPhone(a.phone)===normPhone(phone));
+  if(dupe){toast('That phone number is already registered to '+dupe.full_name+' — each agent must have a unique number','error');return;}
   const existing=S.agents.find(a=>a.id===id);
   var aptVal=document.getElementById('ae-apt').value.trim();
   const roleVal=document.getElementById('ae-role').value;
   const contactVal=document.getElementById('ae-contact').value.trim();
+  const contactPhoneVal=document.getElementById('ae-contact-phone').value.trim();
   const row={
     id:id||uid(),
     full_name:name,
@@ -1743,6 +2005,7 @@ async function saveAgent(){
     notes:(document.getElementById('ae-notes').value.trim()||''),
     role:roleVal||null,
     contact_name:contactVal||null,
+    contact_phone:contactPhoneVal||null,
     date_joined:existing?.date_joined||new Date().toISOString().slice(0,10),
     status:existing?.status||'active',
     created_at:existing?.created_at||new Date().toISOString()
@@ -1763,28 +2026,133 @@ async function saveAgent(){
     closeM('m-agent');
     await refreshAll();
   }catch(e){
-    // If apartment column missing, retry without it
-    if(e.message&&e.message.includes('apartment')){
+    // Retry, progressively stripping any columns missing from the live schema
+    var workRow={...row};
+    var stripped=[];
+    var lastErr=e;
+    for(var attempt=0;attempt<6;attempt++){
+      var m=lastErr&&lastErr.message&&lastErr.message.match(/'([a-zA-Z_]+)'\s*column|column\s*'([a-zA-Z_]+)'|Could not find the '([a-zA-Z_]+)'/);
+      var badCol=m?(m[1]||m[2]||m[3]):null;
+      if(!badCol||!(badCol in workRow)) break;
+      delete workRow[badCol];
+      stripped.push(badCol);
       try{
-        var rowNoApt={...row};
-        delete rowNoApt.apartment;
-        if(id&&existing) await dbUpd('agents',id,rowNoApt);
-        else await dbIns('agents',rowNoApt);
-        toast('Agent '+name+' saved (run SQL schema to add apartment column)','success');
+        if(id&&existing) await dbUpd('agents',id,workRow);
+        else await dbIns('agents',workRow);
+        toast('Agent '+name+' saved (run the SQL schema to add: '+stripped.join(', ')+')','warning');
         closeM('m-agent');
         await refreshAll();
         return;
-      }catch(e2){
-        toast('Error saving agent: '+e2.message,'error');
-        return;
-      }
+      }catch(e2){ lastErr=e2; }
     }
-    toast('Error saving agent: '+(e.message||e),'error');
-    console.error('saveAgent error:',e);
+    toast('Error saving agent: '+(lastErr.message||lastErr),'error');
+    console.error('saveAgent error:',lastErr);
   }
 }
 async function togSt(id){const a=S.agents.find(x=>x.id===id);const ns=a.status==='active'?'suspended':'active';await dbUpd('agents',id,{status:ns});toast(`${a.full_name} ${ns}`,ns==='active'?'success':'warning');addNotif(`👤 Agent ${a.full_name} ${ns}`,'agent');await refreshAll();}
 async function delAg(id){const a=S.agents.find(x=>x.id===id);if(!confirm(`Delete ${a?.full_name}?`))return;await dbDel('agents',id);toast('Agent deleted','warning');addNotif(`👤 Agent ${a?.full_name} deleted`,'agent');await refreshAll();}
+let _rdAgentId=null;
+async function openRouterDetail(agentId){
+  const a=S.agents.find(x=>x.id===agentId);
+  if(!a){ toast('Agent not found','error'); return; }
+  _rdAgentId=agentId;
+  document.getElementById('rd-av').innerHTML=av(a.full_name);
+  document.getElementById('rd-name').textContent=a.full_name;
+  document.getElementById('rd-meta').textContent=[a.phone,a.region,a.apartment].filter(Boolean).join(' · ');
+  document.getElementById('rd-file-input').value='';
+  openM('m-router-detail');
+  await refreshRouterDetailModal();
+}
+async function refreshRouterDetailModal(){
+  if(!_rdAgentId) return;
+  const grid=document.getElementById('rd-photo-grid');
+  const cntEl=document.getElementById('rd-photo-count');
+  if(!grid) return;
+  grid.innerHTML='<div style="font-size:11px;color:var(--muted);">Loading photos&hellip;</div>';
+  const photos=await getRouterPhotos(_rdAgentId);
+  _currentPhotos=photos;
+  const html=renderRouterPhotosHTML(_rdAgentId,photos);
+  grid.innerHTML=html||'<div style="font-size:12px;color:var(--muted);">No router photos yet — add one below.</div>';
+  if(cntEl) cntEl.textContent=photos.length+' photo'+(photos.length===1?'':'s');
+}
+async function handleRouterUploadFromModal(evt){
+  const input=evt.target;
+  const files=Array.from(input.files); if(!files.length||!_rdAgentId) return;
+  let added=0;
+  for(const file of files){
+    try{ const c=await compressImage(file,1400,0.85); await uploadRouterPhoto(_rdAgentId,c,file.name); added++; }
+    catch(e){ toast('Could not process: '+file.name,'warning'); }
+  }
+  await refreshRouterDetailModal();
+  try{renderRoutersPage();}catch(e){}
+  addNotif('📷 '+added+' photo(s) added for '+(S.agents.find(a=>a.id===_rdAgentId)?.full_name||_rdAgentId),'agent');
+  toast(added+' photo(s) saved','success');
+  input.value='';
+}
+
+async function renderRoutersPage(){
+  var grid=document.getElementById('routers-grid');
+  if(!grid) return;
+  // populate region filter options once
+  var regionSel=document.getElementById('rt-region-filter');
+  if(regionSel && regionSel.options.length<=1){
+    var regions=[...new Set(S.agents.map(a=>a.region).filter(Boolean))].sort();
+    regionSel.innerHTML='<option value="">All Regions</option>'+regions.map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+  }
+  var q=(document.getElementById('rt-search')?.value||'').toLowerCase().trim();
+  var regionF=document.getElementById('rt-region-filter')?.value||'';
+  var photoF=document.getElementById('rt-photo-filter')?.value||'';
+
+  var list=S.agents.filter(function(a){
+    if(regionF && a.region!==regionF) return false;
+    if(q){
+      var hay=[a.full_name,a.phone,a.whatsapp_number,a.region,a.apartment,a.location].filter(Boolean).join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if(!list.length){
+    grid.innerHTML='<div class="empty"><div class="empty-icon">&#128225;</div><div class="empty-title">No routers match</div></div>';
+    return;
+  }
+  grid.innerHTML=list.map(function(a){
+    return '<div class="card" style="cursor:pointer;" onclick="openRouterDetail(\''+a.id+'\')">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+      +av(a.full_name)
+      +'<div style="min-width:0;"><div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.full_name+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);">'+(a.region||a.phone||'')+'</div></div>'
+      +'</div>'
+      +'<div id="rt-thumb-'+a.id+'" style="font-size:11px;color:var(--muted);">Loading photos&hellip;</div>'
+      +'</div>';
+  }).join('');
+
+  var withPhotoAgentIds=[];
+  await Promise.all(list.map(function(a){
+    return getRouterPhotos(a.id).then(function(photos){
+      var el=document.getElementById('rt-thumb-'+a.id);
+      if(photos.length) withPhotoAgentIds.push(a.id);
+      if(!el) return;
+      if(!photos.length){ el.innerHTML='<span style="color:var(--muted);">No router photos yet — tap to add</span>'; return; }
+      var first=photos[0],src=first.data||first.url||'';
+      el.innerHTML='<div style="display:flex;gap:8px;align-items:center;">'
+        +'<img src="'+src+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--border);"/>'
+        +'<span>'+photos.length+' photo'+(photos.length>1?'s':'')+'</span></div>';
+    }).catch(function(){});
+  }));
+
+  // apply the photo-presence filter post-hoc (needs async photo counts)
+  if(photoF==='has'||photoF==='none'){
+    Array.from(grid.children).forEach(function(card){
+      var thumb=card.querySelector('[id^="rt-thumb-"]');
+      if(!thumb) return;
+      var agentId=thumb.id.replace('rt-thumb-','');
+      var has=withPhotoAgentIds.includes(agentId);
+      card.style.display=((photoF==='has'&&has)||(photoF==='none'&&!has))?'':'none';
+    });
+  }
+}
+
 function openProf(id){
   const a=S.agents.find(x=>x.id===id);if(!a)return;
   const aV=S.vouchers.filter(v=>v.assigned_agent_id===id);
@@ -2208,12 +2576,19 @@ async function saveVoucher(){
     console.error('saveVoucher:',e);
   }
 }
-function openBulkImport(){openM('m-bulk-import');document.getElementById('bulk-data').value='';}
+function openBulkImport(){openM('m-bulk-import');document.getElementById('bi-codes').value='';document.getElementById('bi-preview').textContent='';}
+function updateBulkPreview(){
+  const raw=document.getElementById('bi-codes').value;
+  const lines=raw.split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l.length>2);
+  document.getElementById('bi-preview').textContent=lines.length?lines.length+' line(s) ready to import':'';
+}
 async function doBulkImport(){
-  const raw=document.getElementById('bulk-data').value;
+  const raw=document.getElementById('bi-codes').value;
   if(!raw.trim()){toast('Paste some voucher data first','warning');return;}
   const lines=raw.split(/[\r\n]+/).map(l=>l.trim()).filter(l=>l.length>2);
   if(lines.length===0){toast('No valid lines found','warning');return;}
+  const defPkg=document.getElementById('bi-pkg').value.trim()||'Standard';
+  const defDays=parseInt(document.getElementById('bi-days').value)||7;
   let added=0,dupes=0,errs=0;
   S.vouchers=await dbGet('vouchers');
   const allCodes=new Set(S.vouchers.map(v=>v.voucher_code));
@@ -2225,8 +2600,8 @@ async function doBulkImport(){
     if(!code||code.length<2){errs++;continue;}
     if(allCodes.has(code)){dupes++;continue;}
     allCodes.add(code);
-    const pkg=p[1]||'Standard';
-    const days=parseInt(p[2])||7;
+    const pkg=p[1]||defPkg;
+    const days=parseInt(p[2])||defDays;
     newRows.push({
       id:uid(),
       voucher_code:code,
@@ -2258,7 +2633,7 @@ async function doBulkImport(){
   }
   const msg='Imported '+added+' voucher(s)'+(dupes?', '+dupes+' dupes skipped':'')+(errs?', '+errs+' failed':'');
   toast(msg,added>0?'success':'warning');
-  if(added>0){closeM('m-bulk-import');document.getElementById('bulk-data').value='';}
+  if(added>0){closeM('m-bulk-import');document.getElementById('bi-codes').value='';document.getElementById('bi-preview').textContent='';}
   await refreshAll();
 }
 function openBulkEdit(){
@@ -2753,8 +3128,9 @@ function renderTrk(){
       '<td style="font-size:11px;">'+fDT(v.sent_at)+'</td>'+
       '<td>'+(v.expires_at?'<span style="font-size:11px;">'+fDT(v.expires_at)+'</span> '+expBadge(v.expires_at):'—')+'</td>'+
       '<td>'+bdg(v.status)+'</td>'+
+      '<td>'+(v.status==='sent'?'<button class="btn btn-ghost btn-sm vcact" data-act="resendvc" data-id="'+v.id+'" style="font-size:10px;padding:4px 7px;white-space:nowrap;">&#128260; Resend</button>':'<span style="color:var(--muted);">&#8212;</span>')+'</td>'+
     '</tr>';
-  }).join(''):'<tr><td colspan="10"><div class="empty"><div class="empty-icon">&#128269;</div><div class="empty-title">No results found</div></div></td></tr>';
+  }).join(''):'<tr><td colspan="11"><div class="empty"><div class="empty-icon">&#128269;</div><div class="empty-title">No results found</div></div></td></tr>';
 }
 
 /* ══════════════════════════ REPORTS ════════════════════════ */
@@ -3282,6 +3658,254 @@ async function doResend(){
 }
 
 /* ═══════════════════════════════════════════════════════════
+   PPPOE CUSTOMERS
+   ═══════════════════════════════════════════════════════════ */
+function pppoeStatus(c){
+  if(!c.last_pay) return 'overdue';
+  var last=new Date(c.last_pay);
+  var days=(Date.now()-last.getTime())/86400000;
+  return days<=31?'paid':'overdue';
+}
+function renderPppoe(){
+  var body=document.getElementById('pppoe-body');
+  if(!body) return;
+  var routerSel=document.getElementById('pp-router');
+  if(routerSel && routerSel.options.length<=1){
+    routerSel.innerHTML='<option value="">— None —</option>'+S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+(a.region?' ('+a.region+')':'')+'</option>';}).join('');
+  }
+  var q=(document.getElementById('pp-search')?.value||'').toLowerCase().trim();
+  var statusF=document.getElementById('pp-status-filter')?.value||'';
+  var list=[...S.pppoe];
+  if(q) list=list.filter(function(c){
+    var hay=[c.full_name,c.phone,c.username,c.region,c.location].filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+  if(statusF) list=list.filter(function(c){ return pppoeStatus(c)===statusF; });
+  document.getElementById('pppoe-sub').textContent=S.pppoe.length+' PPPoE customer(s) \u00b7 '+S.pppoe.filter(function(c){return pppoeStatus(c)==='paid';}).length+' paid this month';
+  body.innerHTML=list.length?list.map(function(c){
+    var router=S.agents.find(function(a){return a.id===c.router_agent_id;});
+    var st=pppoeStatus(c);
+    return '<tr><td><div style="display:flex;align-items:center;gap:10px;">'+av(c.full_name)+'<div><div style="font-weight:600;">'+c.full_name+'</div><div style="font-size:10px;color:var(--muted);">'+(c.location||'')+'</div></div></div></td>'+
+      '<td style="font-family:monospace;font-size:11px;">'+(c.phone||'—')+'</td>'+
+      '<td style="font-size:11px;">'+(c.username||'—')+'</td>'+
+      '<td style="font-size:11px;">'+(router?router.full_name:(c.region||'—'))+'</td>'+
+      '<td style="font-size:11px;">'+(c.monthly_fee?('KES '+c.monthly_fee):'—')+'</td>'+
+      '<td style="font-size:11px;color:var(--muted);">'+(c.last_pay?fD(c.last_pay):'Never')+'</td>'+
+      '<td>'+bdg(st==='paid'?'active':'suspended')+'</td>'+
+      '<td><div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        '<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;" onclick="markPppoePaid(\''+c.id+'\')">&#9989; Paid</button>'+
+        '<button class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 8px;" onclick="openRandomSendForPppoe(\''+c.id+'\')">&#128228; Voucher</button>'+
+        '<button class="btn btn-ghost btn-icon btn-sm" onclick="editPppoe(\''+c.id+'\')">&#9999;</button>'+
+        '<button class="btn btn-danger btn-icon btn-sm" onclick="deletePppoe(\''+c.id+'\')">&#128465;</button>'+
+      '</div></td></tr>';
+  }).join(''):'<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128421;&#65039;</div><div class="empty-title">No PPPoE customers yet</div></div></td></tr>';
+}
+function openAddPppoe(){
+  document.getElementById('m-pp-title').textContent='Add PPPoE Customer';
+  document.getElementById('pp-id').value='';
+  ['pp-name','pp-phone','pp-wa','pp-username','pp-region','pp-location','pp-fee','pp-notes'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('pp-router').value='';
+  openM('m-pppoe');
+}
+function editPppoe(id){
+  var c=S.pppoe.find(function(x){return x.id===id;}); if(!c) return;
+  document.getElementById('m-pp-title').textContent='Edit PPPoE Customer';
+  document.getElementById('pp-id').value=c.id;
+  document.getElementById('pp-name').value=c.full_name||'';
+  document.getElementById('pp-phone').value=c.phone||'';
+  document.getElementById('pp-wa').value=c.whatsapp_number||'';
+  document.getElementById('pp-username').value=c.username||'';
+  document.getElementById('pp-region').value=c.region||'';
+  document.getElementById('pp-location').value=c.location||'';
+  document.getElementById('pp-router').value=c.router_agent_id||'';
+  document.getElementById('pp-fee').value=c.monthly_fee||'';
+  document.getElementById('pp-notes').value=c.notes||'';
+  openM('m-pppoe');
+}
+async function pickContactForPppoe(){
+  if(!('contacts'in navigator&&'ContactsManager'in window)){toast('Contact Picker only works in Chrome on Android. Type manually.','warning');return;}
+  try{
+    var c=await navigator.contacts.select(['name','tel'],{multiple:false});
+    if(c&&c.length){
+      var x=c[0];
+      if(x.name&&x.name[0]) document.getElementById('pp-name').value=x.name[0];
+      if(x.tel&&x.tel[0]){
+        var p=x.tel[0].replace(/\s+/g,''); if(p.startsWith('0')) p='+254'+p.slice(1);
+        document.getElementById('pp-phone').value=p;
+        document.getElementById('pp-wa').value=p;
+      }
+      toast('Contact imported! Fill remaining details.','success');
+    }
+  }catch(e){ toast('Cannot access contacts: '+e.message,'error'); }
+}
+async function savePppoe(){
+  var id=document.getElementById('pp-id').value.trim();
+  var name=document.getElementById('pp-name').value.trim();
+  var phone=document.getElementById('pp-phone').value.trim();
+  if(!name){toast('Full name is required','error');return;}
+  if(!phone){toast('Phone number is required','error');return;}
+  var dupe=S.pppoe.find(function(c){return c.id!==id&&normPhone(c.phone)===normPhone(phone);});
+  if(dupe){toast('That phone number is already registered to '+dupe.full_name,'error');return;}
+  var existing=S.pppoe.find(function(c){return c.id===id;});
+  var row={
+    id:id||uid(),
+    full_name:name,
+    phone:phone,
+    whatsapp_number:document.getElementById('pp-wa').value.trim()||phone,
+    username:document.getElementById('pp-username').value.trim()||null,
+    region:document.getElementById('pp-region').value.trim()||null,
+    location:document.getElementById('pp-location').value.trim()||null,
+    router_agent_id:document.getElementById('pp-router').value||null,
+    monthly_fee:parseFloat(document.getElementById('pp-fee').value)||null,
+    notes:document.getElementById('pp-notes').value.trim()||null,
+    last_pay:existing?.last_pay||null,
+    status:existing?.status||'active',
+    created_at:existing?.created_at||new Date().toISOString()
+  };
+  try{
+    if(id&&existing){ await dbUpd('pppoe_customers',id,row); toast('Customer updated','success'); }
+    else{ await dbIns('pppoe_customers',row); toast('Customer '+name+' added','success'); }
+    closeM('m-pppoe');
+    S.pppoe=await dbGet('pppoe_customers'); renderPppoe();
+  }catch(e){
+    console.error('savePppoe error:',e);
+    toast('Could not save — run the pppoe_customers SQL in Supabase first: '+(e.message||''),'error');
+  }
+}
+async function markPppoePaid(id){
+  var c=S.pppoe.find(function(x){return x.id===id;}); if(!c) return;
+  try{
+    await dbUpd('pppoe_customers',id,{last_pay:new Date().toISOString().slice(0,10)});
+    toast(c.full_name+' marked as paid','success');
+    addNotif('💰 '+c.full_name+' (PPPoE) marked as paid','general');
+    S.pppoe=await dbGet('pppoe_customers'); renderPppoe();
+  }catch(e){ toast('Could not update: '+(e.message||''),'error'); }
+}
+async function deletePppoe(id){
+  var c=S.pppoe.find(function(x){return x.id===id;});
+  if(!confirm('Delete '+(c?.full_name||'this customer')+'?')) return;
+  try{
+    await dbDel('pppoe_customers',id);
+    toast('Customer deleted','warning');
+    S.pppoe=await dbGet('pppoe_customers'); renderPppoe();
+  }catch(e){ toast('Could not delete: '+(e.message||''),'error'); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RANDOM / AD-HOC VOUCHER SEND (walk-ins, PPPoE top-ups, exceptions)
+   ═══════════════════════════════════════════════════════════ */
+let _rs2Method='whatsapp';
+function setRs2Method(m){
+  _rs2Method=m;
+  document.getElementById('rs2-wa').classList.toggle('selected',m==='whatsapp');
+  document.getElementById('rs2-sms').classList.toggle('selected',m==='sms');
+}
+function populateRs2VoucherSelect(){
+  var sel=document.getElementById('rs2-voucher');
+  var avail=S.vouchers.filter(function(v){return v.status==='available';});
+  sel.innerHTML='<option value="">— Select an available voucher —</option>'+avail.map(function(v){
+    return '<option value="'+v.id+'">'+v.voucher_code+' — '+v.package_name+'</option>';
+  }).join('');
+}
+function openRandomSend(){
+  document.getElementById('m-rs-title').textContent='🎯 Send Voucher — Walk-in Customer';
+  document.getElementById('rs2-source').value='walkin';
+  document.getElementById('rs2-name').value='';
+  document.getElementById('rs2-phone').value='';
+  document.getElementById('rs2-notes').value='';
+  document.getElementById('rs2-reason').value='Paid but did not connect';
+  document.getElementById('rs2-reason-text').value='';
+  document.getElementById('rs2-reason-other').style.display='none';
+  setRs2Method('whatsapp');
+  populateRs2VoucherSelect();
+  openM('m-random-send');
+}
+function openRandomSendForPppoe(customerId){
+  var c=S.pppoe.find(function(x){return x.id===customerId;}); if(!c) return;
+  document.getElementById('m-rs-title').textContent='🎯 Send Voucher — '+c.full_name;
+  document.getElementById('rs2-source').value='pppoe:'+customerId;
+  document.getElementById('rs2-name').value=c.full_name;
+  document.getElementById('rs2-phone').value=c.whatsapp_number||c.phone||'';
+  document.getElementById('rs2-notes').value='';
+  document.getElementById('rs2-reason').value='PPPoE top-up';
+  document.getElementById('rs2-reason-text').value='';
+  document.getElementById('rs2-reason-other').style.display='none';
+  setRs2Method('whatsapp');
+  populateRs2VoucherSelect();
+  openM('m-random-send');
+}
+function renderRandomSends(){
+  var body=document.getElementById('random-body');
+  if(!body) return;
+  var list=[...S.randomSends].sort(function(a,b){return new Date(b.sent_at)-new Date(a.sent_at);});
+  body.innerHTML=list.length?list.map(function(r){
+    return '<tr><td style="font-size:11px;color:var(--muted);">'+fDT(r.sent_at)+'</td>'+
+      '<td>'+(r.customer_name||'—')+'</td>'+
+      '<td style="font-family:monospace;font-size:11px;">'+(r.phone||'—')+'</td>'+
+      '<td class="code">'+(r.voucher_code||'—')+'</td>'+
+      '<td style="font-size:11px;">'+(r.reason||'—')+'</td>'+
+      '<td>'+bdg(r.delivery_method||'whatsapp')+'</td></tr>';
+  }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#127919;</div><div class="empty-title">No ad-hoc sends yet</div></div></td></tr>';
+}
+async function doRandomSend(){
+  var phone=document.getElementById('rs2-phone').value.trim();
+  var voucherId=document.getElementById('rs2-voucher').value;
+  var name=document.getElementById('rs2-name').value.trim();
+  var reasonSel=document.getElementById('rs2-reason').value;
+  var reasonOther=document.getElementById('rs2-reason-text').value.trim();
+  var notes=document.getElementById('rs2-notes').value.trim();
+  var source=document.getElementById('rs2-source').value;
+  if(!phone){toast('Phone number is required','error');return;}
+  if(!voucherId){toast('Select a voucher','error');return;}
+  var v=S.vouchers.find(function(x){return x.id===voucherId;});
+  if(!v){toast('Voucher not found','error');return;}
+  var reason=reasonSel==='other'?(reasonOther||'Other'):reasonSel;
+
+  var days=parseInt(v.duration_days)||7;
+  var exp=calcExp(new Date().toISOString(),days);
+  var msg=DTPL
+    .replace(/{VOUCHER_CODE}/g,v.voucher_code)
+    .replace(/{DURATION}/g,daysToText(days))
+    .replace(/{SENT_TIME}/g,new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}))
+    .replace(/{EXPIRY_DATE}/g,exp?new Date(exp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—')
+    .replace(/{EXPIRY_TIME}/g,exp?new Date(exp).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'—')
+    .replace(/{SUPPORT_CONTACT}/g,SUPPORT)
+    .replace(/{AGENT_NAME}/g,name||'Customer');
+
+  var btn=document.querySelector('#m-random-send .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    if(_rs2Method==='whatsapp') await sendWhatsApp(phone,msg,0);
+    else await sendSMS(phone,msg,0);
+
+    var now=new Date().toISOString();
+    await dbUpd('vouchers',v.id,{status:'sent',sent_at:now,expires_at:exp});
+
+    var row={
+      id:uid(),
+      customer_name:name||null,
+      phone:phone,
+      voucher_code:v.voucher_code,
+      reason:reason,
+      source:source.startsWith('pppoe:')?'pppoe':'walkin',
+      delivery_method:_rs2Method,
+      notes:notes||null,
+      sent_at:now
+    };
+    try{ await dbIns('random_sends',row); }catch(e){ console.warn('random_sends insert failed (run SQL schema):',e); S.randomSends.unshift(row); }
+
+    addNotif('🎯 Voucher '+v.voucher_code+' sent to '+(name||phone)+' — '+reason,'voucher');
+    toast('Voucher sent to '+(name||phone)+'!','success');
+    closeM('m-random-send');
+    await refreshAll();
+  }catch(e){
+    toast('Send failed: '+(e.message||e),'error');
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='&#128228; Send Now';}
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    FAULTY VOUCHERS
    ═══════════════════════════════════════════════════════════ */
 function renderFaulty(){
@@ -3329,21 +3953,39 @@ async function saveFaulty(){
   if(!sel){ toast('Select a reason','warning'); return; }
   const reason = sel==='other' ? (other||'Other') : sel;
   const fullReason = notes ? reason+' — '+notes : reason;
-  await dbUpd('vouchers', id, {status:'faulty', fault_reason:fullReason, fault_at:new Date().toISOString()});
-  const v = S.vouchers.find(x=>x.id===id);
-  addNotif('⚠️ Voucher '+(v?.voucher_code||id)+' marked faulty: '+reason,'voucher');
-  toast('Voucher marked as faulty','warning');
-  closeM('m-faulty');
-  await refreshAll();
+  try{
+    try{
+      await dbUpd('vouchers', id, {status:'faulty', fault_reason:fullReason, fault_at:new Date().toISOString()});
+    }catch(e){
+      // Retry with just status if fault_reason/fault_at columns don't exist yet
+      if(e.message&&(e.message.includes('column')||e.message.includes('schema')||e.message.includes('Could not find'))){
+        await dbUpd('vouchers', id, {status:'faulty'});
+        toast('Marked faulty (add fault_reason/fault_at columns in Supabase to save the reason too)','warning');
+      } else { throw e; }
+    }
+    const v = S.vouchers.find(x=>x.id===id);
+    addNotif('⚠️ Voucher '+(v?.voucher_code||id)+' marked faulty: '+reason,'voucher');
+    toast('Voucher marked as faulty','warning');
+    closeM('m-faulty');
+    await refreshAll();
+  }catch(e){
+    console.error('saveFaulty error:',e);
+    toast('Could not mark faulty: '+(e.message||'unknown error'),'error');
+  }
 }
 
 async function restoreVoucher(id){
   if(!confirm('Restore this voucher to Available status?')) return;
-  await dbUpd('vouchers', id, {status:'available', fault_reason:null, fault_at:null});
-  const v = S.vouchers.find(x=>x.id===id);
-  addNotif('✅ Voucher '+(v?.voucher_code||id)+' restored to available','voucher');
-  toast('Voucher restored','success');
-  await refreshAll();
+  try{
+    await dbUpd('vouchers', id, {status:'available', fault_reason:null, fault_at:null});
+    const v = S.vouchers.find(x=>x.id===id);
+    addNotif('✅ Voucher '+(v?.voucher_code||id)+' restored to available','voucher');
+    toast('Voucher restored','success');
+    await refreshAll();
+  }catch(e){
+    console.error('restoreVoucher error:',e);
+    toast('Could not restore voucher: '+(e.message||'unknown error'),'error');
+  }
 }
 
 /* resend a sent voucher's message to the agent */
@@ -3387,11 +4029,11 @@ async function resendVoucher(id){
 
 /* ═══════════════════════════════════════════════════════════
    ROUTER PHOTOS — Supabase Storage (bucket: router-photos)
-   Falls back to localStorage in demo mode.
-   Create bucket "router-photos" (public) in Supabase dashboard.
+   Falls back to localStorage in demo mode or if the network/table is unavailable.
+   Requires a "router_photos" table in Supabase (see scifi-isp-schema.sql addition).
    ═══════════════════════════════════════════════════════════ */
 
-const PHOTO_BUCKET = 'router-photos';
+const ROUTER_PHOTOS_TABLE = 'router_photos';
 
 function _lsGetPhotos(agentId){
   try{ return JSON.parse(localStorage.getItem('router_photos_'+agentId)||'[]'); }
@@ -3405,46 +4047,41 @@ function _lsSavePhotos(agentId,photos){
 async function getRouterPhotos(agentId){
   if(isDemo||!sbClient) return _lsGetPhotos(agentId);
   try{
-    const {data,error}=await sbClient.storage.from(PHOTO_BUCKET).list(agentId+'/',{sortBy:{column:'created_at',order:'desc'}});
+    const {data,error}=await sbClient.from(ROUTER_PHOTOS_TABLE).select('*').eq('agent_id',agentId).order('created_at',{ascending:false});
     if(error||!data) return _lsGetPhotos(agentId);
-    return data.filter(f=>f.name!=='.emptyFolderPlaceholder').map(f=>({
-      id:agentId+'/'+f.name, name:f.name,
-      url:sbClient.storage.from(PHOTO_BUCKET).getPublicUrl(agentId+'/'+f.name).data.publicUrl,
-      ts:f.created_at
-    }));
+    return data.map(r=>({id:r.id,name:r.filename,data:r.photo_data,ts:r.created_at,source:'db'}));
   }catch(e){ return _lsGetPhotos(agentId); }
 }
 
 async function uploadRouterPhoto(agentId,base64Data,filename){
   if(isDemo||!sbClient){
     const photos=_lsGetPhotos(agentId);
-    const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString()};
+    const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString(),source:'local'};
     photos.unshift(entry); _lsSavePhotos(agentId,photos); return entry;
   }
   try{
-    const res=await fetch(base64Data); const blob=await res.blob();
-    const path=agentId+'/'+Date.now()+'_'+filename.replace(/[^a-zA-Z0-9._-]/g,'_');
-    const {error}=await sbClient.storage.from(PHOTO_BUCKET).upload(path,blob,{contentType:blob.type,upsert:false});
+    const row={id:uid(),agent_id:agentId,filename:filename,photo_data:base64Data,created_at:new Date().toISOString()};
+    const{error}=await sbClient.from(ROUTER_PHOTOS_TABLE).insert(row);
     if(error) throw error;
-    const url=sbClient.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
-    return {id:path,name:filename,url,ts:new Date().toISOString()};
+    return{id:row.id,name:filename,data:base64Data,ts:row.created_at,source:'db'};
   }catch(e){
+    console.warn('router_photos insert failed, saving locally:',e);
     const photos=_lsGetPhotos(agentId);
-    const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString()};
+    const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString(),source:'local'};
     photos.unshift(entry); _lsSavePhotos(agentId,photos);
-    toast('Saved locally (create "router-photos" bucket in Supabase)','warning');
+    toast('Saved on this device only — run the router_photos SQL in Supabase to store photos in the database','warning');
     return entry;
   }
 }
 
-async function deleteRouterPhotoById(agentId,photoId,isStoragePath){
-  if(isDemo||!sbClient||!isStoragePath){
+async function deleteRouterPhotoById(agentId,photoId,isDbRow){
+  if(isDemo||!sbClient||!isDbRow){
     const photos=_lsGetPhotos(agentId);
     const idx=photos.findIndex(p=>p.id===photoId);
     if(idx>-1){photos.splice(idx,1);_lsSavePhotos(agentId,photos);}
     return;
   }
-  try{ await sbClient.storage.from(PHOTO_BUCKET).remove([photoId]); }
+  try{ await sbClient.from(ROUTER_PHOTOS_TABLE).delete().eq('id',photoId); }
   catch(e){ console.warn('Delete error:',e); }
 }
 
@@ -3453,10 +4090,10 @@ let _currentPhotos=[];
 function renderRouterPhotosHTML(agentId,photos){
   if(!photos||!photos.length) return '';
   return photos.map((p,i)=>{
-    const src=p.url||p.data||'';
+    const src=p.data||p.url||'';
     return `<div class="router-photo-thumb" onclick="openPhotoLightbox('${agentId}',${i})" title="${p.name||'Photo'}">
       <img src="${src}" alt="${p.name||'Photo '+(i+1)}" loading="lazy"/>
-      <button class="router-photo-del" onclick="event.stopPropagation();delPhoto('${agentId}','${p.id}',${!!(p.url&&!p.url.startsWith('data:'))})" title="Delete">&#10005;</button>
+      <button class="router-photo-del" onclick="event.stopPropagation();delPhoto('${agentId}','${p.id}',${p.source==='db'})" title="Delete">&#10005;</button>
     </div>`;
   }).join('');
 }
@@ -3488,10 +4125,11 @@ async function addRouterPhotos(agentId,input){
   input.value='';
 }
 
-async function delPhoto(agentId,photoId,isStoragePath){
+async function delPhoto(agentId,photoId,isDbRow){
   if(!confirm('Delete this photo?')) return;
-  await deleteRouterPhotoById(agentId,photoId,isStoragePath);
+  await deleteRouterPhotoById(agentId,photoId,isDbRow);
   await refreshRouterPhotoUI(agentId);
+  if(_rdAgentId===agentId) await refreshRouterDetailModal();
   if(document.getElementById('photo-lightbox')) closeLightbox();
   toast('Photo deleted','warning');
 }
@@ -3522,7 +4160,7 @@ function openPhotoLightbox(agentId,idx){
 function showLightbox(){
   const p=_lbPhotos[_lbIdx];if(!p)return;
   const existing=document.getElementById('photo-lightbox');if(existing)existing.remove();
-  const src=p.url||p.data||'';
+  const src=p.data||p.url||'';
   const ts=p.ts?new Date(p.ts).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
   const lb=document.createElement('div');lb.id='photo-lightbox';
   lb.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
@@ -3538,7 +4176,7 @@ function showLightbox(){
       ${ts?'<span style="opacity:.4;">·</span><span>'+ts+'</span>':''}
       <span style="opacity:.35;">${_lbIdx+1} / ${_lbPhotos.length}</span>
       <button onclick="downloadRouterPhoto()" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:11px;cursor:pointer;">&#11015; Save</button>
-      <button onclick="delPhoto('${_lbAgentId}','${p.id}',${!!(p.url&&!p.url.startsWith('data:'))})" style="background:rgba(239,68,68,.2);color:#f87171;border:none;border-radius:8px;padding:5px 14px;font-size:11px;cursor:pointer;">&#128465; Delete</button>
+      <button onclick="delPhoto('${_lbAgentId}','${p.id}',${p.source==='db'})" style="background:rgba(239,68,68,.2);color:#f87171;border:none;border-radius:8px;padding:5px 14px;font-size:11px;cursor:pointer;">&#128465; Delete</button>
     </div>`;
   lb.addEventListener('click',e=>{if(e.target===lb)closeLightbox();});
   document.body.appendChild(lb);
@@ -3550,10 +4188,9 @@ function lbPrev(){_lbIdx=(_lbIdx-1+_lbPhotos.length)%_lbPhotos.length;showLightb
 function lbNext(){_lbIdx=(_lbIdx+1)%_lbPhotos.length;showLightbox();}
 function downloadRouterPhoto(){
   const p=_lbPhotos[_lbIdx];if(!p)return;
-  if(p.url&&!p.url.startsWith('data:')){window.open(p.url,'_blank');}
-  else{const a=document.createElement('a');a.href=p.data||p.url;a.download=p.name||'photo.jpg';a.click();}
+  const a=document.createElement('a');a.href=p.data||p.url;a.download=p.name||'photo.jpg';a.click();
 }
-function deleteRouterPhoto(agentId,index){delPhoto(agentId,(_currentPhotos[index]||{}).id||String(index),!!((_currentPhotos[index]||{}).url&&!(_currentPhotos[index]||{}).url.startsWith('data:')));}
+function deleteRouterPhoto(agentId,index){const ph=_currentPhotos[index]||{};delPhoto(agentId,ph.id||String(index),ph.source==='db');}
 
 /* ═══════════════════════════════════════════════════════════
    BOOT
