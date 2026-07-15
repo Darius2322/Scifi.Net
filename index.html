@@ -970,32 +970,26 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
 
       <div class="page" id="page-configs">
         <div class="ph">
-          <div><div class="pt">&#128196; Configuration Files</div><div class="ps" id="configs-sub">Router backup/config files, tagged to the router they belong to</div></div>
-        </div>
-
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-title">&#11014; Upload Config File</div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Router (Agent) *</label>
-              <select class="form-control" id="cf-agent"><option value="">— Select a router —</option></select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">File *</label>
-              <input type="file" class="form-control" id="cf-file-input" multiple/>
-            </div>
+          <div><div class="pt">&#128196; Configuration Files</div><div class="ps" id="configs-sub">All router backup/config files — upload first, assign to a router any time</div></div>
+          <div class="pa">
+            <label class="btn btn-primary" style="cursor:pointer;">
+              &#10133; Add Configuration File
+              <input type="file" id="cf-file-input" multiple style="display:none;" onchange="uploadConfigFromPage()"/>
+            </label>
           </div>
-          <button class="btn btn-primary" onclick="uploadConfigFromPage()">&#11014; Upload</button>
         </div>
 
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
           <input class="form-control" id="cf-search" placeholder="&#128269; Search by router name or filename..." style="flex:2;min-width:200px;" oninput="renderConfigsPage()"/>
-          <select class="form-control" id="cf-router-filter" style="flex:1;min-width:160px;" onchange="renderConfigsPage()"><option value="">All Routers</option></select>
+          <select class="form-control" id="cf-router-filter" style="flex:1;min-width:160px;" onchange="renderConfigsPage()">
+            <option value="">All Files</option>
+            <option value="__unassigned__">Unassigned Only</option>
+          </select>
         </div>
 
         <div class="card"><div class="table-wrap">
           <table>
-            <thead><tr><th>Router</th><th>File</th><th>Size</th><th>Uploaded</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>File</th><th>Size</th><th>Router</th><th>Uploaded</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="configs-body"></tbody>
           </table>
         </div></div>
@@ -1345,6 +1339,60 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
   </div>
 </div>
 
+<!-- Assign Config File / Assign Router Modal -->
+<div class="modal-overlay" id="m-config-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#128196; File Details</div>
+      <button class="modal-close" onclick="closeM('m-config-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <span style="font-size:28px;">&#128196;</span>
+        <div style="min-width:0;">
+          <div id="cd-name" style="font-weight:700;font-size:14px;word-break:break-all;"></div>
+          <div id="cd-status" style="font-size:11px;margin-top:2px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">Uploaded</div>
+          <div id="cd-uploaded" style="font-size:13px;margin-top:2px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">File Size</div>
+          <div id="cd-size" style="font-size:13px;margin-top:2px;"></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">Assigned Routers</div>
+          <div id="cd-routers" style="font-size:13px;margin-top:6px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cd-assign-btn">&#128279; Assign Routers</button>
+      <button class="btn btn-primary" id="cd-download-btn">&#11015; Download</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-assign-config">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="ac-title">Assign</div>
+      <button class="modal-close" onclick="closeM('m-assign-config')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;" id="ac-hint">Select all that apply — a file can be assigned to more than one router.</div>
+      <div id="ac-list" style="display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-assign-config')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAssignConfig()">&#10003; Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- Router Detail Modal -->
 <div class="modal-overlay" id="m-router-detail">
   <div class="modal" style="max-width:520px;">
@@ -1373,10 +1421,13 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <div style="border-top:1px solid var(--border);margin-top:20px;padding-top:16px;">
         <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">&#128196; Configuration Files</div>
         <div id="rd-config-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
-        <label class="btn btn-secondary btn-full" style="cursor:pointer;">
-          &#128196; Add Config File
-          <input type="file" id="rd-config-input" multiple style="display:none;" onchange="handleConfigUploadFromModal(event)"/>
-        </label>
+        <div style="display:flex;gap:8px;">
+          <label class="btn btn-secondary btn-full" style="cursor:pointer;">
+            &#128196; Add New File
+            <input type="file" id="rd-config-input" multiple style="display:none;" onchange="handleConfigUploadFromModal(event)"/>
+          </label>
+          <button class="btn btn-secondary btn-full" onclick="openAssignFileModal(_rdAgentId)">&#128279; Assign Config File</button>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -4226,46 +4277,15 @@ async function deleteRouterPhotoById(agentId,photoId,isDbRow){
    ROUTER CONFIGURATION FILES (backup/config exports per router)
    ═══════════════════════════════════════════════════════════ */
 const ROUTER_CONFIGS_TABLE = 'router_configs';
+const ROUTER_CONFIG_LINKS_TABLE = 'router_config_links';
 
-function _lsGetConfigs(agentId){
-  try{ return JSON.parse(localStorage.getItem('router_configs_'+agentId)||'[]'); }
+function _lsGetConfigPool(){
+  try{ return JSON.parse(localStorage.getItem('router_configs_pool')||'[]'); }
   catch(e){ return []; }
 }
-function _lsSaveConfigs(agentId,configs){
-  try{ localStorage.setItem('router_configs_'+agentId,JSON.stringify(configs)); }
+function _lsSaveConfigPool(list){
+  try{ localStorage.setItem('router_configs_pool',JSON.stringify(list)); }
   catch(e){ toast('Local storage full','warning'); }
-}
-
-async function getRouterConfigs(agentId){
-  const local=_lsGetConfigs(agentId);
-  if(isDemo||!sbClient) return local;
-  try{
-    const {data,error}=await sbClient.from(ROUTER_CONFIGS_TABLE).select('*').eq('agent_id',agentId).order('created_at',{ascending:false});
-    if(error) return local;
-    const dbConfigs=(data||[]).map(r=>({id:r.id,name:r.filename,data:r.file_data,mime:r.mime_type,notes:r.notes,ts:r.created_at,source:'db'}));
-    if(local.length) migrateLocalConfigsToDb(agentId,local);
-    return [...dbConfigs,...local];
-  }catch(e){ return local; }
-}
-
-async function migrateLocalConfigsToDb(agentId,local){
-  let migrated=0;
-  const remaining=[...local];
-  for(const c of local){
-    try{
-      const row={id:c.id,agent_id:agentId,filename:c.name,file_data:c.data,mime_type:c.mime||null,notes:c.notes||null,created_at:c.ts||new Date().toISOString()};
-      const{error}=await sbClient.from(ROUTER_CONFIGS_TABLE).insert(row);
-      if(error) continue;
-      const idx=remaining.findIndex(r=>r.id===c.id);
-      if(idx>-1) remaining.splice(idx,1);
-      migrated++;
-    }catch(e){ /* try again next time */ }
-  }
-  _lsSaveConfigs(agentId,remaining);
-  if(migrated){
-    toast(migrated+' config file(s) moved from this device into the database','success');
-    try{ if(_rdAgentId===agentId) refreshRouterConfigUI(); }catch(e){}
-  }
 }
 
 function fileToBase64(file){
@@ -4277,37 +4297,114 @@ function fileToBase64(file){
   });
 }
 
-async function uploadRouterConfig(agentId,file){
+// Fetch every config file + which router(s) each is currently assigned to.
+async function getAllRouterConfigs(){
+  let dbRows=[];
+  if(!isDemo&&sbClient){
+    try{
+      const{data:files,error:e1}=await sbClient.from(ROUTER_CONFIGS_TABLE).select('*').order('created_at',{ascending:false});
+      const{data:links,error:e2}=await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).select('*');
+      if(!e1&&files){
+        dbRows=files.map(function(r){
+          const agentIds=(!e2&&links)?links.filter(function(l){return l.config_id===r.id;}).map(function(l){return l.agent_id;}):[];
+          return {id:r.id,name:r.filename,data:r.file_data,mime:r.mime_type,ts:r.created_at,source:'db',agent_ids:agentIds};
+        });
+      }
+    }catch(e){ console.warn('getAllRouterConfigs error:',e); }
+  }
+  const local=_lsGetConfigPool();
+  if(!isDemo&&sbClient&&local.length) migrateLocalConfigsToDb(local);
+  return [...dbRows,...local];
+}
+
+// Files assigned to one specific router (used by the Router Detail view)
+async function getRouterConfigs(agentId){
+  const all=await getAllRouterConfigs();
+  return all.filter(function(c){ return (c.agent_ids||[]).includes(agentId); });
+}
+
+async function migrateLocalConfigsToDb(local){
+  let migrated=0;
+  const remaining=[...local];
+  for(const c of local){
+    try{
+      const row={id:c.id,filename:c.name,file_data:c.data,mime_type:c.mime||null,created_at:c.ts||new Date().toISOString()};
+      const{error}=await sbClient.from(ROUTER_CONFIGS_TABLE).insert(row);
+      if(error) continue;
+      for(const agentId of (c.agent_ids||[])){
+        try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:c.id,agent_id:agentId}); }catch(e){}
+      }
+      const idx=remaining.findIndex(r=>r.id===c.id);
+      if(idx>-1) remaining.splice(idx,1);
+      migrated++;
+    }catch(e){ /* try again next time */ }
+  }
+  _lsSaveConfigPool(remaining);
+  if(migrated){
+    toast(migrated+' config file(s) moved from this device into the database','success');
+    try{ renderConfigsPage(); }catch(e){}
+    try{ if(_rdAgentId) refreshRouterConfigUI(); }catch(e){}
+  }
+}
+
+// Upload a new file into the pool, unassigned unless initialAgentId is given
+async function uploadRouterConfig(file,initialAgentId){
   const base64Data=await fileToBase64(file);
+  const initial=initialAgentId?[initialAgentId]:[];
   if(isDemo||!sbClient){
-    const configs=_lsGetConfigs(agentId);
-    const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local'};
-    configs.unshift(entry); _lsSaveConfigs(agentId,configs); return entry;
+    const pool=_lsGetConfigPool();
+    const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local',agent_ids:initial};
+    pool.unshift(entry); _lsSaveConfigPool(pool); return entry;
   }
   try{
-    const row={id:uid(),agent_id:agentId,filename:file.name,file_data:base64Data,mime_type:file.type||'application/octet-stream',created_at:new Date().toISOString()};
+    const row={id:uid(),filename:file.name,file_data:base64Data,mime_type:file.type||'application/octet-stream',created_at:new Date().toISOString()};
     const{error}=await sbClient.from(ROUTER_CONFIGS_TABLE).insert(row);
     if(error) throw error;
-    return{id:row.id,name:file.name,data:base64Data,mime:row.mime_type,ts:row.created_at,source:'db'};
+    for(const agentId of initial){
+      try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:row.id,agent_id:agentId}); }catch(e){}
+    }
+    return{id:row.id,name:file.name,data:base64Data,mime:row.mime_type,ts:row.created_at,source:'db',agent_ids:initial};
   }catch(e){
     console.warn('router_configs insert failed, saving locally:',e);
-    const configs=_lsGetConfigs(agentId);
-    const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local'};
-    configs.unshift(entry); _lsSaveConfigs(agentId,configs);
+    const pool=_lsGetConfigPool();
+    const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local',agent_ids:initial};
+    pool.unshift(entry); _lsSaveConfigPool(pool);
     toast('Saved on this device only — run the router_configs SQL in Supabase to store config files in the database','warning');
     return entry;
   }
 }
 
-async function deleteRouterConfigById(agentId,configId,isDbRow){
-  if(isDemo||!sbClient||!isDbRow){
-    const configs=_lsGetConfigs(agentId);
-    const idx=configs.findIndex(c=>c.id===configId);
-    if(idx>-1){configs.splice(idx,1);_lsSaveConfigs(agentId,configs);}
-    return;
+// Add / remove one router↔file link, on top of whatever storage the file lives in
+async function linkConfigToAgent(config,agentId){
+  if(config.source==='db'&&sbClient){
+    try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:config.id,agent_id:agentId}); }
+    catch(e){ console.warn('link error:',e); }
+  }else{
+    const pool=_lsGetConfigPool();
+    const entry=pool.find(function(c){return c.id===config.id;});
+    if(entry){ if(!entry.agent_ids.includes(agentId)) entry.agent_ids.push(agentId); _lsSaveConfigPool(pool); }
   }
-  try{ await sbClient.from(ROUTER_CONFIGS_TABLE).delete().eq('id',configId); }
-  catch(e){ console.warn('Delete config error:',e); }
+}
+async function unlinkConfigFromAgent(config,agentId){
+  if(config.source==='db'&&sbClient){
+    try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).delete().eq('config_id',config.id).eq('agent_id',agentId); }
+    catch(e){ console.warn('unlink error:',e); }
+  }else{
+    const pool=_lsGetConfigPool();
+    const entry=pool.find(function(c){return c.id===config.id;});
+    if(entry){ entry.agent_ids=(entry.agent_ids||[]).filter(function(id){return id!==agentId;}); _lsSaveConfigPool(pool); }
+  }
+}
+
+// Delete a file entirely (and all its router links)
+async function deleteConfigEverywhere(config){
+  if(config.source==='db'&&sbClient){
+    try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).delete().eq('config_id',config.id); }catch(e){}
+    try{ await sbClient.from(ROUTER_CONFIGS_TABLE).delete().eq('id',config.id); }catch(e){}
+  }else{
+    const pool=_lsGetConfigPool().filter(function(c){return c.id!==config.id;});
+    _lsSaveConfigPool(pool);
+  }
 }
 
 let _currentConfigs=[];
@@ -4317,18 +4414,19 @@ function fmtBytes(b){
   if(b<1048576) return (b/1024).toFixed(1)+' KB';
   return (b/1048576).toFixed(1)+' MB';
 }
-function renderConfigListHTML(agentId,configs){
+function renderConfigListHTML(configs){
   if(!configs||!configs.length) return '<div style="font-size:12px;color:var(--muted);">No configuration files yet.</div>';
-  return configs.map((c,i)=>{
+  return configs.map(function(c,i){
     const sizeApprox=c.data?Math.round(c.data.length*0.75):0;
     return `<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;">
       <span style="font-size:18px;">&#128196;</span>
       <div style="flex:1;min-width:0;">
         <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name||'config file'}</div>
-        <div style="font-size:10px;color:var(--muted);">${fmtBytes(sizeApprox)}${c.source==='db'?' · saved to database':' · saved on this device'}</div>
+        <div style="font-size:10px;color:var(--muted);">${fmtBytes(sizeApprox)}${c.source==='db'?' · saved to database':' · saved on this device'}${(c.agent_ids||[]).length>1?' · shared with '+c.agent_ids.length+' routers':''}</div>
       </div>
-      <button class="btn btn-ghost btn-icon btn-sm" onclick="downloadRouterConfig('${agentId}',${i})" title="Download">&#11015;</button>
-      <button class="btn btn-danger btn-icon btn-sm" onclick="deleteRouterConfig('${agentId}',${i})" title="Delete">&#128465;</button>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="openConfigDetail(_currentConfigs[${i}].id)" title="Details">&#8505;</button>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="downloadRouterConfig(${i})" title="Download">&#11015;</button>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="unlinkFromCurrentRouter(${i})" title="Remove from this router">&#128279;&#10005;</button>
     </div>`;
   }).join('');
 }
@@ -4338,14 +4436,14 @@ async function refreshRouterConfigUI(){
   if(!list) return;
   list.innerHTML='<div style="font-size:11px;color:var(--muted);">Loading files&hellip;</div>';
   _currentConfigs=await getRouterConfigs(_rdAgentId);
-  list.innerHTML=renderConfigListHTML(_rdAgentId,_currentConfigs);
+  list.innerHTML=renderConfigListHTML(_currentConfigs);
 }
 async function handleConfigUploadFromModal(evt){
   const input=evt.target;
   const files=Array.from(input.files); if(!files.length||!_rdAgentId) return;
   let added=0;
   for(const file of files){
-    try{ await uploadRouterConfig(_rdAgentId,file); added++; }
+    try{ await uploadRouterConfig(file,_rdAgentId); added++; }
     catch(e){ toast('Could not upload: '+file.name,'warning'); }
   }
   await refreshRouterConfigUI();
@@ -4353,15 +4451,15 @@ async function handleConfigUploadFromModal(evt){
   toast(added+' config file(s) saved','success');
   input.value='';
 }
-function downloadRouterConfig(agentId,index){
+function downloadRouterConfig(index){
   const c=_currentConfigs[index]; if(!c) return;
   const a=document.createElement('a'); a.href=c.data; a.download=c.name||'router-config.cfg'; a.click();
 }
-async function deleteRouterConfig(agentId,index){
-  const c=_currentConfigs[index]; if(!c) return;
-  if(!confirm('Delete "'+(c.name||'this file')+'"?')) return;
-  await deleteRouterConfigById(agentId,c.id,c.source==='db');
-  toast('Config file deleted','warning');
+async function unlinkFromCurrentRouter(index){
+  const c=_currentConfigs[index]; if(!c||!_rdAgentId) return;
+  if(!confirm('Remove "'+(c.name||'this file')+'" from this router? (The file itself stays available for other routers, and in Configuration Files.)')) return;
+  await unlinkConfigFromAgent(c,_rdAgentId);
+  toast('Removed from this router','warning');
   await refreshRouterConfigUI();
 }
 
@@ -4370,62 +4468,86 @@ async function deleteRouterConfig(agentId,index){
    ═══════════════════════════════════════════════════════════ */
 let _allConfigs=[];
 
-async function getAllRouterConfigs(){
-  let dbRows=[];
-  if(!isDemo&&sbClient){
-    try{
-      const{data,error}=await sbClient.from(ROUTER_CONFIGS_TABLE).select('*').order('created_at',{ascending:false});
-      if(!error&&data) dbRows=data.map(r=>({id:r.id,agent_id:r.agent_id,name:r.filename,data:r.file_data,mime:r.mime_type,ts:r.created_at,source:'db'}));
-    }catch(e){ console.warn('getAllRouterConfigs error:',e); }
-  }
-  // merge in anything still stashed locally per-agent (not yet migrated, or demo mode)
-  let localRows=[];
-  S.agents.forEach(function(a){
-    const local=_lsGetConfigs(a.id);
-    local.forEach(function(c){ localRows.push({...c,agent_id:a.id}); });
-  });
-  return [...dbRows,...localRows];
+function populateRouterFilterOptions(){
+  const sel=document.getElementById('cf-router-filter');
+  if(!sel || sel.dataset.populated) return;
+  sel.innerHTML='<option value="">All Files</option><option value="__unassigned__">Unassigned Only</option>'
+    +S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+'</option>';}).join('');
+  sel.dataset.populated='1';
+}
+
+function routerNamesFor(config){
+  return (config.agent_ids||[]).map(function(id){
+    const a=S.agents.find(function(x){return x.id===id;});
+    return a?a.full_name:null;
+  }).filter(Boolean);
 }
 
 async function renderConfigsPage(){
   const body=document.getElementById('configs-body');
   if(!body) return;
-  // populate agent selects once
-  ['cf-agent','cf-router-filter'].forEach(function(selId){
-    const sel=document.getElementById(selId);
-    if(sel && sel.options.length<=1){
-      const placeholder=selId==='cf-agent'?'— Select a router —':'All Routers';
-      sel.innerHTML='<option value="">'+placeholder+'</option>'+S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+'</option>';}).join('');
-    }
-  });
+  populateRouterFilterOptions();
   body.innerHTML='<tr><td colspan="6"><div style="font-size:12px;color:var(--muted);padding:12px;">Loading&hellip;</div></td></tr>';
   _allConfigs=await getAllRouterConfigs();
 
   const q=(document.getElementById('cf-search')?.value||'').toLowerCase().trim();
   const routerF=document.getElementById('cf-router-filter')?.value||'';
-  let list=_allConfigs.map(function(c){
-    const agent=S.agents.find(function(a){return a.id===c.agent_id;});
-    return {...c,agentName:agent?agent.full_name:'Unknown router'};
-  });
-  if(routerF) list=list.filter(function(c){return c.agent_id===routerF;});
-  if(q) list=list.filter(function(c){return (c.agentName+' '+(c.name||'')).toLowerCase().includes(q);});
+  let list=_allConfigs.map(function(c){ return {...c,routerNames:routerNamesFor(c)}; });
+  if(routerF==='__unassigned__') list=list.filter(function(c){return !c.routerNames.length;});
+  else if(routerF) list=list.filter(function(c){return (c.agent_ids||[]).includes(routerF);});
+  if(q) list=list.filter(function(c){return (c.routerNames.join(' ')+' '+(c.name||'')).toLowerCase().includes(q);});
   list.sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
 
-  document.getElementById('configs-sub').textContent=_allConfigs.length+' configuration file(s) across '+new Set(_allConfigs.map(function(c){return c.agent_id;})).size+' router(s)';
+  const unassignedCount=_allConfigs.filter(function(c){return !(c.agent_ids||[]).length;}).length;
+  document.getElementById('configs-sub').textContent=_allConfigs.length+' configuration file(s)'+(unassignedCount?' · '+unassignedCount+' unassigned':'');
 
   body.innerHTML=list.length?list.map(function(c){
-    const idx=_allConfigs.indexOf(_allConfigs.find(function(x){return x.id===c.id;}));
     const sizeApprox=c.data?Math.round(c.data.length*0.75):0;
-    return '<tr><td style="font-weight:600;">'+c.agentName+'</td>'+
-      '<td style="font-size:11px;">&#128196; '+(c.name||'—')+'</td>'+
+    const routerCell=c.routerNames.length
+      ? c.routerNames.map(function(n){return '<span class="badge b-available" style="margin:1px;">'+n+'</span>';}).join('')
+      : '<span class="badge b-expired">UNASSIGNED</span>';
+    return '<tr><td style="font-size:11px;">&#128196; '+(c.name||'—')+'</td>'+
       '<td style="font-size:11px;color:var(--muted);">'+fmtBytes(sizeApprox)+'</td>'+
+      '<td>'+routerCell+'</td>'+
       '<td style="font-size:11px;color:var(--muted);">'+(c.ts?fDT(c.ts):'—')+'</td>'+
       '<td>'+(c.source==='db'?'<span class="badge b-available">IN DATABASE</span>':'<span class="badge b-expired">DEVICE ONLY</span>')+'</td>'+
-      '<td><div style="display:flex;gap:4px;">'+
+      '<td><div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        '<button class="btn btn-ghost btn-icon btn-sm" onclick="openConfigDetail(\''+c.id+'\')" title="Details">&#8505;</button>'+
+        '<button class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 8px;" onclick="openAssignRouterModal(\''+c.id+'\')">&#128279; Assign Routers</button>'+
         '<button class="btn btn-ghost btn-icon btn-sm" onclick="downloadConfigPage(\''+c.id+'\')" title="Download">&#11015;</button>'+
         '<button class="btn btn-danger btn-icon btn-sm" onclick="deleteConfigPage(\''+c.id+'\')" title="Delete">&#128465;</button>'+
       '</div></td></tr>';
   }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#128196;</div><div class="empty-title">No configuration files yet</div></div></td></tr>';
+}
+
+async function openConfigDetail(configId){
+  let c=_allConfigs.find(function(x){return x.id===configId;})||_currentConfigs.find(function(x){return x.id===configId;});
+  if(!c){
+    const all=await getAllRouterConfigs();
+    c=all.find(function(x){return x.id===configId;});
+  }
+  if(!c){toast('File not found','error');return;}
+
+  document.getElementById('cd-name').textContent=c.name||'config file';
+  document.getElementById('cd-status').innerHTML=c.source==='db'?'<span class="badge b-available">IN DATABASE</span>':'<span class="badge b-expired">DEVICE ONLY</span>';
+  document.getElementById('cd-uploaded').textContent=c.ts?new Date(c.ts).toLocaleString('en-GB',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Unknown';
+  const sizeApprox=c.data?Math.round(c.data.length*0.75):0;
+  document.getElementById('cd-size').textContent=fmtBytes(sizeApprox)||'Unknown';
+
+  const routerNames=routerNamesFor(c);
+  const routersEl=document.getElementById('cd-routers');
+  routersEl.innerHTML=routerNames.length
+    ? routerNames.map(function(n){return '<span class="badge b-available" style="align-self:flex-start;">'+n+'</span>';}).join('')
+    : '<span style="color:var(--muted);">Not assigned to any router yet</span>';
+
+  document.getElementById('cd-download-btn').onclick=function(){
+    const a=document.createElement('a'); a.href=c.data; a.download=c.name||'router-config.cfg'; a.click();
+  };
+  document.getElementById('cd-assign-btn').onclick=function(){
+    closeM('m-config-detail');
+    openAssignRouterModal(c.id);
+  };
+  openM('m-config-detail');
 }
 
 function downloadConfigPage(configId){
@@ -4434,27 +4556,93 @@ function downloadConfigPage(configId){
 }
 async function deleteConfigPage(configId){
   const c=_allConfigs.find(function(x){return x.id===configId;}); if(!c) return;
-  if(!confirm('Delete "'+(c.name||'this file')+'"?')) return;
-  await deleteRouterConfigById(c.agent_id,c.id,c.source==='db');
+  if(!confirm('Delete "'+(c.name||'this file')+'"? This removes it for every router it\'s assigned to.')) return;
+  await deleteConfigEverywhere(c);
   toast('Config file deleted','warning');
   await renderConfigsPage();
 }
 async function uploadConfigFromPage(){
-  const agentId=document.getElementById('cf-agent').value;
   const input=document.getElementById('cf-file-input');
   const files=Array.from(input.files||[]);
-  if(!agentId){toast('Select which router this file belongs to','warning');return;}
   if(!files.length){toast('Choose a file to upload','warning');return;}
   let added=0;
   for(const file of files){
-    try{ await uploadRouterConfig(agentId,file); added++; }
+    try{ await uploadRouterConfig(file); added++; }
     catch(e){ toast('Could not upload: '+file.name,'warning'); }
   }
-  const agentName=(S.agents.find(function(a){return a.id===agentId;})||{}).full_name||'router';
-  addNotif('📄 '+added+' config file(s) uploaded for '+agentName,'agent');
-  toast(added+' file(s) uploaded for '+agentName,'success');
+  addNotif('📄 '+added+' config file(s) uploaded — assign to a router when ready','agent');
+  toast(added+' file(s) uploaded — tap "Assign Routers" to link them','success');
   input.value='';
   await renderConfigsPage();
+}
+
+/* ── Assign modal: multi-select, works in both directions ── */
+let _acMode=null, _acConfig=null, _acAgentId=null;
+
+async function openAssignRouterModal(configId){
+  let c=_allConfigs.find(function(x){return x.id===configId;})||_currentConfigs.find(function(x){return x.id===configId;});
+  if(!c){
+    const all=await getAllRouterConfigs();
+    c=all.find(function(x){return x.id===configId;});
+  }
+  if(!c){toast('File not found','error');return;}
+  _acMode='pickRouters'; _acConfig=c; _acAgentId=null;
+  document.getElementById('ac-title').textContent='Assign Routers — '+(c.name||'file');
+  document.getElementById('ac-hint').textContent='Select every router that should have access to this file.';
+  const assigned=new Set(c.agent_ids||[]);
+  document.getElementById('ac-list').innerHTML=S.agents.map(function(a){
+    return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">'+
+      '<input type="checkbox" value="'+a.id+'" '+(assigned.has(a.id)?'checked':'')+' style="width:16px;height:16px;"/>'+
+      '<span style="font-size:12px;">'+a.full_name+'</span></label>';
+  }).join('');
+  openM('m-assign-config');
+}
+
+async function openAssignFileModal(agentId){
+  if(!agentId){toast('Open a router first','warning');return;}
+  _acMode='pickFiles'; _acAgentId=agentId; _acConfig=null;
+  const agent=S.agents.find(function(a){return a.id===agentId;});
+  document.getElementById('ac-title').textContent='Assign Config Files — '+(agent?agent.full_name:'router');
+  document.getElementById('ac-hint').textContent='Select every file this router should have access to.';
+  const list=document.getElementById('ac-list');
+  list.innerHTML='<div style="font-size:12px;color:var(--muted);">Loading files&hellip;</div>';
+  openM('m-assign-config');
+  const all=await getAllRouterConfigs();
+  if(!all.length){ list.innerHTML='<div style="font-size:12px;color:var(--muted);">No files uploaded yet — add one from Configuration Files first.</div>'; return; }
+  list.innerHTML=all.map(function(c){
+    const others=(c.agent_ids||[]).filter(function(id){return id!==agentId;}).length;
+    return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;">'+
+      '<input type="checkbox" value="'+c.id+'" '+((c.agent_ids||[]).includes(agentId)?'checked':'')+' style="width:16px;height:16px;"/>'+
+      '<span style="font-size:12px;flex:1;">'+(c.name||'file')+(others?' <span style="color:var(--muted);">(also used by '+others+' other router'+(others>1?'s':'')+')</span>':'')+'</span></label>';
+  }).join('');
+  window._acAllFiles=all;
+}
+
+async function confirmAssignConfig(){
+  const checked=Array.from(document.querySelectorAll('#ac-list input[type=checkbox]:checked')).map(function(el){return el.value;});
+  if(_acMode==='pickRouters'){
+    const before=new Set(_acConfig.agent_ids||[]);
+    const after=new Set(checked);
+    for(const id of after){ if(!before.has(id)) await linkConfigToAgent(_acConfig,id); }
+    for(const id of before){ if(!after.has(id)) await unlinkConfigFromAgent(_acConfig,id); }
+    toast('Assignments updated for "'+(_acConfig.name||'file')+'"','success');
+    closeM('m-assign-config');
+    await renderConfigsPage();
+    if(_rdAgentId) await refreshRouterConfigUI();
+  }else if(_acMode==='pickFiles'){
+    const all=window._acAllFiles||_allConfigs;
+    for(const c of all){
+      const wasIn=(c.agent_ids||[]).includes(_acAgentId);
+      const nowIn=checked.includes(c.id);
+      if(nowIn&&!wasIn) await linkConfigToAgent(c,_acAgentId);
+      if(!nowIn&&wasIn) await unlinkConfigFromAgent(c,_acAgentId);
+    }
+    const agentName=(S.agents.find(function(a){return a.id===_acAgentId;})||{}).full_name||'router';
+    toast('Config files updated for '+agentName,'success');
+    closeM('m-assign-config');
+    if(_rdAgentId) await refreshRouterConfigUI();
+    try{ renderConfigsPage(); }catch(e){}
+  }
 }
 
 let _currentPhotos=[];
