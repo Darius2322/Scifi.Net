@@ -486,6 +486,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
       <a class="nav-link" onclick="goP('tracking',this)"><span class="nav-icon">&#128269;</span>Tracking</a>
       <a class="nav-link" onclick="goP('routers',this)"><span class="nav-icon">&#128225;</span>Routers</a>
+      <a class="nav-link" onclick="goP('configs',this)"><span class="nav-icon">&#128196;</span>Configuration Files</a>
 
       <div class="nav-sec">CUSTOMERS</div>
       <a class="nav-link" onclick="goP('pppoe',this)"><span class="nav-icon">&#128421;&#65039;</span>PPPoE Customers</a>
@@ -967,9 +968,57 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <div id="routers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;"></div>
       </div>
 
+      <div class="page" id="page-configs">
+        <div class="ph">
+          <div><div class="pt">&#128196; Configuration Files</div><div class="ps" id="configs-sub">Router backup/config files, tagged to the router they belong to</div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#11014; Upload Config File</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Router (Agent) *</label>
+              <select class="form-control" id="cf-agent"><option value="">— Select a router —</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">File *</label>
+              <input type="file" class="form-control" id="cf-file-input" multiple/>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="uploadConfigFromPage()">&#11014; Upload</button>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input class="form-control" id="cf-search" placeholder="&#128269; Search by router name or filename..." style="flex:2;min-width:200px;" oninput="renderConfigsPage()"/>
+          <select class="form-control" id="cf-router-filter" style="flex:1;min-width:160px;" onchange="renderConfigsPage()"><option value="">All Routers</option></select>
+        </div>
+
+        <div class="card"><div class="table-wrap">
+          <table>
+            <thead><tr><th>Router</th><th>File</th><th>Size</th><th>Uploaded</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="configs-body"></tbody>
+          </table>
+        </div></div>
+      </div>
+
       <div class="page" id="page-settings">
         <div class="ph">
           <div><div class="pt">&#9881;&#65039; Settings</div><div class="ps">App lock and WhatsApp delivery configuration</div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#128247; Router Photo Downloads</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Browsers on Android always save downloads to your phone's normal <strong>Downloads</strong> folder — a website can't choose a different folder for you. What you <em>can</em> set here is a naming prefix, so downloaded router photos are easy to find and group together in that folder.</div>
+          <div class="form-group">
+            <label class="form-label">Filename Prefix</label>
+            <input class="form-control" id="photo-prefix" placeholder="e.g. SciFi-Router" oninput="savePhotoPrefix()"/>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#128193; App File Location</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Useful for confirming which copy of the file you're running, especially after downloading an update.</div>
+          <div id="app-file-path" style="font-size:11px;font-family:var(--mono);word-break:break-all;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;"></div>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
@@ -1313,10 +1362,20 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       </div>
       <div id="rd-photo-count" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
       <div id="rd-photo-grid" class="router-photo-grid"></div>
-      <div style="margin-top:14px;">
+      <div style="margin-top:14px;display:flex;gap:8px;">
         <label class="btn btn-secondary btn-full" style="cursor:pointer;">
           &#128247; Add Photo(s)
           <input type="file" id="rd-file-input" accept="image/*" multiple style="display:none;" onchange="handleRouterUploadFromModal(event)"/>
+        </label>
+        <button class="btn btn-secondary btn-full" onclick="downloadAllRouterPhotos(_rdAgentId)">&#11015; Download All</button>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin-top:20px;padding-top:16px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">&#128196; Configuration Files</div>
+        <div id="rd-config-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+        <label class="btn btn-secondary btn-full" style="cursor:pointer;">
+          &#128196; Add Config File
+          <input type="file" id="rd-config-input" multiple style="display:none;" onchange="handleConfigUploadFromModal(event)"/>
         </label>
       </div>
     </div>
@@ -1594,6 +1653,8 @@ document.addEventListener('DOMContentLoaded',function(){
   if(ep) ep.addEventListener('keydown',function(e){if(e.key==='Enter' && pp) pp.focus();});
   if(pp) pp.addEventListener('keydown',function(e){if(e.key==='Enter') doLogin();});
   initAuthFlow();
+  var fp=document.getElementById('app-file-path');
+  if(fp) fp.textContent=decodeURIComponent(location.href);
 });
 
 /* ═══════════════ BIOMETRIC APP LOCK (WebAuthn) ═══════════════ */
@@ -1871,6 +1932,10 @@ function bootApp(){
   refreshAll();renderNotifs();
   // Load saved WhatsApp API config after DOM fully renders
   setTimeout(function(){try{loadWAConfig();}catch(e){console.warn('loadWAConfig:',e);}},500);
+  // Establish base history entry so the phone/browser back button has
+  // somewhere to land on before it exits the app entirely
+  _lastPushedPage='dashboard';
+  try{ history.replaceState({type:'page',id:'dashboard'},'','#dashboard'); }catch(e){}
 }
 function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:'public',table:'vouchers'},()=>refreshAll()).on('postgres_changes',{event:'*',schema:'public',table:'agents'},()=>refreshAll()).on('postgres_changes',{event:'*',schema:'public',table:'communications'},()=>refreshAll()).subscribe();}
 
@@ -1886,6 +1951,13 @@ async function refreshAll(){
 }
 
 /* ═══════════════════════ NAVIGATION ════════════════════════ */
+let _isPoppingState=false;
+let _lastPushedPage='dashboard';
+function pushPageState(id){
+  if(_isPoppingState||id===_lastPushedPage) return;
+  _lastPushedPage=id;
+  try{ history.pushState({type:'page',id:id},'','#'+id); }catch(e){}
+}
 function goP(id,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
@@ -1893,14 +1965,16 @@ function goP(id,el){
   if(!pageEl){console.warn('goP: no page for',id);return;}
   pageEl.classList.add('active');
   if(el)el.classList.add('active');
-  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','pppoe':'PPPoE Customers','random':'Random Customer Voucher',packages:'Packages',payments:'Payments',expenses:'Expenses'};
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
   if(window.innerWidth<=900)closeSB();
-  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();}catch(e){console.warn(e);}},50);
+  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();}catch(e){console.warn(e);}},50);
   if(id==='faulty') setTimeout(renderFaulty,50);
   if(id==='routers') setTimeout(()=>{try{renderRoutersPage();}catch(e){console.warn(e);}},50);
+  if(id==='configs') setTimeout(()=>{try{renderConfigsPage();}catch(e){console.warn(e);}},50);
   if(id==='pppoe') setTimeout(()=>{try{renderPppoe();}catch(e){console.warn(e);}},50);
   if(id==='random') setTimeout(()=>{try{renderRandomSends();}catch(e){console.warn(e);}},50);
+  pushPageState(id);
 }
 function toggleSB(){const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');s.classList.toggle('open');b.classList.toggle('open',s.classList.contains('open'));}
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-bd').classList.remove('open');}
@@ -2060,8 +2134,10 @@ async function openRouterDetail(agentId){
   document.getElementById('rd-name').textContent=a.full_name;
   document.getElementById('rd-meta').textContent=[a.phone,a.region,a.apartment].filter(Boolean).join(' · ');
   document.getElementById('rd-file-input').value='';
+  document.getElementById('rd-config-input').value='';
   openM('m-router-detail');
   await refreshRouterDetailModal();
+  await refreshRouterConfigUI();
 }
 async function refreshRouterDetailModal(){
   if(!_rdAgentId) return;
@@ -3344,8 +3420,42 @@ let tid=0;
 function toast(msg,type='info'){const id='t'+(++tid);const ic={success:'&#9989;',error:'&#10060;',warning:'&#9888;&#65039;',info:'&#8505;'};const el=document.createElement('div');el.className=`toast t-${type}`;el.id=id;el.innerHTML=`<span>${ic[type]||''}</span><span style="flex:1;">${msg}</span><button class="toast-close" onclick="document.getElementById('${id}')?.remove()">&#10005;</button>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>{el.style.animation='slideOut .3s ease forwards';setTimeout(()=>el.remove(),300);},3800);}
 
 /* ═══════════════════════ MODALS ════════════════════════════ */
-function openM(id){document.getElementById(id).classList.add('open');}
-function closeM(id){document.getElementById(id).classList.remove('open');}
+function openM(id){
+  document.getElementById(id).classList.add('open');
+  if(!_isPoppingState){
+    try{ history.pushState({type:'modal',id:id},''); }catch(e){}
+  }
+}
+function closeM(id){
+  document.getElementById(id).classList.remove('open');
+  if(!_isPoppingState){
+    // Consume the history entry this modal pushed when it opened, so the
+    // back button doesn't need an extra press later. The resulting
+    // popstate is a no-op because _isPoppingState guards it below.
+    _isPoppingState=true;
+    try{ history.back(); }catch(e){}
+    setTimeout(function(){_isPoppingState=false;},60);
+  }
+}
+window.addEventListener('popstate',function(e){
+  if(_isPoppingState){ _isPoppingState=false; return; }
+  var openModals=document.querySelectorAll('.modal-overlay.open');
+  if(openModals.length){
+    openModals[openModals.length-1].classList.remove('open');
+    return;
+  }
+  var lb=document.getElementById('photo-lightbox');
+  if(lb){ lb.remove(); document.removeEventListener('keydown',_lbKeyHandler); return; }
+  var state=e.state;
+  if(state&&state.type==='page'&&state.id){
+    _isPoppingState=true;
+    goP(state.id,null);
+    _lastPushedPage=state.id;
+    _isPoppingState=false;
+  }
+  // If there's no app state left, let the browser/OS handle the back
+  // press natively (e.g. exit the app) — we don't intercept that case.
+});
 document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('.modal-overlay').forEach(function(m){
     m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('open');});
@@ -4045,12 +4155,39 @@ function _lsSavePhotos(agentId,photos){
 }
 
 async function getRouterPhotos(agentId){
-  if(isDemo||!sbClient) return _lsGetPhotos(agentId);
+  const local=_lsGetPhotos(agentId);
+  if(isDemo||!sbClient) return local;
   try{
     const {data,error}=await sbClient.from(ROUTER_PHOTOS_TABLE).select('*').eq('agent_id',agentId).order('created_at',{ascending:false});
-    if(error||!data) return _lsGetPhotos(agentId);
-    return data.map(r=>({id:r.id,name:r.filename,data:r.photo_data,ts:r.created_at,source:'db'}));
-  }catch(e){ return _lsGetPhotos(agentId); }
+    if(error) return local; // table missing / network issue — show whatever's saved locally
+    const dbPhotos=(data||[]).map(r=>({id:r.id,name:r.filename,data:r.photo_data,ts:r.created_at,source:'db'}));
+    if(local.length){
+      // DB is reachable — migrate any locally-stashed photos into it now, quietly
+      migrateLocalPhotosToDb(agentId,local);
+    }
+    return [...dbPhotos,...local]; // show both until migration finishes and clears local
+  }catch(e){ return local; }
+}
+
+async function migrateLocalPhotosToDb(agentId,local){
+  let migrated=0;
+  const remaining=[...local];
+  for(const p of local){
+    try{
+      const row={id:p.id,agent_id:agentId,filename:p.name,photo_data:p.data,created_at:p.ts||new Date().toISOString()};
+      const{error}=await sbClient.from(ROUTER_PHOTOS_TABLE).insert(row);
+      if(error) continue;
+      const idx=remaining.findIndex(r=>r.id===p.id);
+      if(idx>-1) remaining.splice(idx,1);
+      migrated++;
+    }catch(e){ /* leave it local, try again next time */ }
+  }
+  _lsSavePhotos(agentId,remaining);
+  if(migrated){
+    toast(migrated+' photo(s) moved from this device into the database','success');
+    try{ refreshRouterPhotoUI(agentId); }catch(e){}
+    try{ if(_rdAgentId===agentId) refreshRouterDetailModal(); }catch(e){}
+  }
 }
 
 async function uploadRouterPhoto(agentId,base64Data,filename){
@@ -4083,6 +4220,241 @@ async function deleteRouterPhotoById(agentId,photoId,isDbRow){
   }
   try{ await sbClient.from(ROUTER_PHOTOS_TABLE).delete().eq('id',photoId); }
   catch(e){ console.warn('Delete error:',e); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ROUTER CONFIGURATION FILES (backup/config exports per router)
+   ═══════════════════════════════════════════════════════════ */
+const ROUTER_CONFIGS_TABLE = 'router_configs';
+
+function _lsGetConfigs(agentId){
+  try{ return JSON.parse(localStorage.getItem('router_configs_'+agentId)||'[]'); }
+  catch(e){ return []; }
+}
+function _lsSaveConfigs(agentId,configs){
+  try{ localStorage.setItem('router_configs_'+agentId,JSON.stringify(configs)); }
+  catch(e){ toast('Local storage full','warning'); }
+}
+
+async function getRouterConfigs(agentId){
+  const local=_lsGetConfigs(agentId);
+  if(isDemo||!sbClient) return local;
+  try{
+    const {data,error}=await sbClient.from(ROUTER_CONFIGS_TABLE).select('*').eq('agent_id',agentId).order('created_at',{ascending:false});
+    if(error) return local;
+    const dbConfigs=(data||[]).map(r=>({id:r.id,name:r.filename,data:r.file_data,mime:r.mime_type,notes:r.notes,ts:r.created_at,source:'db'}));
+    if(local.length) migrateLocalConfigsToDb(agentId,local);
+    return [...dbConfigs,...local];
+  }catch(e){ return local; }
+}
+
+async function migrateLocalConfigsToDb(agentId,local){
+  let migrated=0;
+  const remaining=[...local];
+  for(const c of local){
+    try{
+      const row={id:c.id,agent_id:agentId,filename:c.name,file_data:c.data,mime_type:c.mime||null,notes:c.notes||null,created_at:c.ts||new Date().toISOString()};
+      const{error}=await sbClient.from(ROUTER_CONFIGS_TABLE).insert(row);
+      if(error) continue;
+      const idx=remaining.findIndex(r=>r.id===c.id);
+      if(idx>-1) remaining.splice(idx,1);
+      migrated++;
+    }catch(e){ /* try again next time */ }
+  }
+  _lsSaveConfigs(agentId,remaining);
+  if(migrated){
+    toast(migrated+' config file(s) moved from this device into the database','success');
+    try{ if(_rdAgentId===agentId) refreshRouterConfigUI(); }catch(e){}
+  }
+}
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+
+async function uploadRouterConfig(agentId,file){
+  const base64Data=await fileToBase64(file);
+  if(isDemo||!sbClient){
+    const configs=_lsGetConfigs(agentId);
+    const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local'};
+    configs.unshift(entry); _lsSaveConfigs(agentId,configs); return entry;
+  }
+  try{
+    const row={id:uid(),agent_id:agentId,filename:file.name,file_data:base64Data,mime_type:file.type||'application/octet-stream',created_at:new Date().toISOString()};
+    const{error}=await sbClient.from(ROUTER_CONFIGS_TABLE).insert(row);
+    if(error) throw error;
+    return{id:row.id,name:file.name,data:base64Data,mime:row.mime_type,ts:row.created_at,source:'db'};
+  }catch(e){
+    console.warn('router_configs insert failed, saving locally:',e);
+    const configs=_lsGetConfigs(agentId);
+    const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local'};
+    configs.unshift(entry); _lsSaveConfigs(agentId,configs);
+    toast('Saved on this device only — run the router_configs SQL in Supabase to store config files in the database','warning');
+    return entry;
+  }
+}
+
+async function deleteRouterConfigById(agentId,configId,isDbRow){
+  if(isDemo||!sbClient||!isDbRow){
+    const configs=_lsGetConfigs(agentId);
+    const idx=configs.findIndex(c=>c.id===configId);
+    if(idx>-1){configs.splice(idx,1);_lsSaveConfigs(agentId,configs);}
+    return;
+  }
+  try{ await sbClient.from(ROUTER_CONFIGS_TABLE).delete().eq('id',configId); }
+  catch(e){ console.warn('Delete config error:',e); }
+}
+
+let _currentConfigs=[];
+function fmtBytes(b){
+  if(!b) return '';
+  if(b<1024) return b+' B';
+  if(b<1048576) return (b/1024).toFixed(1)+' KB';
+  return (b/1048576).toFixed(1)+' MB';
+}
+function renderConfigListHTML(agentId,configs){
+  if(!configs||!configs.length) return '<div style="font-size:12px;color:var(--muted);">No configuration files yet.</div>';
+  return configs.map((c,i)=>{
+    const sizeApprox=c.data?Math.round(c.data.length*0.75):0;
+    return `<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;">
+      <span style="font-size:18px;">&#128196;</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name||'config file'}</div>
+        <div style="font-size:10px;color:var(--muted);">${fmtBytes(sizeApprox)}${c.source==='db'?' · saved to database':' · saved on this device'}</div>
+      </div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="downloadRouterConfig('${agentId}',${i})" title="Download">&#11015;</button>
+      <button class="btn btn-danger btn-icon btn-sm" onclick="deleteRouterConfig('${agentId}',${i})" title="Delete">&#128465;</button>
+    </div>`;
+  }).join('');
+}
+async function refreshRouterConfigUI(){
+  if(!_rdAgentId) return;
+  const list=document.getElementById('rd-config-list');
+  if(!list) return;
+  list.innerHTML='<div style="font-size:11px;color:var(--muted);">Loading files&hellip;</div>';
+  _currentConfigs=await getRouterConfigs(_rdAgentId);
+  list.innerHTML=renderConfigListHTML(_rdAgentId,_currentConfigs);
+}
+async function handleConfigUploadFromModal(evt){
+  const input=evt.target;
+  const files=Array.from(input.files); if(!files.length||!_rdAgentId) return;
+  let added=0;
+  for(const file of files){
+    try{ await uploadRouterConfig(_rdAgentId,file); added++; }
+    catch(e){ toast('Could not upload: '+file.name,'warning'); }
+  }
+  await refreshRouterConfigUI();
+  addNotif('📄 '+added+' config file(s) added for '+(S.agents.find(a=>a.id===_rdAgentId)?.full_name||_rdAgentId),'agent');
+  toast(added+' config file(s) saved','success');
+  input.value='';
+}
+function downloadRouterConfig(agentId,index){
+  const c=_currentConfigs[index]; if(!c) return;
+  const a=document.createElement('a'); a.href=c.data; a.download=c.name||'router-config.cfg'; a.click();
+}
+async function deleteRouterConfig(agentId,index){
+  const c=_currentConfigs[index]; if(!c) return;
+  if(!confirm('Delete "'+(c.name||'this file')+'"?')) return;
+  await deleteRouterConfigById(agentId,c.id,c.source==='db');
+  toast('Config file deleted','warning');
+  await refreshRouterConfigUI();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONFIGURATION FILES PAGE — every router's config files, in one place
+   ═══════════════════════════════════════════════════════════ */
+let _allConfigs=[];
+
+async function getAllRouterConfigs(){
+  let dbRows=[];
+  if(!isDemo&&sbClient){
+    try{
+      const{data,error}=await sbClient.from(ROUTER_CONFIGS_TABLE).select('*').order('created_at',{ascending:false});
+      if(!error&&data) dbRows=data.map(r=>({id:r.id,agent_id:r.agent_id,name:r.filename,data:r.file_data,mime:r.mime_type,ts:r.created_at,source:'db'}));
+    }catch(e){ console.warn('getAllRouterConfigs error:',e); }
+  }
+  // merge in anything still stashed locally per-agent (not yet migrated, or demo mode)
+  let localRows=[];
+  S.agents.forEach(function(a){
+    const local=_lsGetConfigs(a.id);
+    local.forEach(function(c){ localRows.push({...c,agent_id:a.id}); });
+  });
+  return [...dbRows,...localRows];
+}
+
+async function renderConfigsPage(){
+  const body=document.getElementById('configs-body');
+  if(!body) return;
+  // populate agent selects once
+  ['cf-agent','cf-router-filter'].forEach(function(selId){
+    const sel=document.getElementById(selId);
+    if(sel && sel.options.length<=1){
+      const placeholder=selId==='cf-agent'?'— Select a router —':'All Routers';
+      sel.innerHTML='<option value="">'+placeholder+'</option>'+S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+'</option>';}).join('');
+    }
+  });
+  body.innerHTML='<tr><td colspan="6"><div style="font-size:12px;color:var(--muted);padding:12px;">Loading&hellip;</div></td></tr>';
+  _allConfigs=await getAllRouterConfigs();
+
+  const q=(document.getElementById('cf-search')?.value||'').toLowerCase().trim();
+  const routerF=document.getElementById('cf-router-filter')?.value||'';
+  let list=_allConfigs.map(function(c){
+    const agent=S.agents.find(function(a){return a.id===c.agent_id;});
+    return {...c,agentName:agent?agent.full_name:'Unknown router'};
+  });
+  if(routerF) list=list.filter(function(c){return c.agent_id===routerF;});
+  if(q) list=list.filter(function(c){return (c.agentName+' '+(c.name||'')).toLowerCase().includes(q);});
+  list.sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
+
+  document.getElementById('configs-sub').textContent=_allConfigs.length+' configuration file(s) across '+new Set(_allConfigs.map(function(c){return c.agent_id;})).size+' router(s)';
+
+  body.innerHTML=list.length?list.map(function(c){
+    const idx=_allConfigs.indexOf(_allConfigs.find(function(x){return x.id===c.id;}));
+    const sizeApprox=c.data?Math.round(c.data.length*0.75):0;
+    return '<tr><td style="font-weight:600;">'+c.agentName+'</td>'+
+      '<td style="font-size:11px;">&#128196; '+(c.name||'—')+'</td>'+
+      '<td style="font-size:11px;color:var(--muted);">'+fmtBytes(sizeApprox)+'</td>'+
+      '<td style="font-size:11px;color:var(--muted);">'+(c.ts?fDT(c.ts):'—')+'</td>'+
+      '<td>'+(c.source==='db'?'<span class="badge b-available">IN DATABASE</span>':'<span class="badge b-expired">DEVICE ONLY</span>')+'</td>'+
+      '<td><div style="display:flex;gap:4px;">'+
+        '<button class="btn btn-ghost btn-icon btn-sm" onclick="downloadConfigPage(\''+c.id+'\')" title="Download">&#11015;</button>'+
+        '<button class="btn btn-danger btn-icon btn-sm" onclick="deleteConfigPage(\''+c.id+'\')" title="Delete">&#128465;</button>'+
+      '</div></td></tr>';
+  }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#128196;</div><div class="empty-title">No configuration files yet</div></div></td></tr>';
+}
+
+function downloadConfigPage(configId){
+  const c=_allConfigs.find(function(x){return x.id===configId;}); if(!c) return;
+  const a=document.createElement('a'); a.href=c.data; a.download=c.name||'router-config.cfg'; a.click();
+}
+async function deleteConfigPage(configId){
+  const c=_allConfigs.find(function(x){return x.id===configId;}); if(!c) return;
+  if(!confirm('Delete "'+(c.name||'this file')+'"?')) return;
+  await deleteRouterConfigById(c.agent_id,c.id,c.source==='db');
+  toast('Config file deleted','warning');
+  await renderConfigsPage();
+}
+async function uploadConfigFromPage(){
+  const agentId=document.getElementById('cf-agent').value;
+  const input=document.getElementById('cf-file-input');
+  const files=Array.from(input.files||[]);
+  if(!agentId){toast('Select which router this file belongs to','warning');return;}
+  if(!files.length){toast('Choose a file to upload','warning');return;}
+  let added=0;
+  for(const file of files){
+    try{ await uploadRouterConfig(agentId,file); added++; }
+    catch(e){ toast('Could not upload: '+file.name,'warning'); }
+  }
+  const agentName=(S.agents.find(function(a){return a.id===agentId;})||{}).full_name||'router';
+  addNotif('📄 '+added+' config file(s) uploaded for '+agentName,'agent');
+  toast(added+' file(s) uploaded for '+agentName,'success');
+  input.value='';
+  await renderConfigsPage();
 }
 
 let _currentPhotos=[];
@@ -4186,9 +4558,33 @@ function closeLightbox(){const lb=document.getElementById('photo-lightbox');if(l
 function _lbKeyHandler(e){if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft')lbPrev();if(e.key==='ArrowRight')lbNext();}
 function lbPrev(){_lbIdx=(_lbIdx-1+_lbPhotos.length)%_lbPhotos.length;showLightbox();}
 function lbNext(){_lbIdx=(_lbIdx+1)%_lbPhotos.length;showLightbox();}
+function getPhotoPrefix(){ return localStorage.getItem('scifi_photo_prefix')||''; }
+function savePhotoPrefix(){ localStorage.setItem('scifi_photo_prefix',document.getElementById('photo-prefix').value.trim()); }
+function loadPhotoPrefix(){ const el=document.getElementById('photo-prefix'); if(el) el.value=getPhotoPrefix(); }
+function buildPhotoFilename(name,idx){
+  const prefix=getPhotoPrefix();
+  const ext=(name&&name.includes('.'))?name.slice(name.lastIndexOf('.')):'.jpg';
+  const base=prefix?prefix.replace(/[^a-zA-Z0-9-_ ]/g,'').trim():'';
+  return (base?base+'-':'')+(idx!=null?('photo-'+(idx+1)):('photo-'+Date.now()))+ext;
+}
 function downloadRouterPhoto(){
   const p=_lbPhotos[_lbIdx];if(!p)return;
-  const a=document.createElement('a');a.href=p.data||p.url;a.download=p.name||'photo.jpg';a.click();
+  const a=document.createElement('a');a.href=p.data||p.url;a.download=buildPhotoFilename(p.name,_lbIdx);a.click();
+}
+async function downloadAllRouterPhotos(agentId){
+  const photos=await getRouterPhotos(agentId);
+  if(!photos.length){toast('No photos to download yet','warning');return;}
+  const agentName=(S.agents.find(a=>a.id===agentId)||{}).full_name||'';
+  const prefix=getPhotoPrefix()||agentName.replace(/[^a-zA-Z0-9-_ ]/g,'').trim();
+  photos.forEach(function(p,i){
+    setTimeout(function(){
+      const a=document.createElement('a');
+      a.href=p.data||p.url;
+      a.download=(prefix?prefix+'-':'')+'photo-'+(i+1)+((p.name&&p.name.includes('.'))?p.name.slice(p.name.lastIndexOf('.')):'.jpg');
+      document.body.appendChild(a); a.click(); a.remove();
+    }, i*350); // stagger so mobile browsers don't drop rapid-fire downloads
+  });
+  toast('Downloading '+photos.length+' photo(s) to your Downloads folder…','success');
 }
 function deleteRouterPhoto(agentId,index){const ph=_currentPhotos[index]||{};delPhoto(agentId,ph.id||String(index),ph.source==='db');}
 
