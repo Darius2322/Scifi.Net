@@ -447,6 +447,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
     <div style="margin-top:16px;text-align:center;font-size:11px;color:#4a6380;">
       &#128274; Secured with Supabase Authentication &middot; <strong style="color:#00e5ff;">SciFi ISP v3.6</strong>
     </div>
+    <a href="https://dmn-solution.vercel.app/" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:10px;color:#3a5578;text-decoration:none;margin-top:14px;letter-spacing:.03em;">Powered by <strong style="color:#5a7aa0;">DMN Solutions</strong></a>
 
   </div>
 </div>
@@ -512,6 +513,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <div><div class="user-name" id="u-nm">Admin</div><div class="user-role">SUPER ADMIN</div></div>
       </div>
       <button class="btn-signout" onclick="doLogout()">&#9211; Sign Out</button>
+      <a href="https://dmn-solution.vercel.app/" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:10px;color:#3a5578;text-decoration:none;margin-top:10px;letter-spacing:.03em;">Powered by <strong style="color:#5a7aa0;">DMN Solutions</strong></a>
     </div>
   </aside>
 
@@ -535,6 +537,16 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       </div>
     </header>
     <div class="content">
+
+      <div id="install-banner" style="display:none;background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(59,130,246,.08));border:1px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:22px;">&#128241;</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;">Install this app</div>
+          <div style="font-size:12px;color:var(--muted);">Add SciFi ISP to your home screen for full-screen access, offline-friendly startup, and fingerprint unlock.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="triggerInstall()" style="white-space:nowrap;">&#11015; Install</button>
+        <button onclick="dismissInstallBanner()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;">&#10005;</button>
+      </div>
 
       <div class="page active" id="page-dashboard">
         <div id="setup-wrap"></div>
@@ -1035,6 +1047,13 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
             <label class="form-label">Filename Prefix</label>
             <input class="form-control" id="photo-prefix" placeholder="e.g. SciFi-Router" oninput="savePhotoPrefix()"/>
           </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#129514; Test Database Storage</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Checks whether each table this app needs actually exists and is reachable — tells you exactly why photos/files might still be saving to this device instead of the database.</div>
+          <button class="btn btn-secondary" onclick="testDbStorage()">&#129514; Run Test</button>
+          <div id="db-test-results" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
@@ -1735,6 +1754,58 @@ document.addEventListener('DOMContentLoaded',function(){
   var fp=document.getElementById('app-file-path');
   if(fp) fp.textContent=decodeURIComponent(location.href);
 });
+
+/* ═══════════════ PWA INSTALL PROMPT ═══════════════ */
+let _deferredInstallPrompt=null;
+function isRunningInstalled(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+}
+function isInstallableOrigin(){
+  // Chrome only supports real PWA installation on HTTPS or localhost —
+  // file:// and content:// (e.g. opening the file from Downloads) can
+  // never actually complete an install, even if the event fires.
+  return location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
+}
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  if(!isInstallableOrigin()) return; // ignore — can't really install from this origin
+  _deferredInstallPrompt=e;
+  if(!isRunningInstalled() && localStorage.getItem('scifi_install_dismissed')!=='1'){
+    var b=document.getElementById('install-banner');
+    if(b) b.style.display='flex';
+  }
+});
+window.addEventListener('appinstalled',function(){
+  _deferredInstallPrompt=null;
+  var b=document.getElementById('install-banner');
+  if(b) b.style.display='none';
+  toast('Installed! Open it from your home screen from now on.','success');
+});
+async function triggerInstall(){
+  if(!isInstallableOrigin()){
+    toast("This copy is opened from a local file, so Chrome can't install it directly. Host it on HTTPS (e.g. Netlify, Vercel, GitHub Pages) to enable one-tap install.",'warning');
+    return;
+  }
+  if(!_deferredInstallPrompt){
+    toast('Use your browser menu → "Add to Home Screen" instead — this browser didn\'t offer the one-tap install prompt.','warning');
+    return;
+  }
+  try{
+    _deferredInstallPrompt.prompt();
+    var choice=await _deferredInstallPrompt.userChoice;
+    _deferredInstallPrompt=null;
+    var b=document.getElementById('install-banner');
+    if(b) b.style.display='none';
+  }catch(e){
+    console.warn('Install prompt failed:',e);
+    toast('Could not start install — try your browser menu → "Add to Home Screen" instead.','warning');
+  }
+}
+function dismissInstallBanner(){
+  localStorage.setItem('scifi_install_dismissed','1');
+  var b=document.getElementById('install-banner');
+  if(b) b.style.display='none';
+}
 
 /* ═══════════════ BIOMETRIC APP LOCK (WebAuthn) ═══════════════ */
 const BIO_CRED_KEY='scifi_bio_cred', BIO_EMAIL_KEY='scifi_bio_email';
@@ -4364,7 +4435,7 @@ async function uploadRouterPhoto(agentId,base64Data,filename){
     const photos=_lsGetPhotos(agentId);
     const entry={id:uid(),data:base64Data,name:filename,ts:new Date().toISOString(),source:'local'};
     photos.unshift(entry); _lsSavePhotos(agentId,photos);
-    toast('Saved on this device only — run the router_photos SQL in Supabase to store photos in the database','warning');
+    toast('Saved on this device only — database error: '+(e.message||'unknown')+' (check Settings → Test Database Storage)','warning');
     return entry;
   }
 }
@@ -4482,7 +4553,7 @@ async function uploadRouterConfig(file,initialAgentId){
     const pool=_lsGetConfigPool();
     const entry={id:uid(),data:base64Data,name:file.name,mime:file.type||'application/octet-stream',ts:new Date().toISOString(),source:'local',agent_ids:initial};
     pool.unshift(entry); _lsSaveConfigPool(pool);
-    toast('Saved on this device only — run the router_configs SQL in Supabase to store config files in the database','warning');
+    toast('Saved on this device only — database error: '+(e.message||'unknown')+' (check Settings → Test Database Storage)','warning');
     return entry;
   }
 }
@@ -4862,6 +4933,36 @@ function lbNext(){_lbIdx=(_lbIdx+1)%_lbPhotos.length;showLightbox();}
 function getPhotoPrefix(){ return localStorage.getItem('scifi_photo_prefix')||''; }
 function savePhotoPrefix(){ localStorage.setItem('scifi_photo_prefix',document.getElementById('photo-prefix').value.trim()); }
 function loadPhotoPrefix(){ const el=document.getElementById('photo-prefix'); if(el) el.value=getPhotoPrefix(); }
+
+async function testDbStorage(){
+  const el=document.getElementById('db-test-results');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);">Testing&hellip;</div>';
+  if(isDemo||!sbClient){
+    el.innerHTML='<div style="font-size:12px;color:var(--warn);">⚠️ Not connected to Supabase — running in demo mode. Log in with a real account first.</div>';
+    return;
+  }
+  const tables=[
+    {name:'router_photos',label:'Router Photos'},
+    {name:'router_configs',label:'Configuration Files'},
+    {name:'router_config_links',label:'Config ↔ Router Links'},
+    {name:'pppoe_customers',label:'PPPoE Customers'},
+    {name:'random_sends',label:'Random Voucher Sends'},
+    {name:'activity_logs',label:'Activity Log'},
+  ];
+  const rows=[];
+  for(const t of tables){
+    let statusHtml;
+    try{
+      const{error}=await withTimeout(sbClient.from(t.name).select('id',{count:'exact',head:true}),6000);
+      if(error) statusHtml='<span style="color:var(--danger);">✕ '+(error.message||'not reachable')+'</span>';
+      else statusHtml='<span style="color:var(--accent3,#2ee6a6);">&#10003; Reachable</span>';
+    }catch(e){
+      statusHtml='<span style="color:var(--danger);">✕ '+(e.message||'error')+'</span>';
+    }
+    rows.push('<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;"><span>'+t.label+'</span>'+statusHtml+'</div>');
+  }
+  el.innerHTML=rows.join('');
+}
 function buildPhotoFilename(name,idx){
   const prefix=getPhotoPrefix();
   const ext=(name&&name.includes('.'))?name.slice(name.lastIndexOf('.')):'.jpg';
