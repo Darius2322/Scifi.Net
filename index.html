@@ -111,7 +111,8 @@ textarea.form-control{resize:vertical;min-height:80px;}
 .nb-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:2px solid var(--surface);}
 .content{flex:1;overflow-y:auto;padding:20px;}
 .page{display:none;}
-.page.active{display:block;}
+.page.active{display:block;animation:pageFadeIn .25s ease;}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,255,.02),transparent 60%);pointer-events:none;}
 .card-title{font-size:10px;color:var(--muted);letter-spacing:.14em;font-weight:600;text-transform:uppercase;margin-bottom:14px;}
@@ -291,16 +292,19 @@ tr:last-child td{border-bottom:none;}
 .sb-header{padding:16px 14px;background:rgba(0,212,255,0.04);border-bottom:1px solid var(--border);}
 .brand-icon{background:linear-gradient(135deg,#00d4ff,#3b82f6);border-radius:12px;}
 .brand-name{font-size:14px;color:#00d4ff;letter-spacing:.08em;}
-.nav-link{padding:8px 10px;border-radius:8px;font-size:12px;color:#4d6a8a;margin-bottom:2px;}
+.nav-link{padding:7px 10px;border-radius:8px;font-size:12px;color:#4d6a8a;margin-bottom:1px;}
 .nav-link.active{background:linear-gradient(90deg,rgba(0,212,255,.12),rgba(0,212,255,.04));color:#00d4ff;border:1px solid rgba(0,212,255,.18);font-weight:700;}
 .nav-link:hover{background:rgba(255,255,255,.04);color:#e2eeff;}
-.nav-sec{font-size:9px;color:#2a4060;letter-spacing:.16em;padding:12px 10px 4px;font-weight:700;}
+.nav-sec{font-size:9px;color:#2a4060;letter-spacing:.16em;padding:10px 10px 4px;font-weight:700;}
 .nav-badge{background:linear-gradient(135deg,#00d4ff,#3b82f6);color:#000;font-size:8px;font-weight:800;padding:2px 7px;border-radius:20px;}
 /* Topbar */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:54px;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:54px;box-shadow:0 4px 20px rgba(0,0,0,.15);}
 .topbar-title{font-size:15px;font-weight:800;letter-spacing:.01em;}
 /* Cards */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:20px 22px;}
+.card-clickable{cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.card-clickable:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.card-clickable:active{transform:translateY(0);}
 .card::before{display:none;}
 .card-title{font-size:11px;color:var(--muted);letter-spacing:.12em;font-weight:700;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .card-title::before{content:'';display:inline-block;width:3px;height:12px;background:var(--accent);border-radius:2px;}
@@ -476,25 +480,30 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
     </div>
     <div class="sb-status"><span class="online-dot"></span> SYSTEM ONLINE</div>
     <nav class="sb-nav">
-      <div class="nav-sec">MAIN</div>
+      <div class="nav-sec">OVERVIEW</div>
       <a class="nav-link active" onclick="goP('dashboard',this)"><span class="nav-icon">&#128202;</span>Dashboard</a>
-      <a class="nav-link" onclick="goP('agents',this)"><span class="nav-icon">&#128101;</span>Agents<span class="nav-badge" id="nb-ag">0</span></a>
+
+      <div class="nav-sec">VOUCHERS</div>
       <a class="nav-link" onclick="goP('vouchers',this)"><span class="nav-icon">&#127967;</span>Vouchers<span class="nav-badge" id="nb-vc">0</span></a>
-      <a class="nav-link" onclick="goP('faulty',this)"><span class="nav-icon">&#9888;&#65039;</span>Faulty<span class="nav-badge" id="nb-ft" style="background:var(--danger);">0</span></a>
-      <div class="nav-sec">OPERATIONS</div>
       <a class="nav-link" onclick="goP('distribute',this)"><span class="nav-icon">&#128228;</span>Distribute</a>
-      <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
       <a class="nav-link" onclick="goP('tracking',this)"><span class="nav-icon">&#128269;</span>Tracking</a>
+      <a class="nav-link" onclick="goP('faulty',this)"><span class="nav-icon">&#9888;&#65039;</span>Faulty<span class="nav-badge" id="nb-ft" style="background:var(--danger);">0</span></a>
+
+      <div class="nav-sec">PEOPLE</div>
+      <a class="nav-link" onclick="goP('agents',this)"><span class="nav-icon">&#128101;</span>Agents<span class="nav-badge" id="nb-ag">0</span></a>
+      <a class="nav-link" onclick="goP('pppoe',this)"><span class="nav-icon">&#128421;&#65039;</span>PPPoE Customers</a>
+      <a class="nav-link" onclick="goP('random',this)"><span class="nav-icon">&#127919;</span>Random Voucher</a>
+      <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
+
+      <div class="nav-sec">INFRASTRUCTURE</div>
       <a class="nav-link" onclick="goP('routers',this)"><span class="nav-icon">&#128225;</span>Routers</a>
       <a class="nav-link" onclick="goP('configs',this)"><span class="nav-icon">&#128196;</span>Configuration Files</a>
 
-      <div class="nav-sec">CUSTOMERS</div>
-      <a class="nav-link" onclick="goP('pppoe',this)"><span class="nav-icon">&#128421;&#65039;</span>PPPoE Customers</a>
-      <a class="nav-link" onclick="goP('random',this)"><span class="nav-icon">&#127919;</span>Random Voucher</a>
-
-      <div class="nav-sec">ANALYTICS</div>
+      <div class="nav-sec">INSIGHTS</div>
       <a class="nav-link" onclick="goP('reports',this)"><span class="nav-icon">&#128200;</span>Reports</a>
+
       <div class="nav-sec">SYSTEM</div>
+      <a class="nav-link" onclick="goP('activity',this)"><span class="nav-icon">&#128220;</span>Activity Log</a>
       <a class="nav-link" onclick="goP('settings',this)"><span class="nav-icon">&#9881;&#65039;</span>Settings</a>
     </nav>
     <div class="sb-footer">
@@ -991,6 +1000,25 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
           <table>
             <thead><tr><th>File</th><th>Size</th><th>Router</th><th>Uploaded</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="configs-body"></tbody>
+          </table>
+        </div></div>
+      </div>
+
+      <div class="page" id="page-activity">
+        <div class="ph">
+          <div><div class="pt">&#128220; Activity Log</div><div class="ps" id="activity-sub">Who did what, and when</div></div>
+          <div class="pa">
+            <button class="btn btn-secondary" onclick="renderActivityLog()">&#128260; Refresh</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input class="form-control" id="al-search" placeholder="&#128269; Search by action or who did it..." style="flex:2;min-width:200px;" oninput="renderActivityLog()"/>
+          <select class="form-control" id="al-category-filter" style="flex:1;min-width:140px;" onchange="renderActivityLog()"><option value="">All Types</option></select>
+        </div>
+        <div class="card"><div class="table-wrap">
+          <table>
+            <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Type</th></tr></thead>
+            <tbody id="activity-body"></tbody>
           </table>
         </div></div>
       </div>
@@ -1832,7 +1860,7 @@ async function initAuthFlow(){
   while(!sbClient && waited<3000){await new Promise(function(r){setTimeout(r,150);});waited+=150;}
   if(!sbClient) return; // no network/CDN — normal login screen stays visible
   try{
-    var result=await sbClient.auth.getSession();
+    var result=await withTimeout(sbClient.auth.getSession(),8000);
     var session=result&&result.data?result.data.session:null;
     if(session&&session.user){
       curUser=session.user;isDemo=false;
@@ -1859,10 +1887,10 @@ async function dbGet(t){
   }
   try{
     const orderCol=t==='agents'?'created_at':t==='vouchers'?'date_added':t==='pppoe_customers'?'created_at':t==='random_sends'?'sent_at':'sent_at';
-    const{data,error}=await sbClient.from(t).select('*').order(orderCol,{ascending:false});
+    const{data,error}=await withTimeout(sbClient.from(t).select('*').order(orderCol,{ascending:false}),10000);
     if(error){
       // If column doesn't exist fall back to id ordering
-      const{data:d2,error:e2}=await sbClient.from(t).select('*');
+      const{data:d2,error:e2}=await withTimeout(sbClient.from(t).select('*'),10000);
       if(e2){console.error('dbGet error:',e2);return[];}
       return d2||[];
     }
@@ -2016,7 +2044,7 @@ function goP(id,el){
   if(!pageEl){console.warn('goP: no page for',id);return;}
   pageEl.classList.add('active');
   if(el)el.classList.add('active');
-  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher',packages:'Packages',payments:'Payments',expenses:'Expenses'};
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher','activity':'Activity Log',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
   if(window.innerWidth<=900)closeSB();
   if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();}catch(e){console.warn(e);}},50);
@@ -2025,6 +2053,7 @@ function goP(id,el){
   if(id==='configs') setTimeout(()=>{try{renderConfigsPage();}catch(e){console.warn(e);}},50);
   if(id==='pppoe') setTimeout(()=>{try{renderPppoe();}catch(e){console.warn(e);}},50);
   if(id==='random') setTimeout(()=>{try{renderRandomSends();}catch(e){console.warn(e);}},50);
+  if(id==='activity') setTimeout(()=>{try{renderActivityLog();}catch(e){console.warn(e);}},50);
   pushPageState(id);
 }
 function toggleSB(){const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');s.classList.toggle('open');b.classList.toggle('open',s.classList.contains('open'));}
@@ -2244,7 +2273,7 @@ async function renderRoutersPage(){
     return;
   }
   grid.innerHTML=list.map(function(a){
-    return '<div class="card" style="cursor:pointer;" onclick="openRouterDetail(\''+a.id+'\')">'
+    return '<div class="card card-clickable" onclick="openRouterDetail(\''+a.id+'\')">'
       +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
       +av(a.full_name)
       +'<div style="min-width:0;"><div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+a.full_name+'</div>'
@@ -3438,6 +3467,84 @@ function addNotif(text, type){
   if(isDemo){ DB.notifs.unshift(notif); }
   else { if(!window._liveNotifs) window._liveNotifs=[]; window._liveNotifs.unshift(notif); }
   renderNotifs();
+  logActivity(text,type);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACTIVITY LOG — durable record of who did what, and when
+   ═══════════════════════════════════════════════════════════ */
+const ACTIVITY_LOGS_TABLE='activity_logs';
+function _lsGetActivityLocal(){
+  try{ return JSON.parse(localStorage.getItem('activity_logs_local')||'[]'); }catch(e){ return []; }
+}
+function _lsSaveActivityLocal(list){
+  try{ localStorage.setItem('activity_logs_local',JSON.stringify(list.slice(0,500))); }catch(e){}
+}
+async function logActivity(text,category){
+  const row={id:uid(),actor_email:(curUser&&curUser.email)||'unknown',action:text,category:category||'general',created_at:new Date().toISOString()};
+  if(isDemo||!sbClient){ const list=_lsGetActivityLocal(); list.unshift(row); _lsSaveActivityLocal(list); return; }
+  try{
+    const{error}=await withTimeout(sbClient.from(ACTIVITY_LOGS_TABLE).insert(row),8000);
+    if(error) throw error;
+  }catch(e){
+    const list=_lsGetActivityLocal(); list.unshift(row); _lsSaveActivityLocal(list);
+  }
+}
+async function migrateActivityLogsToDb(local){
+  let migrated=0;
+  const remaining=[...local];
+  for(const row of local){
+    try{
+      const{error}=await sbClient.from(ACTIVITY_LOGS_TABLE).insert(row);
+      if(error) continue;
+      const idx=remaining.findIndex(function(r){return r.id===row.id;});
+      if(idx>-1) remaining.splice(idx,1);
+      migrated++;
+    }catch(e){}
+  }
+  _lsSaveActivityLocal(remaining);
+  if(migrated) try{ renderActivityLog(); }catch(e){}
+}
+async function getActivityLogs(){
+  let dbRows=[];
+  if(!isDemo&&sbClient){
+    try{
+      const{data,error}=await withTimeout(sbClient.from(ACTIVITY_LOGS_TABLE).select('*').order('created_at',{ascending:false}).limit(300),8000);
+      if(!error&&data) dbRows=data.map(function(r){return{...r,source:'db'};});
+    }catch(e){ console.warn('getActivityLogs error:',e); }
+  }
+  const local=_lsGetActivityLocal().map(function(r){return{...r,source:'local'};});
+  if(!isDemo&&sbClient&&local.length) migrateActivityLogsToDb(local);
+  return [...dbRows,...local].sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+}
+let _allActivity=[];
+async function renderActivityLog(){
+  const body=document.getElementById('activity-body');
+  if(!body) return;
+  body.innerHTML='<tr><td colspan="4"><div style="font-size:12px;color:var(--muted);padding:12px;">Loading&hellip;</div></td></tr>';
+  _allActivity=await getActivityLogs();
+
+  const catSel=document.getElementById('al-category-filter');
+  if(catSel&&!catSel.dataset.populated){
+    const cats=[...new Set(_allActivity.map(function(r){return r.category||'general';}))].sort();
+    catSel.innerHTML='<option value="">All Types</option>'+cats.map(function(c){return '<option value="'+c+'">'+c.charAt(0).toUpperCase()+c.slice(1)+'</option>';}).join('');
+    catSel.dataset.populated='1';
+  }
+  const q=(document.getElementById('al-search')?.value||'').toLowerCase().trim();
+  const catF=document.getElementById('al-category-filter')?.value||'';
+  let list=_allActivity;
+  if(catF) list=list.filter(function(r){return (r.category||'general')===catF;});
+  if(q) list=list.filter(function(r){return ((r.action||'')+' '+(r.actor_email||'')).toLowerCase().includes(q);});
+
+  document.getElementById('activity-sub').textContent=_allActivity.length+' logged action(s)'+(!isDemo&&sbClient?'':' (demo data)');
+
+  const catColors={voucher:'b-voucher',agent:'b-active',map:'b-sent',general:'b-available'};
+  body.innerHTML=list.length?list.map(function(r){
+    return '<tr><td style="font-size:11px;color:var(--muted);white-space:nowrap;">'+fDT(r.created_at)+'</td>'+
+      '<td style="font-size:11px;">'+(r.actor_email||'Unknown')+'</td>'+
+      '<td style="font-size:12px;">'+(r.action||'—')+'</td>'+
+      '<td><span class="badge '+(catColors[r.category]||'b-available')+'">'+(r.category||'general').toUpperCase()+'</span></td></tr>';
+  }).join(''):'<tr><td colspan="4"><div class="empty"><div class="empty-icon">&#128220;</div><div class="empty-title">No activity logged yet</div></div></td></tr>';
 }
 function renderNotifs(){
   const notifs=isDemo?DB.notifs:(window._liveNotifs||[]);
@@ -4209,7 +4316,7 @@ async function getRouterPhotos(agentId){
   const local=_lsGetPhotos(agentId);
   if(isDemo||!sbClient) return local;
   try{
-    const {data,error}=await sbClient.from(ROUTER_PHOTOS_TABLE).select('*').eq('agent_id',agentId).order('created_at',{ascending:false});
+    const {data,error}=await withTimeout(sbClient.from(ROUTER_PHOTOS_TABLE).select('*').eq('agent_id',agentId).order('created_at',{ascending:false}),8000);
     if(error) return local; // table missing / network issue — show whatever's saved locally
     const dbPhotos=(data||[]).map(r=>({id:r.id,name:r.filename,data:r.photo_data,ts:r.created_at,source:'db'}));
     if(local.length){
@@ -4298,12 +4405,18 @@ function fileToBase64(file){
 }
 
 // Fetch every config file + which router(s) each is currently assigned to.
+function withTimeout(promise,ms){
+  return Promise.race([
+    promise,
+    new Promise(function(resolve){ setTimeout(function(){ resolve({data:null,error:{message:'Request timed out'}}); },ms); })
+  ]);
+}
 async function getAllRouterConfigs(){
   let dbRows=[];
   if(!isDemo&&sbClient){
     try{
-      const{data:files,error:e1}=await sbClient.from(ROUTER_CONFIGS_TABLE).select('*').order('created_at',{ascending:false});
-      const{data:links,error:e2}=await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).select('*');
+      const{data:files,error:e1}=await withTimeout(sbClient.from(ROUTER_CONFIGS_TABLE).select('*').order('created_at',{ascending:false}),8000);
+      const{data:links,error:e2}=await withTimeout(sbClient.from(ROUTER_CONFIG_LINKS_TABLE).select('*'),8000);
       if(!e1&&files){
         dbRows=files.map(function(r){
           const agentIds=(!e2&&links)?links.filter(function(l){return l.config_id===r.id;}).map(function(l){return l.agent_id;}):[];
