@@ -303,6 +303,13 @@ tr:last-child td{border-bottom:none;}
 /* Cards */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:20px 22px;}
 .card-clickable{cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.qa-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease;font-family:inherit;}
+.qa-btn:hover{transform:translateY(-2px);border-color:var(--accent);background:rgba(0,212,255,.08);}
+.qa-btn:active{transform:translateY(0);}
+.qa-icon{font-size:22px;}
+.hb-menu-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent);font-size:18px;cursor:pointer;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s ease,border-color .15s ease;}
+.hb-menu-btn:hover{background:rgba(0,212,255,.1);border-color:var(--accent);}
+.hb-menu-btn:active{transform:scale(.95);}
 .card-clickable:hover{transform:translateY(-2px);border-color:var(--border2);box-shadow:0 10px 30px rgba(0,0,0,.35);}
 .card-clickable:active{transform:translateY(0);}
 .card::before{display:none;}
@@ -504,6 +511,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <a class="nav-link" onclick="goP('reports',this)"><span class="nav-icon">&#128200;</span>Reports</a>
 
       <div class="nav-sec">SYSTEM</div>
+      <a class="nav-link" onclick="goP('issues',this)"><span class="nav-icon">&#9888;&#65039;</span>Report an Issue</a>
       <a class="nav-link" onclick="goP('activity',this)"><span class="nav-icon">&#128220;</span>Activity Log</a>
       <a class="nav-link" onclick="goP('settings',this)"><span class="nav-icon">&#9881;&#65039;</span>Settings</a>
     </nav>
@@ -519,7 +527,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
 
   <div class="main">
     <header class="topbar">
-      <button onclick="toggleSB()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">&#9776;</button>
+      <button onclick="toggleSB()" class="hb-menu-btn" title="Menu" aria-label="Open menu">&#9776;</button>
       <div><div class="topbar-title" id="tb-title">Dashboard</div><div class="topbar-sub" id="tb-date"></div></div>
       <div class="sw"><span class="sw-icon">&#128269;</span><input type="text" placeholder="Search agents, vouchers, codes&#8230;" id="g-search" oninput="gSearch(this.value)"/></div>
       <div class="tb-right">
@@ -538,7 +546,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
     </header>
     <div class="content">
 
-      <div id="install-banner" style="display:none;background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(59,130,246,.08));border:1px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+      <div id="install-banner" style="display:none;background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(59,130,246,.08));border:1px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:16px;align-items:center;gap:12px;">
         <span style="font-size:22px;">&#128241;</span>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:700;font-size:13px;">Install this app</div>
@@ -558,6 +566,28 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
           </div>
         </div>
         <div class="stats-grid" id="stats-grid"></div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#9889; Quick Actions</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;">
+            <button class="qa-btn" onclick="qaDistribute()">
+              <span class="qa-icon">&#128228;</span><span>Distribute</span>
+            </button>
+            <button class="qa-btn" onclick="qaAddAgent()">
+              <span class="qa-icon">&#128101;</span><span>Add Agent</span>
+            </button>
+            <button class="qa-btn" onclick="openAddVoucherChoice()">
+              <span class="qa-icon">&#127967;</span><span>Add Voucher</span>
+            </button>
+            <button class="qa-btn" onclick="qaReports()">
+              <span class="qa-icon">&#128200;</span><span>Reports</span>
+            </button>
+            <button class="qa-btn" onclick="openReportIssueModal()">
+              <span class="qa-icon">&#9888;&#65039;</span><span>Report Issue</span>
+            </button>
+          </div>
+        </div>
+
         <div class="g2" style="margin-bottom:16px;">
           <div class="card"><div class="card-title">Daily Distribution &mdash; Last 7 Days</div><div class="chart-wrap"><canvas id="ch-daily"></canvas></div></div>
           <div class="card"><div class="card-title">Top Agents by Volume</div><div id="top-agents"></div></div>
@@ -584,17 +614,25 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <div class="ph">
           <div><div class="pt">Voucher Management</div><div class="ps" id="vc-sub"></div></div>
           <div class="pa">
-            <button class="btn btn-secondary" onclick="openBulkEdit()">&#9999; Bulk Edit</button>
-            <button class="btn btn-danger" onclick="bulkDeleteVouchers()">&#128465; Bulk Delete</button>
             <button class="btn btn-secondary" onclick="openBulkImport()">&#128229; Bulk Import</button>
             <button class="btn btn-primary" onclick="openAddVoucher()">&#10133; Add Voucher</button>
           </div>
+        </div>
+        <div id="vc-quick-actions" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(0,212,255,.08);border:1px solid var(--accent);border-radius:12px;padding:10px 14px;margin-bottom:14px;">
+          <span style="font-size:12px;font-weight:600;" id="vc-sel-count">0 selected</span>
+          <div style="flex:1;"></div>
+          <button class="btn btn-secondary btn-sm" onclick="openBulkEdit()">&#9999; Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="quickReserveSelected()">&#128274; Reserve</button>
+          <button class="btn btn-secondary btn-sm" onclick="quickUnreserveSelected()">&#128275; Un-reserve</button>
+          <button class="btn btn-danger btn-sm" onclick="bulkDeleteVouchers()">&#128465; Delete</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearVoucherSelection()">&#10005; Clear</button>
         </div>
         <!-- Advanced filters -->
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 16px;margin-bottom:14px;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
             <button class="fb active" onclick="fV('all',this)">All</button>
             <button class="fb" onclick="fV('available',this)">Available</button>
+            <button class="fb" onclick="fV('reserved',this)">Reserved</button>
             <button class="fb" onclick="fV('sent',this)">Sent</button>
             <button class="fb" onclick="fV('used',this)">Used</button>
             <button class="fb" onclick="fV('expired',this)">Expired</button>
@@ -1016,6 +1054,37 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         </div></div>
       </div>
 
+      <div class="page" id="page-issues">
+        <div class="ph">
+          <div><div class="pt">&#9888;&#65039; Report an Issue</div><div class="ps" id="issues-sub">Fibre cuts, line loss, and other network/service problems</div></div>
+          <div class="pa">
+            <button class="btn btn-primary" onclick="openReportIssueModal()">&#10133; Report Issue</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input class="form-control" id="is-search" placeholder="&#128269; Search by description or location..." style="flex:2;min-width:200px;" oninput="renderIssuesPage()"/>
+          <select class="form-control" id="is-type-filter" style="flex:1;min-width:140px;" onchange="renderIssuesPage()">
+            <option value="">All Types</option>
+            <option value="Fibre Cut">Fibre Cut</option>
+            <option value="Signal Loss">Signal Loss</option>
+            <option value="Power Outage">Power Outage</option>
+            <option value="Router Fault">Router Fault</option>
+            <option value="Other">Other</option>
+          </select>
+          <select class="form-control" id="is-status-filter" style="flex:1;min-width:140px;" onchange="renderIssuesPage()">
+            <option value="">All Statuses</option>
+            <option value="open">Open</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <div class="card"><div class="table-wrap">
+          <table>
+            <thead><tr><th>Reported</th><th>Type</th><th>Location / Router</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="issues-body"></tbody>
+          </table>
+        </div></div>
+      </div>
+
       <div class="page" id="page-activity">
         <div class="ph">
           <div><div class="pt">&#128220; Activity Log</div><div class="ps" id="activity-sub">Who did what, and when</div></div>
@@ -1047,6 +1116,16 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
             <label class="form-label">Filename Prefix</label>
             <input class="form-control" id="photo-prefix" placeholder="e.g. SciFi-Router" oninput="savePhotoPrefix()"/>
           </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#128276; Notification Sound</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Plays a short chime whenever a new notification appears (voucher sent, agent changes, uploads, etc).</div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="notif-sound-toggle" onchange="setNotifSoundMuted(!this.checked)" style="width:18px;height:18px;"/>
+            <span style="font-size:13px;">Play a sound for new notifications</span>
+          </label>
+          <button class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="playNotifSound()">&#128264; Test Sound</button>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
@@ -1436,6 +1515,65 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeM('m-assign-config')">Cancel</button>
       <button class="btn btn-primary" onclick="confirmAssignConfig()">&#10003; Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-report-issue">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#9888;&#65039; Report an Issue</div>
+      <button class="modal-close" onclick="closeM('m-report-issue')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="is-id"/>
+      <div class="form-group">
+        <label class="form-label">Issue Type *</label>
+        <select class="form-control" id="is-type">
+          <option value="Fibre Cut">&#127968; Fibre Cut</option>
+          <option value="Signal Loss">&#128246; Signal Loss</option>
+          <option value="Power Outage">&#9889; Power Outage</option>
+          <option value="Router Fault">&#128225; Router Fault</option>
+          <option value="Other">&#10067; Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Router / Agent (optional)</label>
+        <select class="form-control" id="is-agent"><option value="">— Not specific to one router —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input class="form-control" id="is-location" placeholder="e.g. Kilimani junction, near Total petrol station"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea class="form-control" id="is-desc" rows="3" placeholder="What happened, when it was noticed, impact..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-report-issue')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveIssue()">&#10003; Report Issue</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-add-voucher-choice">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">&#127967; Add Voucher</div>
+      <button class="modal-close" onclick="closeM('m-add-voucher-choice')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="qa-btn" style="flex-direction:row;justify-content:flex-start;padding:16px;" onclick="qaAddVoucherSingle()">
+          <span class="qa-icon">&#10133;</span>
+          <div style="text-align:left;"><div>Add One Voucher</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Enter a single voucher code manually</div></div>
+        </button>
+        <button class="qa-btn" style="flex-direction:row;justify-content:flex-start;padding:16px;" onclick="qaAddVoucherBulk()">
+          <span class="qa-icon">&#128229;</span>
+          <div style="text-align:left;"><div>Bulk Import</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Paste a list of many voucher codes at once</div></div>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -2031,7 +2169,7 @@ function calcExp(sentAt,days){if(!sentAt||!days)return null;const d=new Date(sen
 function fD(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
 function fDT(iso){if(!iso)return'&#8212;';return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 function expBadge(exp){if(!exp)return'';const d=(new Date(exp)-new Date())/(864e5);if(d<0)return'<span class="eb eb-exp">Expired</span>';if(d<3)return`<span class="eb eb-warn">&#9888; ${Math.ceil(d)}d left</span>`;return`<span class="eb eb-ok">&#10003; ${Math.ceil(d)}d left</span>`;}
-function bdg(s){const m={available:'b-available',sent:'b-sent',used:'b-used',expired:'b-expired',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',faulty:'b-expired',resend:'b-sent',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}" style="${s==='faulty'?'background:rgba(255,59,92,.15);color:var(--danger);border-color:rgba(255,59,92,.3);':''}">${s.replace(/_/g,' ').toUpperCase()}</span>`;}
+function bdg(s){const m={available:'b-available',reserved:'b-sent',sent:'b-sent',used:'b-used',expired:'b-expired',active:'b-active',suspended:'b-suspended',delivered:'b-delivered',failed:'b-failed',faulty:'b-expired',resend:'b-sent',whatsapp:'b-whatsapp',sms:'b-sms',voucher:'b-voucher',announcement:'b-announcement',promotion:'b-announcement',maintenance:'b-announcement',service_interruption:'b-announcement',network_upgrade:'b-announcement',payment_reminder:'b-announcement'};return`<span class="badge ${m[s]||''}" style="${s==='faulty'?'background:rgba(255,59,92,.15);color:var(--danger);border-color:rgba(255,59,92,.3);':''}${s==='reserved'?'background:rgba(245,158,11,.15);color:var(--warn);border-color:rgba(245,158,11,.3);':''}">${s.replace(/_/g,' ').toUpperCase()}</span>`;}
 function av(n,big=''){return`<div class="av ${big}" style="flex-shrink:0;">${n[0].toUpperCase()}</div>`;}
 
 /* ═══════════════════ FILTER DROPDOWNS ══════════════════════ */
@@ -2076,7 +2214,7 @@ function bootApp(){
   const nm=curUser?.user_metadata?.full_name||curUser?.email?.split('@')[0]||'Admin';
   document.getElementById('u-nm').textContent=nm;document.getElementById('u-av').textContent=nm[0].toUpperCase();
   const ds=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('tb-date').textContent=ds;document.getElementById('dash-date').textContent='&#8987; '+ds;
+  document.getElementById('tb-date').textContent=ds;document.getElementById('dash-date').innerHTML='&#8987; '+ds;
   if(isDemo)renderSetupBanner();
   if(!isDemo&&sbClient)subRT();
   refreshAll();renderNotifs();
@@ -2086,6 +2224,11 @@ function bootApp(){
   // somewhere to land on before it exits the app entirely
   _lastPushedPage='dashboard';
   try{ history.replaceState({type:'page',id:'dashboard'},'','#dashboard'); }catch(e){}
+  // Never show the install banner if we're already running as an installed app
+  if(isRunningInstalled()){
+    var ib=document.getElementById('install-banner');
+    if(ib) ib.style.display='none';
+  }
 }
 function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:'public',table:'vouchers'},()=>refreshAll()).on('postgres_changes',{event:'*',schema:'public',table:'agents'},()=>refreshAll()).on('postgres_changes',{event:'*',schema:'public',table:'communications'},()=>refreshAll()).subscribe();}
 
@@ -2115,20 +2258,45 @@ function goP(id,el){
   if(!pageEl){console.warn('goP: no page for',id);return;}
   pageEl.classList.add('active');
   if(el)el.classList.add('active');
-  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher','activity':'Activity Log',packages:'Packages',payments:'Payments',expenses:'Expenses'};
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher','activity':'Activity Log','issues':'Report an Issue',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
-  if(window.innerWidth<=900)closeSB();
-  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();}catch(e){console.warn(e);}},50);
+  if(window.innerWidth<=900)closeSB(true);
+  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();var nst=document.getElementById('notif-sound-toggle');if(nst)nst.checked=!isNotifSoundMuted();}catch(e){console.warn(e);}},50);
   if(id==='faulty') setTimeout(renderFaulty,50);
   if(id==='routers') setTimeout(()=>{try{renderRoutersPage();}catch(e){console.warn(e);}},50);
   if(id==='configs') setTimeout(()=>{try{renderConfigsPage();}catch(e){console.warn(e);}},50);
   if(id==='pppoe') setTimeout(()=>{try{renderPppoe();}catch(e){console.warn(e);}},50);
   if(id==='random') setTimeout(()=>{try{renderRandomSends();}catch(e){console.warn(e);}},50);
   if(id==='activity') setTimeout(()=>{try{renderActivityLog();}catch(e){console.warn(e);}},50);
+  if(id==='issues') setTimeout(()=>{try{renderIssuesPage();}catch(e){console.warn(e);}},50);
   pushPageState(id);
 }
-function toggleSB(){const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');s.classList.toggle('open');b.classList.toggle('open',s.classList.contains('open'));}
-function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-bd').classList.remove('open');}
+function toggleSB(){
+  const s=document.getElementById('sidebar'),b=document.getElementById('sb-bd');
+  const opening=!s.classList.contains('open');
+  s.classList.toggle('open');
+  b.classList.toggle('open',s.classList.contains('open'));
+  if(window.innerWidth<=900 && !_isPoppingState){
+    if(opening){ try{ history.pushState({type:'sidebar'},''); }catch(e){} }
+  }
+}
+function closeSB(fromNav){
+  const wasOpen=document.getElementById('sidebar').classList.contains('open');
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-bd').classList.remove('open');
+  if(wasOpen && window.innerWidth<=900 && !_isPoppingState){
+    if(fromNav){
+      // A page navigation is about to push its own history entry right
+      // after this — swap out the sidebar's entry in place instead of
+      // consuming a real back-press, so the two don't collide.
+      try{ history.replaceState({type:'page',id:_lastPushedPage},''); }catch(e){}
+    }else{
+      _isPoppingState=true;
+      try{ history.back(); }catch(e){}
+      setTimeout(function(){_isPoppingState=false;},60);
+    }
+  }
+}
 
 /* ══════════════════════ DASHBOARD ══════════════════════════ */
 function renderDash(){
@@ -2168,6 +2336,14 @@ function renderAgents(){
     return`<tr><td><div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openProf('${a.id}')">${av(a.full_name)}<div><div style="font-weight:600;">${a.full_name}</div><div style="font-size:10px;color:var(--muted);">${a.email||''}</div></div></div></td><td style="font-family:monospace;font-size:11px;">${a.phone}</td><td>${a.region||'&#8212;'}</td><td style="font-size:11px;">${a.apartment||'&#8212;'}</td><td style="font-size:11px;color:var(--muted);">${a.date_joined||''}</td><td style="color:var(--accent);font-weight:700;">${vc}</td><td>${bdg(a.status)}</td><td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-icon btn-sm" onclick="openProf('${a.id}')">&#128065;</button><button class="btn btn-ghost btn-icon btn-sm" onclick="editAg('${a.id}')">&#9999;</button><button class="btn btn-ghost btn-icon btn-sm" onclick="togSt('${a.id}')">${a.status==='active'?'&#128274;':'&#9989;'}</button><button class="btn btn-danger btn-icon btn-sm" onclick="delAg('${a.id}')">&#128465;</button></div></td></tr>`;
   }).join(''):`<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No agents found</div></div></td></tr>`;
 }
+/* ═══════════════════ DASHBOARD QUICK ACTIONS ═══════════════════ */
+function qaDistribute(){ goP('distribute',document.querySelector('.nav-link[onclick*="\'distribute\'"]')); }
+function qaAddAgent(){ goP('agents',document.querySelector('.nav-link[onclick*="\'agents\'"]')); setTimeout(openAddAgent,100); }
+function qaReports(){ goP('reports',document.querySelector('.nav-link[onclick*="\'reports\'"]')); }
+function openAddVoucherChoice(){ openM('m-add-voucher-choice'); }
+function qaAddVoucherSingle(){ closeM('m-add-voucher-choice'); goP('vouchers',document.querySelector('.nav-link[onclick*="\'vouchers\'"]')); setTimeout(openAddVoucher,100); }
+function qaAddVoucherBulk(){ closeM('m-add-voucher-choice'); goP('vouchers',document.querySelector('.nav-link[onclick*="\'vouchers\'"]')); setTimeout(openBulkImport,100); }
+
 function openAddAgent(){document.getElementById('m-ag-title').textContent='Add Agent';document.getElementById('ae-id').value='';['ae-name','ae-phone','ae-wa','ae-email','ae-loc','ae-reg','ae-apt','ae-notes','ae-contact','ae-contact-phone'].forEach(id=>document.getElementById(id).value='');document.getElementById('ae-role').value='';document.getElementById('ae-contact-block').style.display='none';openM('m-agent');}
 // Update contact label + visibility based on role
 function updateContactBlock(v){
@@ -2305,11 +2481,15 @@ async function refreshRouterDetailModal(){
 async function handleRouterUploadFromModal(evt){
   const input=evt.target;
   const files=Array.from(input.files); if(!files.length||!_rdAgentId) return;
+  const label=input.closest('label');
+  const origHtml=label?label.innerHTML:'';
+  if(label) label.innerHTML='&#8987; Uploading&hellip;';
   let added=0;
   for(const file of files){
     try{ const c=await compressImage(file,1400,0.85); await uploadRouterPhoto(_rdAgentId,c,file.name); added++; }
     catch(e){ toast('Could not process: '+file.name,'warning'); }
   }
+  if(label) label.innerHTML=origHtml;
   await refreshRouterDetailModal();
   try{renderRoutersPage();}catch(e){}
   addNotif('📷 '+added+' photo(s) added for '+(S.agents.find(a=>a.id===_rdAgentId)?.full_name||_rdAgentId),'agent');
@@ -2499,6 +2679,7 @@ function renderVouchers(){
       '<td>'+
         '<div class="vc-actions" style="display:flex;gap:3px;align-items:center;flex-wrap:nowrap;">'+
           (v.status==="available"?'<button class="btn btn-primary btn-sm vcact" data-act="sendto" data-id="'+v.id+'" style="font-size:10px;padding:4px 9px;white-space:nowrap;">&#128228; Send</button>':'')+
+          (v.status==="reserved"?'<button class="btn btn-ghost btn-sm vcact" data-act="unreserve" data-id="'+v.id+'" style="font-size:10px;padding:4px 7px;white-space:nowrap;">&#128275; Un-reserve</button>':'')+
           (v.status==="sent"?'<button class="btn btn-ghost btn-sm vcact" data-act="resendvc" data-id="'+v.id+'" style="font-size:10px;padding:4px 7px;white-space:nowrap;">&#128260; Resend</button>':'')+
           (v.status==="faulty"?'<button class="vcact" data-act="restore" data-id="'+v.id+'" style="background:rgba(0,255,157,.1);color:var(--accent3);border:1px solid rgba(0,255,157,.2);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:10px;white-space:nowrap;">&#9654; Restore</button>':'')+
           '<button class="btn btn-ghost btn-icon btn-sm vcact" data-act="view" data-id="'+v.id+'" title="View" style="padding:5px 6px;">&#128065;</button>'+
@@ -2506,7 +2687,8 @@ function renderVouchers(){
             '<button class="btn btn-ghost btn-icon btn-sm" title="More" style="padding:5px 7px;font-size:14px;" onclick="toggleVCMore(this)">&#8942;</button>'+
             '<div class="vc-more-menu" style="display:none;position:absolute;right:0;top:110%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);min-width:155px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.5);overflow:hidden;">'+
               (v.status==="available"?'<button class="vc-more-item vcact" data-act="edit" data-id="'+v.id+'">&#9999;&#xFE0F; Edit</button>':'')+
-              (v.status==="available"?'<button class="vc-more-item vcact" data-act="disable" data-id="'+v.id+'">&#128274; Disable</button>':'')+
+              (v.status==="available"?'<button class="vc-more-item vcact" data-act="reserve" data-id="'+v.id+'">&#128274; Reserve</button>':'')+
+              (v.status==="available"?'<button class="vc-more-item vcact" data-act="disable" data-id="'+v.id+'">&#128683; Disable</button>':'')+
               (v.status==="sent"?'<button class="vc-more-item vcact" data-act="used" data-id="'+v.id+'">&#9989; Mark Used</button>':'')+
               (v.status!=="faulty"?'<button class="vc-more-item vcact" data-act="faulty" data-id="'+v.id+'" style="color:var(--danger);">&#9888; Mark Faulty</button>':'')+
               '<button class="vc-more-item vcact" data-act="delete" data-id="'+v.id+'" style="color:var(--danger);">&#128465; Delete</button>'+
@@ -2531,8 +2713,8 @@ document.addEventListener('click',function(e){
     document.querySelectorAll('.vc-more-menu').forEach(m=>m.style.display='none');
   }
 });
-function togVC(id,cb){if(cb.checked)selV.add(id);else selV.delete(id);}
-function selAllV(cb){document.querySelectorAll('.vcb').forEach(b=>{b.checked=cb.checked;if(cb.checked)selV.add(b.value);else selV.delete(b.value);});}
+function togVC(id,cb){if(cb.checked)selV.add(id);else selV.delete(id);updateVCSelectionBar();}
+function selAllV(cb){document.querySelectorAll('.vcb').forEach(b=>{b.checked=cb.checked;if(cb.checked)selV.add(b.value);else selV.delete(b.value);});updateVCSelectionBar();}
 
 function daysToText(d){
   d=parseInt(d)||7;
@@ -2875,6 +3057,59 @@ async function doBulkEdit(){
   for(const id of av){const p={};if(pkg)p.package_name=pkg;if(days)p.duration_days=parseInt(days);await dbUpd('vouchers',id,p);}
   toast(`Updated ${av.length} vouchers`,'success');selV.clear();closeM('m-bulk-edit');await refreshAll();
 }
+async function reserveVoucher(id){
+  try{
+    await dbUpd('vouchers',id,{status:'reserved'});
+    const v=S.vouchers.find(x=>x.id===id);
+    addNotif('🔒 Voucher '+(v?.voucher_code||id)+' reserved','voucher');
+    toast('Voucher reserved','success');
+    await refreshAll();
+  }catch(e){ toast('Could not reserve: '+(e.message||e),'error'); }
+}
+async function unreserveVoucher(id){
+  try{
+    await dbUpd('vouchers',id,{status:'available'});
+    const v=S.vouchers.find(x=>x.id===id);
+    addNotif('🔓 Voucher '+(v?.voucher_code||id)+' un-reserved','voucher');
+    toast('Voucher available again','success');
+    await refreshAll();
+  }catch(e){ toast('Could not un-reserve: '+(e.message||e),'error'); }
+}
+async function quickReserveSelected(){
+  const ids=[...selV].filter(id=>{const v=S.vouchers.find(x=>x.id===id);return v&&v.status==='available';});
+  if(!ids.length){toast('Select available vouchers first','warning');return;}
+  for(const id of ids){ await dbUpd('vouchers',id,{status:'reserved'}); }
+  toast(ids.length+' voucher(s) reserved','success');
+  addNotif('🔒 '+ids.length+' vouchers reserved','voucher');
+  selV.clear();updateVCSelectionBar();
+  await refreshAll();
+}
+async function quickUnreserveSelected(){
+  const ids=[...selV].filter(id=>{const v=S.vouchers.find(x=>x.id===id);return v&&v.status==='reserved';});
+  if(!ids.length){toast('Select reserved vouchers first','warning');return;}
+  for(const id of ids){ await dbUpd('vouchers',id,{status:'available'}); }
+  toast(ids.length+' voucher(s) un-reserved','success');
+  addNotif('🔓 '+ids.length+' vouchers un-reserved','voucher');
+  selV.clear();updateVCSelectionBar();
+  await refreshAll();
+}
+function clearVoucherSelection(){
+  selV.clear();
+  document.querySelectorAll('.vcb').forEach(function(b){b.checked=false;});
+  const vca=document.getElementById('vca'); if(vca) vca.checked=false;
+  updateVCSelectionBar();
+}
+function updateVCSelectionBar(){
+  const bar=document.getElementById('vc-quick-actions');
+  const cnt=document.getElementById('vc-sel-count');
+  if(!bar||!cnt) return;
+  if(selV.size>0){
+    bar.style.display='flex';
+    cnt.textContent=selV.size+' selected';
+  }else{
+    bar.style.display='none';
+  }
+}
 async function bulkDeleteVouchers(){
   const ids=[...selV];
   if(!ids.length){toast('Select vouchers first','warning');return;}
@@ -2884,6 +3119,7 @@ async function bulkDeleteVouchers(){
   addNotif('🎫 '+ids.length+' vouchers bulk deleted','voucher');
   selV.clear();
   const vca=document.getElementById('vca'); if(vca) vca.checked=false;
+  updateVCSelectionBar();
   await refreshAll();
 }
 
@@ -3538,7 +3774,33 @@ function addNotif(text, type){
   if(isDemo){ DB.notifs.unshift(notif); }
   else { if(!window._liveNotifs) window._liveNotifs=[]; window._liveNotifs.unshift(notif); }
   renderNotifs();
+  playNotifSound();
   logActivity(text,type);
+}
+
+/* ═══════════════════ NOTIFICATION SOUND ═══════════════════ */
+function isNotifSoundMuted(){ return localStorage.getItem('scifi_notif_muted')==='1'; }
+function setNotifSoundMuted(v){ localStorage.setItem('scifi_notif_muted', v?'1':'0'); }
+function playNotifSound(){
+  if(isNotifSoundMuted()) return;
+  try{
+    const Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx) return;
+    if(!window._notifAudioCtx) window._notifAudioCtx=new Ctx();
+    const ctx=window._notifAudioCtx;
+    if(ctx.state==='suspended') ctx.resume();
+    const now=ctx.currentTime;
+    // Two quick ascending tones — a light, pleasant "ding-ding" like a phone notification
+    [[880,now],[1108,now+0.11]].forEach(function(pair){
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.type='sine'; osc.frequency.value=pair[0];
+      gain.gain.setValueAtTime(0.0001,pair[1]);
+      gain.gain.exponentialRampToValueAtTime(0.25,pair[1]+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001,pair[1]+0.28);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(pair[1]); osc.stop(pair[1]+0.3);
+    });
+  }catch(e){ console.warn('Notification sound error:',e); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -3617,6 +3879,139 @@ async function renderActivityLog(){
       '<td><span class="badge '+(catColors[r.category]||'b-available')+'">'+(r.category||'general').toUpperCase()+'</span></td></tr>';
   }).join(''):'<tr><td colspan="4"><div class="empty"><div class="empty-icon">&#128220;</div><div class="empty-title">No activity logged yet</div></div></td></tr>';
 }
+
+/* ═══════════════════════════════════════════════════════════
+   REPORT AN ISSUE — fibre cuts, signal loss, outages, etc.
+   ═══════════════════════════════════════════════════════════ */
+const ISSUES_TABLE='network_issues';
+function _lsGetIssuesLocal(){
+  try{ return JSON.parse(localStorage.getItem('network_issues_local')||'[]'); }catch(e){ return []; }
+}
+function _lsSaveIssuesLocal(list){
+  try{ localStorage.setItem('network_issues_local',JSON.stringify(list)); }catch(e){}
+}
+async function getIssues(){
+  let dbRows=[];
+  if(!isDemo&&sbClient){
+    try{
+      const{data,error}=await withTimeout(sbClient.from(ISSUES_TABLE).select('*').order('created_at',{ascending:false}),8000);
+      if(!error&&data) dbRows=data.map(function(r){return{...r,source:'db'};});
+    }catch(e){ console.warn('getIssues error:',e); }
+  }
+  const local=_lsGetIssuesLocal().map(function(r){return{...r,source:'local'};});
+  if(!isDemo&&sbClient&&local.length) migrateIssuesToDb(local);
+  return [...dbRows,...local].sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+}
+async function migrateIssuesToDb(local){
+  let migrated=0; const remaining=[...local];
+  for(const row of local){
+    try{
+      const{id:_id,source:_s,...clean}=row;
+      const{error}=await sbClient.from(ISSUES_TABLE).insert({...clean,id:row.id});
+      if(error) continue;
+      const idx=remaining.findIndex(function(r){return r.id===row.id;});
+      if(idx>-1) remaining.splice(idx,1);
+      migrated++;
+    }catch(e){}
+  }
+  _lsSaveIssuesLocal(remaining);
+  if(migrated) try{ renderIssuesPage(); }catch(e){}
+}
+function openReportIssueModal(){
+  document.getElementById('is-id').value='';
+  document.getElementById('is-type').value='Fibre Cut';
+  document.getElementById('is-location').value='';
+  document.getElementById('is-desc').value='';
+  const sel=document.getElementById('is-agent');
+  if(sel&&!sel.dataset.populated){
+    sel.innerHTML='<option value="">— Not specific to one router —</option>'+S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+'</option>';}).join('');
+    sel.dataset.populated='1';
+  }
+  openM('m-report-issue');
+}
+async function saveIssue(){
+  const type=document.getElementById('is-type').value;
+  const agentId=document.getElementById('is-agent').value||null;
+  const location=document.getElementById('is-location').value.trim();
+  const desc=document.getElementById('is-desc').value.trim();
+  if(!desc){toast('Add a description of the issue','warning');return;}
+  const row={id:uid(),issue_type:type,agent_id:agentId,location:location||null,description:desc,status:'open',reported_by:(curUser&&curUser.email)||'unknown',created_at:new Date().toISOString(),resolved_at:null};
+  if(isDemo||!sbClient){
+    const list=_lsGetIssuesLocal(); list.unshift(row); _lsSaveIssuesLocal(list);
+  }else{
+    try{
+      const{error}=await withTimeout(sbClient.from(ISSUES_TABLE).insert(row),8000);
+      if(error) throw error;
+    }catch(e){
+      const list=_lsGetIssuesLocal(); list.unshift(row); _lsSaveIssuesLocal(list);
+      toast('Saved on this device only — database error: '+(e.message||'unknown'),'warning');
+    }
+  }
+  addNotif('⚠️ '+type+' reported'+(location?' at '+location:''),'general');
+  toast('Issue reported','warning');
+  closeM('m-report-issue');
+  await renderIssuesPage();
+}
+async function resolveIssue(issueId){
+  const all=_allIssues;
+  const row=all.find(function(x){return x.id===issueId;});
+  if(!row) return;
+  if(row.source==='db'&&sbClient){
+    try{ await sbClient.from(ISSUES_TABLE).update({status:'resolved',resolved_at:new Date().toISOString()}).eq('id',issueId); }
+    catch(e){ toast('Could not update: '+(e.message||e),'error'); return; }
+  }else{
+    const list=_lsGetIssuesLocal();
+    const idx=list.findIndex(function(x){return x.id===issueId;});
+    if(idx>-1){ list[idx].status='resolved'; list[idx].resolved_at=new Date().toISOString(); _lsSaveIssuesLocal(list); }
+  }
+  addNotif('✅ Issue resolved: '+(row.issue_type||'Issue'),'general');
+  toast('Marked resolved','success');
+  await renderIssuesPage();
+}
+async function deleteIssue(issueId){
+  if(!confirm('Delete this issue report?')) return;
+  const row=_allIssues.find(function(x){return x.id===issueId;});
+  if(!row) return;
+  if(row.source==='db'&&sbClient){
+    try{ await sbClient.from(ISSUES_TABLE).delete().eq('id',issueId); }catch(e){}
+  }else{
+    const list=_lsGetIssuesLocal().filter(function(x){return x.id!==issueId;});
+    _lsSaveIssuesLocal(list);
+  }
+  toast('Issue deleted','warning');
+  await renderIssuesPage();
+}
+let _allIssues=[];
+async function renderIssuesPage(){
+  const body=document.getElementById('issues-body');
+  if(!body) return;
+  body.innerHTML='<tr><td colspan="6"><div style="font-size:12px;color:var(--muted);padding:12px;">Loading&hellip;</div></td></tr>';
+  _allIssues=await getIssues();
+
+  const q=(document.getElementById('is-search')?.value||'').toLowerCase().trim();
+  const typeF=document.getElementById('is-type-filter')?.value||'';
+  const statusF=document.getElementById('is-status-filter')?.value||'';
+  let list=_allIssues;
+  if(typeF) list=list.filter(function(r){return r.issue_type===typeF;});
+  if(statusF) list=list.filter(function(r){return r.status===statusF;});
+  if(q) list=list.filter(function(r){return ((r.description||'')+' '+(r.location||'')).toLowerCase().includes(q);});
+
+  const openCount=_allIssues.filter(function(r){return r.status==='open';}).length;
+  document.getElementById('issues-sub').textContent=_allIssues.length+' issue(s) reported · '+openCount+' open';
+
+  body.innerHTML=list.length?list.map(function(r){
+    const agent=r.agent_id?(S.agents.find(function(a){return a.id===r.agent_id;})||{}).full_name:null;
+    return '<tr><td style="font-size:11px;color:var(--muted);white-space:nowrap;">'+fDT(r.created_at)+'</td>'+
+      '<td style="font-size:11px;font-weight:600;">'+(r.issue_type||'—')+'</td>'+
+      '<td style="font-size:11px;">'+(agent||r.location||'—')+'</td>'+
+      '<td style="font-size:12px;max-width:220px;">'+(r.description||'—')+'</td>'+
+      '<td>'+(r.status==='resolved'?'<span class="badge b-available">RESOLVED</span>':'<span class="badge b-expired">OPEN</span>')+'</td>'+
+      '<td><div style="display:flex;gap:4px;">'+
+        (r.status==='open'?'<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;" onclick="resolveIssue(\''+r.id+'\')">&#10003; Resolve</button>':'')+
+        '<button class="btn btn-danger btn-icon btn-sm" onclick="deleteIssue(\''+r.id+'\')" title="Delete">&#128465;</button>'+
+      '</div></td></tr>';
+  }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#9888;&#65039;</div><div class="empty-title">No issues reported</div></div></td></tr>';
+}
 function renderNotifs(){
   const notifs=isDemo?DB.notifs:(window._liveNotifs||[]);
   const unread=notifs.filter(n=>!n.read).length;
@@ -3668,6 +4063,12 @@ function closeM(id){
 }
 window.addEventListener('popstate',function(e){
   if(_isPoppingState){ _isPoppingState=false; return; }
+  var sidebar=document.getElementById('sidebar');
+  if(sidebar && sidebar.classList.contains('open') && window.innerWidth<=900){
+    sidebar.classList.remove('open');
+    document.getElementById('sb-bd').classList.remove('open');
+    return;
+  }
   var openModals=document.querySelectorAll('.modal-overlay.open');
   if(openModals.length){
     openModals[openModals.length-1].classList.remove('open');
@@ -3704,6 +4105,8 @@ document.addEventListener('DOMContentLoaded',function(){
     else if(act==='resendvc') resendVoucher(id);
     else if(act==='faulty')  openMarkFaulty(id);
     else if(act==='restore') restoreVoucher(id);
+    else if(act==='reserve') reserveVoucher(id);
+    else if(act==='unreserve') unreserveVoucher(id);
   });
 });
 
@@ -4427,7 +4830,7 @@ async function uploadRouterPhoto(agentId,base64Data,filename){
   }
   try{
     const row={id:uid(),agent_id:agentId,filename:filename,photo_data:base64Data,created_at:new Date().toISOString()};
-    const{error}=await sbClient.from(ROUTER_PHOTOS_TABLE).insert(row);
+    const{error}=await withTimeout(sbClient.from(ROUTER_PHOTOS_TABLE).insert(row),12000);
     if(error) throw error;
     return{id:row.id,name:filename,data:base64Data,ts:row.created_at,source:'db'};
   }catch(e){
@@ -4542,10 +4945,10 @@ async function uploadRouterConfig(file,initialAgentId){
   }
   try{
     const row={id:uid(),filename:file.name,file_data:base64Data,mime_type:file.type||'application/octet-stream',created_at:new Date().toISOString()};
-    const{error}=await sbClient.from(ROUTER_CONFIGS_TABLE).insert(row);
+    const{error}=await withTimeout(sbClient.from(ROUTER_CONFIGS_TABLE).insert(row),12000);
     if(error) throw error;
     for(const agentId of initial){
-      try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:row.id,agent_id:agentId}); }catch(e){}
+      try{ await withTimeout(sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:row.id,agent_id:agentId}),12000); }catch(e){}
     }
     return{id:row.id,name:file.name,data:base64Data,mime:row.mime_type,ts:row.created_at,source:'db',agent_ids:initial};
   }catch(e){
@@ -4561,7 +4964,7 @@ async function uploadRouterConfig(file,initialAgentId){
 // Add / remove one router↔file link, on top of whatever storage the file lives in
 async function linkConfigToAgent(config,agentId){
   if(config.source==='db'&&sbClient){
-    try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:config.id,agent_id:agentId}); }
+    try{ await withTimeout(sbClient.from(ROUTER_CONFIG_LINKS_TABLE).insert({id:uid(),config_id:config.id,agent_id:agentId}),12000); }
     catch(e){ console.warn('link error:',e); }
   }else{
     const pool=_lsGetConfigPool();
@@ -4571,7 +4974,7 @@ async function linkConfigToAgent(config,agentId){
 }
 async function unlinkConfigFromAgent(config,agentId){
   if(config.source==='db'&&sbClient){
-    try{ await sbClient.from(ROUTER_CONFIG_LINKS_TABLE).delete().eq('config_id',config.id).eq('agent_id',agentId); }
+    try{ await withTimeout(sbClient.from(ROUTER_CONFIG_LINKS_TABLE).delete().eq('config_id',config.id).eq('agent_id',agentId),12000); }
     catch(e){ console.warn('unlink error:',e); }
   }else{
     const pool=_lsGetConfigPool();
@@ -4804,28 +5207,38 @@ async function openAssignFileModal(agentId){
 
 async function confirmAssignConfig(){
   const checked=Array.from(document.querySelectorAll('#ac-list input[type=checkbox]:checked')).map(function(el){return el.value;});
-  if(_acMode==='pickRouters'){
-    const before=new Set(_acConfig.agent_ids||[]);
-    const after=new Set(checked);
-    for(const id of after){ if(!before.has(id)) await linkConfigToAgent(_acConfig,id); }
-    for(const id of before){ if(!after.has(id)) await unlinkConfigFromAgent(_acConfig,id); }
-    toast('Assignments updated for "'+(_acConfig.name||'file')+'"','success');
-    closeM('m-assign-config');
-    await renderConfigsPage();
-    if(_rdAgentId) await refreshRouterConfigUI();
-  }else if(_acMode==='pickFiles'){
-    const all=window._acAllFiles||_allConfigs;
-    for(const c of all){
-      const wasIn=(c.agent_ids||[]).includes(_acAgentId);
-      const nowIn=checked.includes(c.id);
-      if(nowIn&&!wasIn) await linkConfigToAgent(c,_acAgentId);
-      if(!nowIn&&wasIn) await unlinkConfigFromAgent(c,_acAgentId);
+  const btn=document.querySelector('#m-assign-config .btn-primary');
+  const origLabel=btn?btn.innerHTML:'';
+  if(btn){ btn.disabled=true; btn.innerHTML='&#8987; Saving&hellip;'; }
+  try{
+    if(_acMode==='pickRouters'){
+      const before=new Set(_acConfig.agent_ids||[]);
+      const after=new Set(checked);
+      for(const id of after){ if(!before.has(id)) await linkConfigToAgent(_acConfig,id); }
+      for(const id of before){ if(!after.has(id)) await unlinkConfigFromAgent(_acConfig,id); }
+      toast('Assignments updated for "'+(_acConfig.name||'file')+'"','success');
+      closeM('m-assign-config');
+      await renderConfigsPage();
+      if(_rdAgentId) await refreshRouterConfigUI();
+    }else if(_acMode==='pickFiles'){
+      const all=window._acAllFiles||_allConfigs;
+      for(const c of all){
+        const wasIn=(c.agent_ids||[]).includes(_acAgentId);
+        const nowIn=checked.includes(c.id);
+        if(nowIn&&!wasIn) await linkConfigToAgent(c,_acAgentId);
+        if(!nowIn&&wasIn) await unlinkConfigFromAgent(c,_acAgentId);
+      }
+      const agentName=(S.agents.find(function(a){return a.id===_acAgentId;})||{}).full_name||'router';
+      toast('Config files updated for '+agentName,'success');
+      closeM('m-assign-config');
+      if(_rdAgentId) await refreshRouterConfigUI();
+      try{ renderConfigsPage(); }catch(e){}
     }
-    const agentName=(S.agents.find(function(a){return a.id===_acAgentId;})||{}).full_name||'router';
-    toast('Config files updated for '+agentName,'success');
-    closeM('m-assign-config');
-    if(_rdAgentId) await refreshRouterConfigUI();
-    try{ renderConfigsPage(); }catch(e){}
+  }catch(e){
+    console.error('confirmAssignConfig error:',e);
+    toast('Could not save assignment: '+(e.message||'unknown error'),'error');
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML=origLabel||'&#10003; Save'; }
   }
 }
 
