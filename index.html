@@ -500,6 +500,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <div class="nav-sec">PEOPLE</div>
       <a class="nav-link" onclick="goP('agents',this)"><span class="nav-icon">&#128101;</span>Agents<span class="nav-badge" id="nb-ag">0</span></a>
       <a class="nav-link" onclick="goP('pppoe',this)"><span class="nav-icon">&#128421;&#65039;</span>PPPoE Customers</a>
+      <a class="nav-link" onclick="goP('installs',this)"><span class="nav-icon">&#128295;</span>Installation Requests</a>
       <a class="nav-link" onclick="goP('random',this)"><span class="nav-icon">&#127919;</span>Random Voucher</a>
       <a class="nav-link" onclick="goP('messages',this)"><span class="nav-icon">&#128172;</span>Messages</a>
 
@@ -531,9 +532,6 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <div><div class="topbar-title" id="tb-title">Dashboard</div><div class="topbar-sub" id="tb-date"></div></div>
       <div class="sw"><span class="sw-icon">&#128269;</span><input type="text" placeholder="Search agents, vouchers, codes&#8230;" id="g-search" oninput="gSearch(this.value)"/></div>
       <div class="tb-right">
-        <button class="icon-btn" id="wa-api-badge" onclick="goP('settings',document.querySelector('[onclick*=settings]'))" title="WhatsApp API Status" style="font-size:11px;padding:6px 10px;gap:5px;display:flex;align-items:center;">
-          &#128172; <span id="wa-api-label" style="font-size:10px;font-weight:700;letter-spacing:.06em;">WA</span>
-        </button>
         <div style="position:relative;">
           <button class="icon-btn" onclick="toggleND()">&#128276;<span class="nb-dot" id="nb-dot" style="display:none;"></span></button>
           <div class="nd" id="nd">
@@ -1063,7 +1061,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         </div>
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
           <input class="form-control" id="is-search" placeholder="&#128269; Search by description or location..." style="flex:2;min-width:200px;" oninput="renderIssuesPage()"/>
-          <select class="form-control" id="is-type-filter" style="flex:1;min-width:140px;" onchange="renderIssuesPage()">
+          <select class="form-control" id="is-type-filter" style="flex:1;min-width:130px;" onchange="renderIssuesPage()">
             <option value="">All Types</option>
             <option value="Fibre Cut">Fibre Cut</option>
             <option value="Signal Loss">Signal Loss</option>
@@ -1071,15 +1069,23 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
             <option value="Router Fault">Router Fault</option>
             <option value="Other">Other</option>
           </select>
-          <select class="form-control" id="is-status-filter" style="flex:1;min-width:140px;" onchange="renderIssuesPage()">
+          <select class="form-control" id="is-status-filter" style="flex:1;min-width:130px;" onchange="renderIssuesPage()">
             <option value="">All Statuses</option>
             <option value="open">Open</option>
             <option value="resolved">Resolved</option>
           </select>
+          <select class="form-control" id="is-resolution-filter" style="flex:1;min-width:150px;" onchange="renderIssuesPage()">
+            <option value="">Any Resolution</option>
+            <option value="repaired">Repaired</option>
+            <option value="replacement_required">Requires Replacement</option>
+          </select>
+          <select class="form-control" id="is-router-filter" style="flex:1;min-width:150px;" onchange="renderIssuesPage()">
+            <option value="">All Routers</option>
+          </select>
         </div>
         <div class="card"><div class="table-wrap">
           <table>
-            <thead><tr><th>Reported</th><th>Type</th><th>Location / Router</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Reported</th><th>Type</th><th>Location / Router</th><th>Description</th><th>Photo</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="issues-body"></tbody>
           </table>
         </div></div>
@@ -1205,6 +1211,38 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
               <th>Monthly Fee</th><th>Last Paid</th><th>Status</th><th>Actions</th>
             </tr></thead>
             <tbody id="pppoe-body"></tbody>
+          </table>
+        </div></div>
+      </div>
+
+      <div class="page" id="page-installs">
+        <div class="ph">
+          <div><div class="pt">&#128295; Installation Requests</div><div class="ps" id="installs-sub">Planned installs and customer requests, tracked from request to completion</div></div>
+          <div class="pa">
+            <button class="btn btn-primary" onclick="openAddInstall()">&#10133; New Request</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input class="form-control" id="in-search" placeholder="&#128269; Search by name, phone, location..." style="flex:2;min-width:200px;" oninput="renderInstalls()"/>
+          <select class="form-control" id="in-status-filter" style="flex:1;min-width:130px;" onchange="renderInstalls()">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="partial">Partially Done</option>
+            <option value="done">Done</option>
+          </select>
+          <select class="form-control" id="in-type-filter" style="flex:1;min-width:130px;" onchange="renderInstalls()">
+            <option value="">Hotspot &amp; PPPoE</option>
+            <option value="hotspot">Hotspot Agent</option>
+            <option value="pppoe">PPPoE Client</option>
+          </select>
+          <input type="date" class="form-control" id="in-date-filter" style="flex:1;min-width:130px;" onchange="renderInstalls()"/>
+        </div>
+        <div class="card"><div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Requested</th><th>Customer</th><th>Location</th><th>Type</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="installs-body"></tbody>
           </table>
         </div></div>
       </div>
@@ -1386,6 +1424,108 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
   </div>
 </div>
 
+<!-- Installation Request Modal -->
+<div class="modal-overlay" id="m-install">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m-in-title">New Installation Request</div>
+      <button class="modal-close" onclick="closeM('m-install')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="in-id"/>
+      <button type="button" class="btn btn-secondary btn-full" onclick="pickContactForInstall()" style="margin-bottom:14px;">&#128101; Import from Contacts</button>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Customer Name *</label><input class="form-control" id="in-name" placeholder="e.g. Wilfred Nyakundi"/></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-control" id="in-phone" placeholder="+254712345678"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Location</label><input class="form-control" id="in-location" placeholder="e.g. Daraja Mbili, near the market"/></div>
+        <div class="form-group"><label class="form-label">Region</label><input class="form-control" id="in-region" placeholder="e.g. Kisii or Nyamira"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Requested By</label>
+          <select class="form-control" id="in-source">
+            <option value="planned">We're planning to install here</option>
+            <option value="customer">Customer requested installation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Will Become *</label>
+          <select class="form-control" id="in-service-type">
+            <option value="hotspot">Hotspot Agent</option>
+            <option value="pppoe">PPPoE Client</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Scheduled Date</label>
+        <input type="date" class="form-control" id="in-scheduled"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Requirements</label>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">One item per line — e.g. router, 50m cable, mounting bracket, ladder</div>
+        <textarea class="form-control" id="in-requirements" rows="4" placeholder="Router&#10;50m ethernet cable&#10;Mounting bracket"></textarea>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="in-notes" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-install')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInstall()">&#10003; Save Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Installation Detail Modal -->
+<div class="modal-overlay" id="m-install-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#128295; Installation Details</div>
+      <button class="modal-close" onclick="closeM('m-install-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div id="ind-av"></div>
+        <div><div id="ind-name" style="font-weight:700;font-size:14px;"></div><div id="ind-meta" style="font-size:12px;color:var(--muted);"></div></div>
+      </div>
+      <div id="ind-status-badge" style="margin-bottom:14px;"></div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">Requirements Checklist</div>
+      <div id="ind-requirements" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;"></div>
+      <div id="ind-timeline" style="font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:12px;"></div>
+      <div id="ind-partial-notes-wrap" style="display:none;margin-top:12px;padding:10px 12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;">
+        <div style="font-size:11px;color:var(--warn);font-weight:700;text-transform:uppercase;">What's left</div>
+        <div id="ind-partial-notes" style="font-size:13px;margin-top:4px;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="editInstall(document.getElementById('in-id-detail').value)">&#9999; Edit</button>
+      <button class="btn btn-danger" onclick="deleteInstall(document.getElementById('in-id-detail').value)">&#128465; Delete</button>
+      <input type="hidden" id="in-id-detail"/>
+    </div>
+  </div>
+</div>
+
+<!-- Mark Partial Modal -->
+<div class="modal-overlay" id="m-install-partial">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#9203; Mark as Partially Done</div>
+      <button class="modal-close" onclick="closeM('m-install-partial')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ip-id"/>
+      <div class="form-group">
+        <label class="form-label">What's left to finish? *</label>
+        <textarea class="form-control" id="ip-notes" rows="3" placeholder="e.g. Cable run to the house, but router not yet fixed/configured"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-install-partial')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmMarkPartial()">&#10003; Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- PPPoE Customer Modal -->
 <div class="modal-overlay" id="m-pppoe">
   <div class="modal">
@@ -1548,6 +1688,14 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <div class="form-group">
         <label class="form-label">Description *</label>
         <textarea class="form-control" id="is-desc" rows="3" placeholder="What happened, when it was noticed, impact..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Photo(s)</label>
+        <div id="is-photo-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+        <label class="btn btn-secondary btn-full" style="cursor:pointer;">
+          &#128247; Add Photo(s)
+          <input type="file" id="is-photo-input" accept="image/*" multiple style="display:none;" onchange="handleIssuePhotoSelect(event)"/>
+        </label>
       </div>
     </div>
     <div class="modal-footer">
@@ -2041,12 +2189,13 @@ async function tryBiometricUnlock(){
     return false;
   }
 }
+let _sessionRestorePromise=null;
 function showLockScreen(email){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('lock-email').textContent=email?('Unlock for '+email):'Use your fingerprint to unlock SciFi ISP';
   document.getElementById('lock-screen').style.display='flex';
-  setTimeout(doBiometricUnlock,300);
+  setTimeout(doBiometricUnlock,50);
 }
 async function doBiometricUnlock(){
   var btn=document.getElementById('lock-unlock-btn');
@@ -2054,6 +2203,14 @@ async function doBiometricUnlock(){
   var ok=await tryBiometricUnlock();
   btn.innerHTML='&#128272; Unlock with Fingerprint';btn.disabled=false;
   if(ok){
+    // The session restore was already running in the background while
+    // the fingerprint prompt was up — just wait for whichever is left.
+    if(_sessionRestorePromise){ try{ await _sessionRestorePromise; }catch(e){} }
+    if(window._bioSessionMismatch){
+      window._bioSessionMismatch=false;
+      toast('Your saved sign-in has expired — please log in again','warning');
+      return; // login screen is already showing at this point
+    }
     document.getElementById('lock-screen').style.display='none';
     bootApp();
   }else{
@@ -2065,23 +2222,55 @@ function lockUsePassword(){
   document.getElementById('login-screen').style.display='flex';
 }
 async function initAuthFlow(){
-  var waited=0;
-  while(!sbClient && waited<3000){await new Promise(function(r){setTimeout(r,150);});waited+=150;}
-  if(!sbClient) return; // no network/CDN — normal login screen stays visible
-  try{
-    var result=await withTimeout(sbClient.auth.getSession(),8000);
-    var session=result&&result.data?result.data.session:null;
-    if(session&&session.user){
-      curUser=session.user;isDemo=false;
-      var stored=bioStored();
-      var storedEmail=localStorage.getItem(BIO_EMAIL_KEY);
-      if(stored&&storedEmail&&storedEmail===session.user.email){
-        showLockScreen(session.user.email);
-      }else{
-        bootApp();
+  // Check for a stored fingerprint credential instantly, from localStorage —
+  // no need to wait on the Supabase CDN or network before showing the
+  // sensor prompt. The actual session gets restored concurrently below.
+  var stored=bioStored();
+  var storedEmail=localStorage.getItem(BIO_EMAIL_KEY);
+  var showedLockEarly=false;
+  if(stored&&storedEmail){
+    showLockScreen(storedEmail);
+    showedLockEarly=true;
+  }
+
+  _sessionRestorePromise=(async function(){
+    var waited=0;
+    while(!sbClient && waited<3000){await new Promise(function(r){setTimeout(r,150);});waited+=150;}
+    if(!sbClient){
+      if(showedLockEarly){
+        // Never got a Supabase client — fall back to the password screen
+        document.getElementById('lock-screen').style.display='none';
+        document.getElementById('login-screen').style.display='flex';
       }
+      return;
     }
-  }catch(e){console.warn('Session restore error:',e);}
+    try{
+      var result=await withTimeout(sbClient.auth.getSession(),8000);
+      var session=result&&result.data?result.data.session:null;
+      if(session&&session.user){
+        curUser=session.user;isDemo=false;
+        if(showedLockEarly && session.user.email!==storedEmail){
+          // The fingerprint on this device is registered to a different
+          // account than the one that's actually signed in — don't let
+          // it through, fall back to password entry instead.
+          window._bioSessionMismatch=true;
+          document.getElementById('lock-screen').style.display='none';
+          document.getElementById('login-screen').style.display='flex';
+        }else if(!showedLockEarly){
+          // No stored biometric credential for this account — go straight in
+          bootApp();
+        }
+        // If we DID show the lock screen early and the account matches,
+        // doBiometricUnlock() picks this promise up once the fingerprint succeeds.
+      }else if(showedLockEarly){
+        window._bioSessionMismatch=true;
+        // Session didn't actually restore — don't leave the user stuck
+        // on a lock screen for an account that isn't really signed in.
+        document.getElementById('lock-screen').style.display='none';
+        document.getElementById('login-screen').style.display='flex';
+      }
+    }catch(e){console.warn('Session restore error:',e);}
+  })();
 }
 
 /* ═══════════════════════ DATA LAYER ══════════════════════════ */
@@ -2092,10 +2281,11 @@ async function dbGet(t){
     if(t==='communications')return[...DB.comms];
     if(t==='pppoe_customers')return[...DB.pppoe];
     if(t==='random_sends')return[...DB.randomSends];
+    if(t==='installation_requests')return[...(DB.installs||[])];
     return[];
   }
   try{
-    const orderCol=t==='agents'?'created_at':t==='vouchers'?'date_added':t==='pppoe_customers'?'created_at':t==='random_sends'?'sent_at':'sent_at';
+    const orderCol=t==='agents'?'created_at':t==='vouchers'?'date_added':t==='pppoe_customers'?'created_at':t==='random_sends'?'sent_at':t==='installation_requests'?'created_at':'sent_at';
     const{data,error}=await withTimeout(sbClient.from(t).select('*').order(orderCol,{ascending:false}),10000);
     if(error){
       // If column doesn't exist fall back to id ordering
@@ -2113,6 +2303,7 @@ async function dbIns(t,row){
     if(t==='communications')DB.comms.push(row);
     if(t==='pppoe_customers')DB.pppoe.push(row);
     if(t==='random_sends')DB.randomSends.push(row);
+    if(t==='installation_requests'){ if(!DB.installs)DB.installs=[]; DB.installs.push(row); }
     return row;
   }
   const{data,error}=await sbClient.from(t).insert(row).select().single();
@@ -2128,6 +2319,7 @@ async function dbUpd(t,id,patch){
     if(t==='vouchers')DB.vouchers=DB.vouchers.map(r=>r.id===id?{...r,...patch}:r);
     if(t==='pppoe_customers')DB.pppoe=DB.pppoe.map(r=>r.id===id?{...r,...patch}:r);
     if(t==='random_sends')DB.randomSends=DB.randomSends.map(r=>r.id===id?{...r,...patch}:r);
+    if(t==='installation_requests'&&DB.installs)DB.installs=DB.installs.map(r=>r.id===id?{...r,...patch}:r);
     return;
   }
   const{error}=await sbClient.from(t).update(patch).eq('id',id);if(error)throw error;
@@ -2138,13 +2330,14 @@ async function dbDel(t,id){
     if(t==='vouchers')DB.vouchers=DB.vouchers.filter(r=>r.id!==id);
     if(t==='pppoe_customers')DB.pppoe=DB.pppoe.filter(r=>r.id!==id);
     if(t==='random_sends')DB.randomSends=DB.randomSends.filter(r=>r.id!==id);
+    if(t==='installation_requests'&&DB.installs)DB.installs=DB.installs.filter(r=>r.id!==id);
     return;
   }
   await sbClient.from(t).delete().eq('id',id);
 }
 
 /* ═══════════════════════════ STATE ═══════════════════════════ */
-let S={agents:[],vouchers:[],comms:[],pppoe:[],randomSends:[]};
+let S={agents:[],vouchers:[],comms:[],pppoe:[],randomSends:[],installs:[]};
 let DS={agents:[],assignments:[],method:'whatsapp',step:1};
 let cmMethod='whatsapp',cmSel=[],selV=new Set(),vFilt='all';
 let charts={},curUser=null;
@@ -2236,11 +2429,13 @@ function subRT(){sbClient.channel('rt').on('postgres_changes',{event:'*',schema:
 async function refreshAll(){
   S.agents=await dbGet('agents');S.vouchers=await dbGet('vouchers');S.comms=await dbGet('communications');
   S.pppoe=await dbGet('pppoe_customers');S.randomSends=await dbGet('random_sends');
+  S.installs=await dbGet('installation_requests');
   renderDash();renderAgents();renderVouchers();renderTrk();renderCmLog();renderReports();
   renderFaulty();
   updateBadges();popFilters();initDist();initCmAg();
   try{renderPppoe();}catch(e){console.warn(e);}
   try{renderRandomSends();}catch(e){console.warn(e);}
+  try{renderInstalls();}catch(e){console.warn(e);}
 }
 
 /* ═══════════════════════ NAVIGATION ════════════════════════ */
@@ -2258,7 +2453,7 @@ function goP(id,el){
   if(!pageEl){console.warn('goP: no page for',id);return;}
   pageEl.classList.add('active');
   if(el)el.classList.add('active');
-  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher','activity':'Activity Log','issues':'Report an Issue',packages:'Packages',payments:'Payments',expenses:'Expenses'};
+  const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher','activity':'Activity Log','issues':'Report an Issue','installs':'Installation Requests',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
   if(window.innerWidth<=900)closeSB(true);
   if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();var nst=document.getElementById('notif-sound-toggle');if(nst)nst.checked=!isNotifSoundMuted();}catch(e){console.warn(e);}},50);
@@ -2269,6 +2464,7 @@ function goP(id,el){
   if(id==='random') setTimeout(()=>{try{renderRandomSends();}catch(e){console.warn(e);}},50);
   if(id==='activity') setTimeout(()=>{try{renderActivityLog();}catch(e){console.warn(e);}},50);
   if(id==='issues') setTimeout(()=>{try{renderIssuesPage();}catch(e){console.warn(e);}},50);
+  if(id==='installs') setTimeout(()=>{try{renderInstalls();}catch(e){console.warn(e);}},50);
   pushPageState(id);
 }
 function toggleSB(){
@@ -2598,6 +2794,7 @@ function openProf(id){
           <button class="btn btn-primary" style="flex:1;" onclick="openSendVoucherForAgent('${a.id}')" ${availCount===0?'disabled title="No available vouchers"':''}>&#127967; Send Voucher <span style="font-size:10px;opacity:.7;">(${availCount} avail)</span></button>
           <button class="btn btn-secondary" onclick="editAg('${a.id}')">&#9999; Edit</button>
           <button class="btn btn-ghost" onclick="openSetLoc('${a.id}')">&#128204; Location</button>
+          <button class="btn btn-ghost" onclick="openReportIssueModal('${a.id}')">&#9888;&#65039; Report Issue</button>
         </div>
       </div>
 
@@ -3917,17 +4114,53 @@ async function migrateIssuesToDb(local){
   _lsSaveIssuesLocal(remaining);
   if(migrated) try{ renderIssuesPage(); }catch(e){}
 }
-function openReportIssueModal(){
+function openReportIssueModal(preselectAgentId){
   document.getElementById('is-id').value='';
   document.getElementById('is-type').value='Fibre Cut';
   document.getElementById('is-location').value='';
   document.getElementById('is-desc').value='';
+  document.getElementById('is-photo-input').value='';
+  document.getElementById('is-photo-preview').innerHTML='';
+  window._isPendingPhotos=[];
   const sel=document.getElementById('is-agent');
   if(sel&&!sel.dataset.populated){
     sel.innerHTML='<option value="">— Not specific to one router —</option>'+S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+'</option>';}).join('');
     sel.dataset.populated='1';
   }
+  sel.value=preselectAgentId||'';
   openM('m-report-issue');
+}
+async function handleIssuePhotoSelect(evt){
+  const files=Array.from(evt.target.files||[]);
+  if(!files.length) return;
+  if(!window._isPendingPhotos) window._isPendingPhotos=[];
+  for(const file of files){
+    try{
+      const compressed=await compressImage(file,1200,0.8);
+      window._isPendingPhotos.push(compressed);
+    }catch(e){ toast('Could not process: '+file.name,'warning'); }
+  }
+  renderIssuePhotoPreview();
+  evt.target.value='';
+}
+function renderIssuePhotoPreview(){
+  const wrap=document.getElementById('is-photo-preview');
+  if(!wrap) return;
+  const photos=window._isPendingPhotos||[];
+  wrap.innerHTML=photos.map(function(src,i){
+    return '<div style="position:relative;width:64px;height:64px;">'+
+      '<img src="'+src+'" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--border);"/>'+
+      '<button onclick="removePendingIssuePhoto('+i+')" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:11px;cursor:pointer;line-height:1;">&#10005;</button>'+
+    '</div>';
+  }).join('');
+}
+function removePendingIssuePhoto(index){
+  window._isPendingPhotos.splice(index,1);
+  renderIssuePhotoPreview();
+}
+function viewIssuePhoto(src){
+  const w=window.open('','_blank');
+  if(w) w.document.write('<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;height:100vh;"><img src="'+src+'" style="max-width:100%;max-height:100%;"/></body>');
 }
 async function saveIssue(){
   const type=document.getElementById('is-type').value;
@@ -3935,12 +4168,13 @@ async function saveIssue(){
   const location=document.getElementById('is-location').value.trim();
   const desc=document.getElementById('is-desc').value.trim();
   if(!desc){toast('Add a description of the issue','warning');return;}
-  const row={id:uid(),issue_type:type,agent_id:agentId,location:location||null,description:desc,status:'open',reported_by:(curUser&&curUser.email)||'unknown',created_at:new Date().toISOString(),resolved_at:null};
+  const photos=window._isPendingPhotos||[];
+  const row={id:uid(),issue_type:type,agent_id:agentId,location:location||null,description:desc,status:'open',resolution:null,photos:photos,reported_by:(curUser&&curUser.email)||'unknown',created_at:new Date().toISOString(),resolved_at:null};
   if(isDemo||!sbClient){
     const list=_lsGetIssuesLocal(); list.unshift(row); _lsSaveIssuesLocal(list);
   }else{
     try{
-      const{error}=await withTimeout(sbClient.from(ISSUES_TABLE).insert(row),8000);
+      const{error}=await withTimeout(sbClient.from(ISSUES_TABLE).insert(row),12000);
       if(error) throw error;
     }catch(e){
       const list=_lsGetIssuesLocal(); list.unshift(row); _lsSaveIssuesLocal(list);
@@ -3952,22 +4186,26 @@ async function saveIssue(){
   closeM('m-report-issue');
   await renderIssuesPage();
 }
-async function resolveIssue(issueId){
+async function resolveIssueWith(issueId,resolution){
   const all=_allIssues;
   const row=all.find(function(x){return x.id===issueId;});
   if(!row) return;
+  const patch={status:'resolved',resolution:resolution,resolved_at:new Date().toISOString()};
   if(row.source==='db'&&sbClient){
-    try{ await sbClient.from(ISSUES_TABLE).update({status:'resolved',resolved_at:new Date().toISOString()}).eq('id',issueId); }
+    try{ await withTimeout(sbClient.from(ISSUES_TABLE).update(patch).eq('id',issueId),12000); }
     catch(e){ toast('Could not update: '+(e.message||e),'error'); return; }
   }else{
     const list=_lsGetIssuesLocal();
     const idx=list.findIndex(function(x){return x.id===issueId;});
-    if(idx>-1){ list[idx].status='resolved'; list[idx].resolved_at=new Date().toISOString(); _lsSaveIssuesLocal(list); }
+    if(idx>-1){ Object.assign(list[idx],patch); _lsSaveIssuesLocal(list); }
   }
-  addNotif('✅ Issue resolved: '+(row.issue_type||'Issue'),'general');
-  toast('Marked resolved','success');
+  const label=resolution==='repaired'?'repaired':'marked as requiring replacement';
+  addNotif('✅ Issue '+label+': '+(row.issue_type||'Issue'),'general');
+  toast('Issue '+label,'success');
   await renderIssuesPage();
 }
+function markIssueRepaired(id){ resolveIssueWith(id,'repaired'); }
+function markIssueReplacementRequired(id){ resolveIssueWith(id,'replacement_required'); }
 async function deleteIssue(issueId){
   if(!confirm('Delete this issue report?')) return;
   const row=_allIssues.find(function(x){return x.id===issueId;});
@@ -3982,18 +4220,33 @@ async function deleteIssue(issueId){
   await renderIssuesPage();
 }
 let _allIssues=[];
+function resolutionBadge(resolution){
+  if(resolution==='repaired') return '<span class="badge b-available">REPAIRED</span>';
+  if(resolution==='replacement_required') return '<span class="badge" style="background:rgba(245,158,11,.15);color:var(--warn);border-color:rgba(245,158,11,.3);">NEEDS REPLACEMENT</span>';
+  return '<span class="badge b-expired">OPEN</span>';
+}
 async function renderIssuesPage(){
   const body=document.getElementById('issues-body');
   if(!body) return;
-  body.innerHTML='<tr><td colspan="6"><div style="font-size:12px;color:var(--muted);padding:12px;">Loading&hellip;</div></td></tr>';
+  body.innerHTML='<tr><td colspan="7"><div style="font-size:12px;color:var(--muted);padding:12px;">Loading&hellip;</div></td></tr>';
   _allIssues=await getIssues();
+
+  const routerSel=document.getElementById('is-router-filter');
+  if(routerSel && !routerSel.dataset.populated){
+    routerSel.innerHTML='<option value="">All Routers</option>'+S.agents.map(function(a){return '<option value="'+a.id+'">'+a.full_name+'</option>';}).join('');
+    routerSel.dataset.populated='1';
+  }
 
   const q=(document.getElementById('is-search')?.value||'').toLowerCase().trim();
   const typeF=document.getElementById('is-type-filter')?.value||'';
   const statusF=document.getElementById('is-status-filter')?.value||'';
+  const resolutionF=document.getElementById('is-resolution-filter')?.value||'';
+  const routerF=document.getElementById('is-router-filter')?.value||'';
   let list=_allIssues;
   if(typeF) list=list.filter(function(r){return r.issue_type===typeF;});
   if(statusF) list=list.filter(function(r){return r.status===statusF;});
+  if(resolutionF) list=list.filter(function(r){return r.resolution===resolutionF;});
+  if(routerF) list=list.filter(function(r){return r.agent_id===routerF;});
   if(q) list=list.filter(function(r){return ((r.description||'')+' '+(r.location||'')).toLowerCase().includes(q);});
 
   const openCount=_allIssues.filter(function(r){return r.status==='open';}).length;
@@ -4001,16 +4254,22 @@ async function renderIssuesPage(){
 
   body.innerHTML=list.length?list.map(function(r){
     const agent=r.agent_id?(S.agents.find(function(a){return a.id===r.agent_id;})||{}).full_name:null;
+    const photos=r.photos||[];
+    const photoCell=photos.length
+      ? '<img src="'+photos[0]+'" onclick="viewIssuePhoto(\''+photos[0]+'\')" style="width:40px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid var(--border);"/>'+(photos.length>1?' <span style="font-size:10px;color:var(--muted);">+'+(photos.length-1)+'</span>':'')
+      : '<span style="color:var(--muted);font-size:11px;">—</span>';
     return '<tr><td style="font-size:11px;color:var(--muted);white-space:nowrap;">'+fDT(r.created_at)+'</td>'+
       '<td style="font-size:11px;font-weight:600;">'+(r.issue_type||'—')+'</td>'+
       '<td style="font-size:11px;">'+(agent||r.location||'—')+'</td>'+
       '<td style="font-size:12px;max-width:220px;">'+(r.description||'—')+'</td>'+
-      '<td>'+(r.status==='resolved'?'<span class="badge b-available">RESOLVED</span>':'<span class="badge b-expired">OPEN</span>')+'</td>'+
-      '<td><div style="display:flex;gap:4px;">'+
-        (r.status==='open'?'<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;" onclick="resolveIssue(\''+r.id+'\')">&#10003; Resolve</button>':'')+
+      '<td>'+photoCell+'</td>'+
+      '<td>'+(r.status==='resolved'?resolutionBadge(r.resolution):'<span class="badge b-expired">OPEN</span>')+'</td>'+
+      '<td><div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        (r.status==='open'?'<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 7px;white-space:nowrap;" onclick="markIssueRepaired(\''+r.id+'\')">&#128295; Repaired</button>':'')+
+        (r.status==='open'?'<button class="btn btn-secondary btn-sm" style="font-size:10px;padding:4px 7px;white-space:nowrap;" onclick="markIssueReplacementRequired(\''+r.id+'\')">&#128260; Requires Replacement</button>':'')+
         '<button class="btn btn-danger btn-icon btn-sm" onclick="deleteIssue(\''+r.id+'\')" title="Delete">&#128465;</button>'+
       '</div></td></tr>';
-  }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#9888;&#65039;</div><div class="empty-title">No issues reported</div></div></td></tr>';
+  }).join(''):'<tr><td colspan="7"><div class="empty"><div class="empty-icon">&#9888;&#65039;</div><div class="empty-title">No issues reported</div></div></td></tr>';
 }
 function renderNotifs(){
   const notifs=isDemo?DB.notifs:(window._liveNotifs||[]);
@@ -4051,8 +4310,11 @@ function openM(id){
   }
 }
 function closeM(id){
-  document.getElementById(id).classList.remove('open');
-  if(!_isPoppingState){
+  var el=document.getElementById(id);
+  if(!el) return;
+  var wasOpen=el.classList.contains('open');
+  el.classList.remove('open');
+  if(wasOpen && !_isPoppingState){
     // Consume the history entry this modal pushed when it opened, so the
     // back button doesn't need an extra press later. The resulting
     // popstate is a no-op because _isPoppingState guards it below.
@@ -4531,6 +4793,265 @@ async function deletePppoe(id){
     toast('Customer deleted','warning');
     S.pppoe=await dbGet('pppoe_customers'); renderPppoe();
   }catch(e){ toast('Could not delete: '+(e.message||''),'error'); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INSTALLATION REQUESTS — plan/request → requirements → done/partial
+   ═══════════════════════════════════════════════════════════ */
+function parseRequirements(text){
+  return text.split(/[\r\n]+/).map(function(l){return l.trim();}).filter(Boolean)
+    .map(function(l){return {text:l,done:false};});
+}
+async function pickContactForInstall(){
+  if(!('contacts'in navigator&&'ContactsManager'in window)){toast('Contact Picker only works in Chrome on Android. Type manually.','warning');return;}
+  try{
+    var c=await navigator.contacts.select(['name','tel'],{multiple:false});
+    if(c&&c.length){
+      var x=c[0];
+      if(x.name&&x.name[0]) document.getElementById('in-name').value=x.name[0];
+      if(x.tel&&x.tel[0]){
+        var p=x.tel[0].replace(/\s+/g,''); if(p.startsWith('0')) p='+254'+p.slice(1);
+        document.getElementById('in-phone').value=p;
+      }
+      toast('Contact imported! Fill remaining details.','success');
+    }
+  }catch(e){ toast('Cannot access contacts: '+e.message,'error'); }
+}
+function openAddInstall(){
+  document.getElementById('m-in-title').textContent='New Installation Request';
+  document.getElementById('in-id').value='';
+  ['in-name','in-phone','in-location','in-region','in-scheduled','in-requirements','in-notes'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('in-source').value='planned';
+  document.getElementById('in-service-type').value='hotspot';
+  openM('m-install');
+}
+function editInstall(id){
+  var r=S.installs.find(function(x){return x.id===id;}); if(!r) return;
+  closeM('m-install-detail');
+  document.getElementById('m-in-title').textContent='Edit Installation Request';
+  document.getElementById('in-id').value=r.id;
+  document.getElementById('in-name').value=r.customer_name||'';
+  document.getElementById('in-phone').value=r.phone||'';
+  document.getElementById('in-location').value=r.location||'';
+  document.getElementById('in-region').value=r.region||'';
+  document.getElementById('in-source').value=r.request_source||'planned';
+  document.getElementById('in-service-type').value=r.service_type||'hotspot';
+  document.getElementById('in-scheduled').value=r.scheduled_date||'';
+  document.getElementById('in-requirements').value=(r.requirements||[]).map(function(item){return typeof item==='string'?item:item.text;}).join('\n');
+  document.getElementById('in-notes').value=r.notes||'';
+  openM('m-install');
+}
+async function saveInstall(){
+  var id=document.getElementById('in-id').value.trim();
+  var name=document.getElementById('in-name').value.trim();
+  var phone=document.getElementById('in-phone').value.trim();
+  if(!name){toast('Customer name is required','error');return;}
+  if(!phone){toast('Phone number is required','error');return;}
+  var existing=S.installs.find(function(x){return x.id===id;});
+  var reqText=document.getElementById('in-requirements').value;
+  var requirements=existing&&existing.requirements&&existing.requirements.length
+    ? mergeRequirements(existing.requirements,reqText)
+    : parseRequirements(reqText);
+  var row={
+    id:id||uid(),
+    customer_name:name,
+    phone:phone,
+    location:document.getElementById('in-location').value.trim()||null,
+    region:document.getElementById('in-region').value.trim()||null,
+    request_source:document.getElementById('in-source').value,
+    service_type:document.getElementById('in-service-type').value,
+    scheduled_date:document.getElementById('in-scheduled').value||null,
+    requirements:requirements,
+    notes:document.getElementById('in-notes').value.trim()||null,
+    status:existing?existing.status:'pending',
+    partial_notes:existing?existing.partial_notes:null,
+    completed_at:existing?existing.completed_at:null,
+    created_by:existing?existing.created_by:((curUser&&curUser.email)||'unknown'),
+    created_at:existing?existing.created_at:new Date().toISOString()
+  };
+  try{
+    if(id&&existing){ await dbUpd('installation_requests',id,row); toast('Installation request updated','success'); addNotif('🔧 Installation request updated: '+name,'general'); }
+    else{ await dbIns('installation_requests',row); toast('Installation request added','success'); addNotif('🔧 New installation request: '+name,'general'); }
+    closeM('m-install');
+    S.installs=await dbGet('installation_requests'); renderInstalls();
+  }catch(e){
+    console.error('saveInstall error:',e);
+    toast('Could not save — run the installation_requests SQL in Supabase first: '+(e.message||''),'error');
+  }
+}
+function mergeRequirements(existingList,newText){
+  // Keep done-state for items that still exist by text; append any new lines
+  var newItems=parseRequirements(newText);
+  return newItems.map(function(ni){
+    var match=existingList.find(function(ei){return (typeof ei==='string'?ei:ei.text)===ni.text;});
+    return match?{text:ni.text,done:(typeof match==='string'?false:!!match.done)}:ni;
+  });
+}
+function installStatusBadge(status){
+  if(status==='done') return '<span class="badge b-available">DONE</span>';
+  if(status==='partial') return '<span class="badge" style="background:rgba(245,158,11,.15);color:var(--warn);border-color:rgba(245,158,11,.3);">PARTIALLY DONE</span>';
+  return '<span class="badge b-expired">PENDING</span>';
+}
+let _allInstalls=[];
+function renderInstalls(){
+  var body=document.getElementById('installs-body');
+  if(!body) return;
+  var q=(document.getElementById('in-search')?.value||'').toLowerCase().trim();
+  var statusF=document.getElementById('in-status-filter')?.value||'';
+  var typeF=document.getElementById('in-type-filter')?.value||'';
+  var dateF=document.getElementById('in-date-filter')?.value||'';
+  var list=[...S.installs];
+  if(statusF) list=list.filter(function(r){return r.status===statusF;});
+  if(typeF) list=list.filter(function(r){return r.service_type===typeF;});
+  if(dateF) list=list.filter(function(r){return r.scheduled_date===dateF;});
+  if(q) list=list.filter(function(r){
+    var hay=[r.customer_name,r.phone,r.location,r.region].filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+  list.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+  _allInstalls=list;
+
+  var pending=S.installs.filter(function(r){return r.status==='pending';}).length;
+  var partial=S.installs.filter(function(r){return r.status==='partial';}).length;
+  var done=S.installs.filter(function(r){return r.status==='done';}).length;
+  document.getElementById('installs-sub').textContent=S.installs.length+' request(s) · '+pending+' pending · '+partial+' partial · '+done+' done';
+
+  body.innerHTML=list.length?list.map(function(r){
+    return '<tr style="cursor:pointer;" onclick="openInstallDetail(\''+r.id+'\')">'+
+      '<td style="font-size:11px;color:var(--muted);white-space:nowrap;">'+fDT(r.created_at)+'</td>'+
+      '<td><div style="display:flex;align-items:center;gap:8px;">'+av(r.customer_name)+'<div><div style="font-weight:600;font-size:12px;">'+r.customer_name+'</div><div style="font-size:10px;color:var(--muted);">'+(r.phone||'')+'</div></div></div></td>'+
+      '<td style="font-size:11px;">'+(r.location||r.region||'—')+'</td>'+
+      '<td style="font-size:11px;">'+(r.service_type==='pppoe'?'PPPoE':'Hotspot')+'</td>'+
+      '<td>'+installStatusBadge(r.status)+'</td>'+
+      '<td onclick="event.stopPropagation();"><div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        (r.status!=='done'?'<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;" onclick="markInstallDone(\''+r.id+'\')">&#9989; Done</button>':'')+
+        (r.status!=='done'?'<button class="btn btn-secondary btn-sm" style="font-size:10px;padding:4px 8px;" onclick="openMarkPartial(\''+r.id+'\')">&#9203; Partial</button>':'')+
+        '<button class="btn btn-ghost btn-icon btn-sm" onclick="editInstall(\''+r.id+'\')">&#9999;</button>'+
+        '<button class="btn btn-danger btn-icon btn-sm" onclick="deleteInstall(\''+r.id+'\')">&#128465;</button>'+
+      '</div></td></tr>';
+  }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#128295;</div><div class="empty-title">No installation requests yet</div></div></td></tr>';
+}
+function openInstallDetail(id){
+  var r=S.installs.find(function(x){return x.id===id;}); if(!r) return;
+  document.getElementById('in-id-detail').value=r.id;
+  document.getElementById('ind-av').innerHTML=av(r.customer_name);
+  document.getElementById('ind-name').textContent=r.customer_name;
+  document.getElementById('ind-meta').textContent=[r.phone,r.location,r.region].filter(Boolean).join(' · ');
+  document.getElementById('ind-status-badge').innerHTML=installStatusBadge(r.status)+' &nbsp; <span class="badge b-sent">'+(r.service_type==='pppoe'?'PPPoE CLIENT':'HOTSPOT AGENT')+'</span>';
+  var reqs=r.requirements||[];
+  document.getElementById('ind-requirements').innerHTML=reqs.length?reqs.map(function(item,i){
+    var text=typeof item==='string'?item:item.text;
+    var done=typeof item==='string'?false:!!item.done;
+    return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;'+(done?'opacity:.55;':'')+'">'+
+      '<input type="checkbox" '+(done?'checked':'')+' onchange="toggleRequirement(\''+r.id+'\','+i+',this.checked)" style="width:16px;height:16px;"/>'+
+      '<span style="font-size:12px;'+(done?'text-decoration:line-through;':'')+'">'+text+'</span></label>';
+  }).join(''):'<div style="font-size:12px;color:var(--muted);">No requirements listed.</div>';
+
+  var timeline='<div><strong>Requested:</strong> '+fDT(r.created_at)+' by '+(r.created_by||'—')+'</div>';
+  if(r.scheduled_date) timeline+='<div style="margin-top:4px;"><strong>Scheduled:</strong> '+r.scheduled_date+'</div>';
+  if(r.completed_at) timeline+='<div style="margin-top:4px;"><strong>Completed:</strong> '+fDT(r.completed_at)+'</div>';
+  if(r.notes) timeline+='<div style="margin-top:4px;"><strong>Notes:</strong> '+r.notes+'</div>';
+  document.getElementById('ind-timeline').innerHTML=timeline;
+
+  var partialWrap=document.getElementById('ind-partial-notes-wrap');
+  if(r.status==='partial'&&r.partial_notes){
+    partialWrap.style.display='block';
+    document.getElementById('ind-partial-notes').textContent=r.partial_notes;
+  }else{
+    partialWrap.style.display='none';
+  }
+  openM('m-install-detail');
+}
+async function toggleRequirement(id,index,checked){
+  var r=S.installs.find(function(x){return x.id===id;}); if(!r) return;
+  var reqs=(r.requirements||[]).map(function(item,i){
+    var text=typeof item==='string'?item:item.text;
+    if(i===index) return {text:text,done:checked};
+    return typeof item==='string'?{text:item,done:false}:item;
+  });
+  r.requirements=reqs;
+  try{ await dbUpd('installation_requests',id,{requirements:reqs}); }
+  catch(e){ toast('Could not save checklist: '+(e.message||e),'error'); }
+}
+async function deleteInstall(id){
+  var r=S.installs.find(function(x){return x.id===id;});
+  if(!confirm('Delete this installation request for '+(r?.customer_name||'this customer')+'?')) return;
+  try{
+    await dbDel('installation_requests',id);
+    toast('Installation request deleted','warning');
+    closeM('m-install-detail');
+    S.installs=await dbGet('installation_requests'); renderInstalls();
+  }catch(e){ toast('Could not delete: '+(e.message||''),'error'); }
+}
+function openMarkPartial(id){
+  var r=S.installs.find(function(x){return x.id===id;}); if(!r) return;
+  document.getElementById('ip-id').value=id;
+  document.getElementById('ip-notes').value=r.partial_notes||'';
+  openM('m-install-partial');
+}
+async function confirmMarkPartial(){
+  var id=document.getElementById('ip-id').value;
+  var notes=document.getElementById('ip-notes').value.trim();
+  if(!notes){toast("Describe what's left to finish",'warning');return;}
+  try{
+    await dbUpd('installation_requests',id,{status:'partial',partial_notes:notes});
+    var r=S.installs.find(function(x){return x.id===id;});
+    addNotif('⏳ Installation partially done for '+(r?.customer_name||'customer')+' — '+notes,'general');
+    toast('Marked partially done','warning');
+    closeM('m-install-partial');
+    S.installs=await dbGet('installation_requests'); renderInstalls();
+  }catch(e){ toast('Could not update: '+(e.message||e),'error'); }
+}
+async function markInstallDone(id){
+  var r=S.installs.find(function(x){return x.id===id;}); if(!r) return;
+  if(!confirm('Mark installation for '+r.customer_name+' as done? This will add them as a '+(r.service_type==='pppoe'?'PPPoE client':'hotspot agent')+'.')) return;
+  try{
+    await dbUpd('installation_requests',id,{status:'done',completed_at:new Date().toISOString()});
+    // Auto-create the corresponding customer/agent record
+    if(r.service_type==='pppoe'){
+      var dupe=S.pppoe.find(function(c){return normPhone(c.phone)===normPhone(r.phone);});
+      if(!dupe){
+        var pppoeRow={
+          id:uid(), full_name:r.customer_name, phone:r.phone, whatsapp_number:r.phone,
+          username:null, region:r.region||null, location:r.location||null,
+          router_agent_id:null, monthly_fee:null, last_pay:null, status:'active',
+          notes:'Installed via Installation Request'+(r.notes?(' — '+r.notes):''),
+          created_at:new Date().toISOString()
+        };
+        await dbIns('pppoe_customers',pppoeRow);
+        toast(r.customer_name+' added as a PPPoE client','success');
+      }else{
+        toast(r.customer_name+' marked done (already exists as a PPPoE client)','success');
+      }
+    }else{
+      var dupeAgent=S.agents.find(function(a){return normPhone(a.phone)===normPhone(r.phone);});
+      if(!dupeAgent){
+        var agentRow={
+          id:uid(), full_name:r.customer_name, phone:r.phone, whatsapp_number:r.phone,
+          email:null, location:r.location||null, region:r.region||null, apartment:null,
+          notes:'Installed via Installation Request'+(r.notes?(' — '+r.notes):''),
+          role:null, contact_name:null, contact_phone:null,
+          date_joined:new Date().toISOString().slice(0,10), status:'active',
+          created_at:new Date().toISOString()
+        };
+        await dbIns('agents',agentRow);
+        toast(r.customer_name+' added as a hotspot agent','success');
+      }else{
+        toast(r.customer_name+' marked done (already exists as an agent)','success');
+      }
+    }
+    addNotif('✅ Installation completed for '+r.customer_name+' ('+(r.service_type==='pppoe'?'PPPoE':'Hotspot')+')','general');
+    S.installs=await dbGet('installation_requests');
+    S.pppoe=await dbGet('pppoe_customers');
+    S.agents=await dbGet('agents');
+    renderInstalls();
+    try{renderPppoe();}catch(e){}
+    try{renderAgents();}catch(e){}
+    closeM('m-install-detail');
+  }catch(e){
+    console.error('markInstallDone error:',e);
+    toast('Could not complete: '+(e.message||e),'error');
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
