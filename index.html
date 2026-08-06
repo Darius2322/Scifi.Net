@@ -125,6 +125,8 @@ textarea.form-control{resize:vertical;min-height:80px;}
 .stat-label{font-size:10px;color:var(--muted);letter-spacing:.1em;margin-top:4px;text-transform:uppercase;}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
+.tr-clickable{transition:background .12s ease;}
+.tr-clickable:hover{background:rgba(0,212,255,.06);}
 th{color:var(--muted);font-size:10px;letter-spacing:.1em;font-weight:600;text-transform:uppercase;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
 td{padding:10px 12px;border-bottom:1px solid rgba(30,53,80,.5);color:var(--text);vertical-align:middle;}
 tr:hover td{background:rgba(0,229,255,.02);}
@@ -153,14 +155,14 @@ tr:last-child td{border-bottom:none;}
 .modal-close:hover{color:var(--danger);}
 .modal-body{padding:20px 22px;flex:1;}
 .modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
-.toast-container{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:12px;font-size:12px;font-weight:500;min-width:260px;max-width:360px;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:slideIn .3s ease;border:1px solid transparent;}
-@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
-.t-success{background:rgba(0,255,157,.08);border-color:rgba(0,255,157,.2);color:#00ff9d;}
-.t-error{background:rgba(255,59,92,.08);border-color:rgba(255,59,92,.2);color:#ff6b85;}
-.t-warning{background:rgba(255,184,0,.08);border-color:rgba(255,184,0,.2);color:#ffb800;}
-.t-info{background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.2);color:var(--accent);}
+.toast-container{position:fixed;top:70px;right:16px;z-index:400;display:flex;flex-direction:column;gap:10px;max-width:calc(100vw - 32px);}
+.toast{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;font-size:12px;font-weight:500;min-width:260px;max-width:360px;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:slideIn .3s cubic-bezier(.2,.8,.2,1);border:1px solid transparent;border-left-width:3px;backdrop-filter:blur(16px);background-color:rgba(13,20,33,.92)!important;}
+@keyframes slideIn{from{transform:translateX(calc(100% + 20px));opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(calc(100% + 20px));opacity:0}}
+.t-success{border-left-color:#00ff9d;color:#00ff9d;}
+.t-error{border-left-color:#ff6b85;color:#ff6b85;}
+.t-warning{border-left-color:#ffb800;color:#ffb800;}
+.t-info{border-left-color:var(--accent);color:var(--accent);}
 .toast-close{margin-left:auto;background:none;border:none;color:inherit;opacity:.6;cursor:pointer;font-size:14px;}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:14px;flex-wrap:wrap;}
 .pt{font-size:20px;font-weight:800;}
@@ -292,9 +294,12 @@ tr:last-child td{border-bottom:none;}
 .sb-header{padding:16px 14px;background:rgba(0,212,255,0.04);border-bottom:1px solid var(--border);}
 .brand-icon{background:linear-gradient(135deg,#00d4ff,#3b82f6);border-radius:12px;}
 .brand-name{font-size:14px;color:#00d4ff;letter-spacing:.08em;}
-.nav-link{padding:7px 10px;border-radius:8px;font-size:12px;color:#4d6a8a;margin-bottom:1px;}
-.nav-link.active{background:linear-gradient(90deg,rgba(0,212,255,.12),rgba(0,212,255,.04));color:#00d4ff;border:1px solid rgba(0,212,255,.18);font-weight:700;}
+.nav-link{padding:7px 10px;border-radius:8px;font-size:12px;color:#4d6a8a;margin-bottom:1px;position:relative;}
+.nav-link.active{background:linear-gradient(90deg,rgba(0,212,255,.14),rgba(0,212,255,.03));color:#00d4ff;border:1px solid rgba(0,212,255,.18);font-weight:700;}
+.nav-link.active::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,#00d4ff,#3b82f6);}
 .nav-link:hover{background:rgba(255,255,255,.04);color:#e2eeff;}
+.nav-link .nav-icon{transition:transform .15s ease;}
+.nav-link:hover .nav-icon{transform:scale(1.1);}
 .nav-sec{font-size:9px;color:#2a4060;letter-spacing:.16em;padding:10px 10px 4px;font-weight:700;}
 .nav-badge{background:linear-gradient(135deg,#00d4ff,#3b82f6);color:#000;font-size:8px;font-weight:800;padding:2px 7px;border-radius:20px;}
 /* Topbar */
@@ -303,10 +308,15 @@ tr:last-child td{border-bottom:none;}
 /* Cards */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius2);padding:20px 22px;}
 .card-clickable{cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
-.qa-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease;font-family:inherit;}
-.qa-btn:hover{transform:translateY(-2px);border-color:var(--accent);background:rgba(0,212,255,.08);}
-.qa-btn:active{transform:translateY(0);}
-.qa-icon{font-size:22px;}
+.qa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px;margin-top:12px;}
+.qa-btn{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px 16px;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:16px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;font-family:inherit;position:relative;overflow:hidden;}
+.qa-btn::before{content:'';position:absolute;inset:0;background:var(--qa-glow,transparent);opacity:0;transition:opacity .18s ease;}
+.qa-btn:hover{transform:translateY(-3px);border-color:var(--qa-accent,var(--accent));box-shadow:0 10px 26px rgba(0,0,0,.35);}
+.qa-btn:hover::before{opacity:.06;}
+.qa-btn:active{transform:translateY(-1px);}
+.qa-icon{font-size:20px;}
+.qa-icon-chip{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--qa-chip-bg,rgba(0,212,255,.12));border:1px solid var(--qa-chip-border,rgba(0,212,255,.25));position:relative;z-index:1;}
+.qa-btn span:last-child{position:relative;z-index:1;}
 .hb-menu-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent);font-size:18px;cursor:pointer;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s ease,border-color .15s ease;}
 .hb-menu-btn:hover{background:rgba(0,212,255,.1);border-color:var(--accent);}
 .hb-menu-btn:active{transform:scale(.95);}
@@ -564,6 +574,16 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <button onclick="dismissUpdateBanner()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;">&#10005;</button>
       </div>
 
+      <div id="open-in-app-banner" style="display:none;background:linear-gradient(135deg,rgba(124,140,255,.12),rgba(59,130,246,.08));border:1px solid #7c8cff;border-radius:12px;padding:14px 16px;margin-bottom:16px;align-items:center;gap:12px;">
+        <span style="font-size:22px;">&#128241;</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;">You've already installed this app</div>
+          <div style="font-size:12px;color:var(--muted);">For full-screen access and fingerprint unlock, open it from your home screen instead of this browser tab.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="attemptOpenInApp()" style="white-space:nowrap;background:#7c8cff;">&#8599; Open in App</button>
+        <button onclick="dismissOpenInAppBanner()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;">&#10005;</button>
+      </div>
+
       <div class="page active" id="page-dashboard">
         <div id="setup-wrap"></div>
         <div class="ph">
@@ -577,21 +597,21 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
 
         <div class="card" style="margin-bottom:16px;">
           <div class="card-title">&#9889; Quick Actions</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;">
-            <button class="qa-btn" onclick="qaDistribute()">
-              <span class="qa-icon">&#128228;</span><span>Distribute</span>
+          <div class="qa-grid">
+            <button class="qa-btn" style="--qa-accent:#00d4ff;--qa-chip-bg:rgba(0,212,255,.14);--qa-chip-border:rgba(0,212,255,.3);--qa-glow:#00d4ff;" onclick="qaDistribute()">
+              <span class="qa-icon-chip">&#128228;</span><span>Distribute</span>
             </button>
-            <button class="qa-btn" onclick="qaAddAgent()">
-              <span class="qa-icon">&#128101;</span><span>Add Agent</span>
+            <button class="qa-btn" style="--qa-accent:#7c8cff;--qa-chip-bg:rgba(124,140,255,.14);--qa-chip-border:rgba(124,140,255,.3);--qa-glow:#7c8cff;" onclick="qaAddAgent()">
+              <span class="qa-icon-chip">&#128101;</span><span>Add Agent</span>
             </button>
-            <button class="qa-btn" onclick="openAddVoucherChoice()">
-              <span class="qa-icon">&#127967;</span><span>Add Voucher</span>
+            <button class="qa-btn" style="--qa-accent:#00ff9d;--qa-chip-bg:rgba(0,255,157,.14);--qa-chip-border:rgba(0,255,157,.3);--qa-glow:#00ff9d;" onclick="openAddVoucherChoice()">
+              <span class="qa-icon-chip">&#127967;</span><span>Add Voucher</span>
             </button>
-            <button class="qa-btn" onclick="qaReports()">
-              <span class="qa-icon">&#128200;</span><span>Reports</span>
+            <button class="qa-btn" style="--qa-accent:#ffb800;--qa-chip-bg:rgba(255,184,0,.14);--qa-chip-border:rgba(255,184,0,.3);--qa-glow:#ffb800;" onclick="qaReports()">
+              <span class="qa-icon-chip">&#128200;</span><span>Reports</span>
             </button>
-            <button class="qa-btn" onclick="openReportIssueModal()">
-              <span class="qa-icon">&#9888;&#65039;</span><span>Report Issue</span>
+            <button class="qa-btn" style="--qa-accent:#ff6b85;--qa-chip-bg:rgba(255,107,133,.14);--qa-chip-border:rgba(255,107,133,.3);--qa-glow:#ff6b85;" onclick="openReportIssueModal()">
+              <span class="qa-icon-chip">&#9888;&#65039;</span><span>Report Issue</span>
             </button>
           </div>
         </div>
@@ -1073,11 +1093,6 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
           <input class="form-control" id="is-search" placeholder="&#128269; Search by description or location..." style="flex:2;min-width:200px;" oninput="renderIssuesPage()"/>
           <select class="form-control" id="is-type-filter" style="flex:1;min-width:130px;" onchange="renderIssuesPage()">
             <option value="">All Types</option>
-            <option value="Fibre Cut">Fibre Cut</option>
-            <option value="Signal Loss">Signal Loss</option>
-            <option value="Power Outage">Power Outage</option>
-            <option value="Router Fault">Router Fault</option>
-            <option value="Other">Other</option>
           </select>
           <select class="form-control" id="is-status-filter" style="flex:1;min-width:130px;" onchange="renderIssuesPage()">
             <option value="">All Statuses</option>
@@ -1149,6 +1164,12 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
           <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Checks whether each table this app needs actually exists and is reachable — tells you exactly why photos/files might still be saving to this device instead of the database.</div>
           <button class="btn btn-secondary" onclick="testDbStorage()">&#129514; Run Test</button>
           <div id="db-test-results" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">&#128241; Install App</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;" id="settings-install-desc">Add this to your home screen for full-screen access, faster startup, and fingerprint unlock.</div>
+          <button class="btn btn-primary" onclick="triggerInstall()">&#11015; Install Now</button>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
@@ -1267,7 +1288,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
         <div class="card"><div class="table-wrap">
           <table>
             <thead><tr>
-              <th>Date</th><th>Customer</th><th>Phone</th><th>Voucher</th><th>Reason</th><th>Method</th>
+              <th>Date</th><th>Customer</th><th>Phone</th><th>Voucher</th><th>Reason</th><th>Method</th><th>Actions</th>
             </tr></thead>
             <tbody id="random-body"></tbody>
           </table>
@@ -1616,6 +1637,112 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
 </div>
 
 <!-- Assign Config File / Assign Router Modal -->
+<!-- Voucher Detail Modal -->
+<div class="modal-overlay" id="m-voucher-detail">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">&#127967; Voucher Details</div>
+      <button class="modal-close" onclick="closeM('m-voucher-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="code" id="vd-code" style="font-size:16px;margin-bottom:14px;"></div>
+      <div id="vd-status" style="margin-bottom:14px;"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Package</span><span id="vd-package"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Duration</span><span id="vd-duration"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Added</span><span id="vd-added"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Sent</span><span id="vd-sent"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Expires</span><span id="vd-expires"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Agent</span><span id="vd-agent"></span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" onclick="closeM('m-voucher-detail')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Detail Modal -->
+<div class="modal-overlay" id="m-issue-detail">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">&#9888;&#65039; Issue Details</div>
+      <button class="modal-close" onclick="closeM('m-issue-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div id="isd-type-badge" style="font-size:13px;font-weight:700;"></div>
+        <div id="isd-status" style="margin-left:auto;"></div>
+      </div>
+      <div id="isd-photos" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+        <div><span style="color:var(--muted);">Description</span><div id="isd-desc" style="margin-top:3px;"></div></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Router / Location</span><span id="isd-location"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Reported</span><span id="isd-reported"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">By</span><span id="isd-by"></span></div>
+        <div id="isd-resolved-wrap" style="display:none;justify-content:space-between;"><span style="color:var(--muted);">Resolved</span><span id="isd-resolved"></span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" onclick="closeM('m-issue-detail')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- PPPoE Detail Modal -->
+<div class="modal-overlay" id="m-pppoe-detail">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">&#128421;&#65039; Customer Details</div>
+      <button class="modal-close" onclick="closeM('m-pppoe-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div id="ppd-av"></div>
+        <div><div id="ppd-name" style="font-weight:700;font-size:14px;"></div><div id="ppd-status" style="margin-top:2px;"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Phone</span><span id="ppd-phone"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Username</span><span id="ppd-username"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Router</span><span id="ppd-router"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Location</span><span id="ppd-location"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Monthly Fee</span><span id="ppd-fee"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Last Paid</span><span id="ppd-lastpay"></span></div>
+        <div id="ppd-notes-wrap" style="display:none;"><span style="color:var(--muted);">Notes</span><div id="ppd-notes" style="margin-top:3px;"></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeM('m-pppoe-detail');editPppoe(document.getElementById('ppd-id').value)">&#9999; Edit</button>
+      <input type="hidden" id="ppd-id"/>
+      <button class="btn btn-primary btn-full" onclick="closeM('m-pppoe-detail')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Random Send Detail Modal -->
+<div class="modal-overlay" id="m-random-detail">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">&#127919; Send Details</div>
+      <button class="modal-close" onclick="closeM('m-random-detail')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Date</span><span id="rsd-date"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Customer</span><span id="rsd-name"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Phone</span><span id="rsd-phone"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Voucher</span><span id="rsd-voucher" class="code" style="font-size:12px;"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Reason</span><span id="rsd-reason"></span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Method</span><span id="rsd-method"></span></div>
+        <div id="rsd-notes-wrap" style="display:none;"><span style="color:var(--muted);">Notes</span><div id="rsd-notes" style="margin-top:3px;"></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" onclick="closeM('m-random-detail')">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="m-install-popup">
   <div class="modal" style="max-width:400px;">
     <div class="modal-body" style="text-align:center;padding-top:30px;">
@@ -1692,13 +1819,17 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <input type="hidden" id="is-id"/>
       <div class="form-group">
         <label class="form-label">Issue Type *</label>
-        <select class="form-control" id="is-type">
+        <select class="form-control" id="is-type" onchange="document.getElementById('is-type-other-wrap').style.display=this.value==='Other'?'block':'none';">
           <option value="Fibre Cut">&#127968; Fibre Cut</option>
           <option value="Signal Loss">&#128246; Signal Loss</option>
           <option value="Power Outage">&#9889; Power Outage</option>
           <option value="Router Fault">&#128225; Router Fault</option>
           <option value="Other">&#10067; Other</option>
         </select>
+      </div>
+      <div class="form-group" id="is-type-other-wrap" style="display:none;">
+        <label class="form-label">Describe the issue type *</label>
+        <input class="form-control" id="is-type-other" placeholder="e.g. Vandalism, Theft, Weather damage"/>
       </div>
       <div class="form-group">
         <label class="form-label">Router / Agent (optional)</label>
@@ -2061,6 +2192,10 @@ document.addEventListener('DOMContentLoaded',function(){
   if(pp) pp.addEventListener('keydown',function(e){if(e.key==='Enter') doLogin();});
   initAuthFlow();
   initServiceWorker();
+  checkInstallState();
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible') checkInstallState();
+  });
   var fp=document.getElementById('app-file-path');
   if(fp) fp.textContent=decodeURIComponent(location.href);
 });
@@ -2076,11 +2211,54 @@ function isInstallableOrigin(){
   // never actually complete an install, even if the event fires.
   return location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
 }
+function checkInstallState(){
+  if(isRunningInstalled()){
+    // Remember that this app has been installed at least once on this
+    // device/browser, so a future visit via a plain browser tab (not
+    // the installed shell) can offer "Open in App" instead of "Install".
+    localStorage.setItem('scifi_was_installed','1');
+    var ib=document.getElementById('install-banner'); if(ib) ib.style.display='none';
+    var oa=document.getElementById('open-in-app-banner'); if(oa) oa.style.display='none';
+    return;
+  }
+  if(localStorage.getItem('scifi_was_installed')==='1' && isInstallableOrigin()){
+    var oa2=document.getElementById('open-in-app-banner');
+    if(oa2 && localStorage.getItem('scifi_openinapp_dismissed')!=='1') oa2.style.display='flex';
+  }
+}
+function attemptOpenInApp(){
+  // There is no universal, guaranteed API for a webpage to force-launch
+  // its own installed PWA shell from inside a plain browser tab — this
+  // is entirely up to the OS/browser. We make a best-effort attempt and
+  // give honest fallback guidance rather than pretending it always works.
+  try{ window.location.href=location.origin+location.pathname+location.search; }catch(e){}
+  setTimeout(function(){
+    toast("If that stayed in the browser, open the app from your home screen icon instead — that's the reliable way in.",'info');
+  },600);
+}
+function dismissOpenInAppBanner(){
+  localStorage.setItem('scifi_openinapp_dismissed','1');
+  var oa=document.getElementById('open-in-app-banner');
+  if(oa) oa.style.display='none';
+}
+function renderInstallSettingsStatus(){
+  var descEl=document.getElementById('settings-install-desc');
+  if(!descEl) return;
+  if(isRunningInstalled()){
+    descEl.innerHTML='<span style="color:var(--accent3,#00ff9d);">&#9989; Already running as an installed app on this device.</span>';
+  }else if(!isInstallableOrigin()){
+    descEl.textContent="This copy is opened from a local file, so it can't be installed directly — host it on HTTPS to enable this.";
+  }else if(localStorage.getItem('scifi_was_installed')==='1'){
+    descEl.textContent="You've installed this before on this device — open it from your home screen icon instead of this browser tab.";
+  }else{
+    descEl.textContent='Add this to your home screen for full-screen access, faster startup, and fingerprint unlock.';
+  }
+}
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   if(!isInstallableOrigin()) return; // ignore — can't really install from this origin
   _deferredInstallPrompt=e;
-  if(!isRunningInstalled() && localStorage.getItem('scifi_install_dismissed')!=='1'){
+  if(!isRunningInstalled() && localStorage.getItem('scifi_install_dismissed')!=='1' && localStorage.getItem('scifi_was_installed')!=='1'){
     var b=document.getElementById('install-banner');
     if(b) b.style.display='flex';
     // Also surface an actual popup, once per browser session, so it's
@@ -2095,6 +2273,7 @@ window.addEventListener('beforeinstallprompt',function(e){
 });
 window.addEventListener('appinstalled',function(){
   _deferredInstallPrompt=null;
+  localStorage.setItem('scifi_was_installed','1');
   var b=document.getElementById('install-banner');
   if(b) b.style.display='none';
   closeM('m-install-popup');
@@ -2555,7 +2734,7 @@ function goP(id,el){
   const T={dashboard:'Dashboard',agents:'Agents',vouchers:'Vouchers',distribute:'Distribute',messages:'Messages',tracking:'Tracking',reports:'Reports','agent-profile':'Agent Profile',settings:'Settings',faulty:'Faulty Vouchers',routers:'Routers','configs':'Configuration Files','pppoe':'PPPoE Customers','random':'Random Customer Voucher','activity':'Activity Log','issues':'Report an Issue','installs':'Installation Requests',packages:'Packages',payments:'Payments',expenses:'Expenses'};
   document.getElementById('tb-title').textContent=T[id]||id;
   if(window.innerWidth<=900)closeSB(true);
-  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();var nst=document.getElementById('notif-sound-toggle');if(nst)nst.checked=!isNotifSoundMuted();}catch(e){console.warn(e);}},50);
+  if(id==='settings') setTimeout(()=>{try{renderWAStatus();loadWAConfig();renderBioStatus();loadPhotoPrefix();renderInstallSettingsStatus();var nst=document.getElementById('notif-sound-toggle');if(nst)nst.checked=!isNotifSoundMuted();}catch(e){console.warn(e);}},50);
   if(id==='faulty') setTimeout(renderFaulty,50);
   if(id==='routers') setTimeout(()=>{try{renderRoutersPage();}catch(e){console.warn(e);}},50);
   if(id==='configs') setTimeout(()=>{try{renderConfigsPage();}catch(e){console.warn(e);}},50);
@@ -3026,15 +3205,15 @@ function daysToText(d){
 function viewVoucher(id){
   var v=S.vouchers.find(x=>x.id===id); if(!v) return;
   var ag=S.agents.find(a=>a.id===v.assigned_agent_id);
-  var info='Code: '+v.voucher_code+
-    '\nPackage: '+v.package_name+
-    '\nDuration: '+(v.duration||v.duration_days+'d')+
-    '\nStatus: '+v.status+
-    '\nAdded: '+(v.date_added||'—')+
-    '\nSent: '+fDT(v.sent_at)+
-    '\nExpires: '+fDT(v.expires_at)+
-    '\nAgent: '+(ag?ag.full_name+' ('+ag.phone+')':'Unassigned');
-  alert(info);
+  document.getElementById('vd-code').textContent=v.voucher_code;
+  document.getElementById('vd-status').innerHTML=bdg(v.status);
+  document.getElementById('vd-package').textContent=v.package_name||'—';
+  document.getElementById('vd-duration').textContent=v.duration||(v.duration_days?v.duration_days+'d':'—');
+  document.getElementById('vd-added').textContent=v.date_added||'—';
+  document.getElementById('vd-sent').textContent=fDT(v.sent_at);
+  document.getElementById('vd-expires').textContent=fDT(v.expires_at);
+  document.getElementById('vd-agent').textContent=ag?(ag.full_name+' ('+ag.phone+')'):'Unassigned';
+  openM('m-voucher-detail');
 }
 function editVoucher(id){
   var v=S.vouchers.find(x=>x.id===id); if(!v) return;
@@ -3876,7 +4055,7 @@ function renderTrk(){
     var a=S.agents.find(function(x){return x.id===v.assigned_agent_id;});
     var cm=a?S.comms.find(function(x){return x.agent_id===a.id&&x.message_type==='voucher';}):null;
     var dur=v.duration||(v.duration_days?v.duration_days+'d':'—');
-    return '<tr>'+
+    return '<tr class="tr-clickable" onclick="viewVoucher(\''+v.id+'\')" style="cursor:pointer;">'+
       '<td class="code">'+v.voucher_code+'</td>'+
       '<td>'+v.package_name+'</td>'+
       '<td>'+dur+'</td>'+
@@ -3887,7 +4066,7 @@ function renderTrk(){
       '<td style="font-size:11px;">'+fDT(v.sent_at)+'</td>'+
       '<td>'+(v.expires_at?'<span style="font-size:11px;">'+fDT(v.expires_at)+'</span> '+expBadge(v.expires_at):'—')+'</td>'+
       '<td>'+bdg(v.status)+'</td>'+
-      '<td>'+(v.status==='sent'?'<button class="btn btn-ghost btn-sm vcact" data-act="resendvc" data-id="'+v.id+'" style="font-size:10px;padding:4px 7px;white-space:nowrap;">&#128260; Resend</button>':'<span style="color:var(--muted);">&#8212;</span>')+'</td>'+
+      '<td onclick="event.stopPropagation();">'+(v.status==='sent'?'<button class="btn btn-ghost btn-sm vcact" data-act="resendvc" data-id="'+v.id+'" style="font-size:10px;padding:4px 7px;white-space:nowrap;">&#128260; Resend</button>':'<span style="color:var(--muted);">&#8212;</span>')+'</td>'+
     '</tr>';
   }).join(''):'<tr><td colspan="11"><div class="empty"><div class="empty-icon">&#128269;</div><div class="empty-title">No results found</div></div></td></tr>';
 }
@@ -4216,6 +4395,8 @@ async function migrateIssuesToDb(local){
 function openReportIssueModal(preselectAgentId){
   document.getElementById('is-id').value='';
   document.getElementById('is-type').value='Fibre Cut';
+  document.getElementById('is-type-other').value='';
+  document.getElementById('is-type-other-wrap').style.display='none';
   document.getElementById('is-location').value='';
   document.getElementById('is-desc').value='';
   document.getElementById('is-photo-input').value='';
@@ -4262,7 +4443,10 @@ function viewIssuePhoto(src){
   if(w) w.document.write('<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;height:100vh;"><img src="'+src+'" style="max-width:100%;max-height:100%;"/></body>');
 }
 async function saveIssue(){
-  const type=document.getElementById('is-type').value;
+  const typeSel=document.getElementById('is-type').value;
+  const customType=document.getElementById('is-type-other').value.trim();
+  if(typeSel==='Other'&&!customType){toast('Describe the issue type','warning');return;}
+  const type=typeSel==='Other'?customType:typeSel;
   const agentId=document.getElementById('is-agent').value||null;
   const location=document.getElementById('is-location').value.trim();
   const desc=document.getElementById('is-desc').value.trim();
@@ -4336,6 +4520,14 @@ async function renderIssuesPage(){
     routerSel.dataset.populated='1';
   }
 
+  const typeSelEl=document.getElementById('is-type-filter');
+  if(typeSelEl){
+    const currentTypeVal=typeSelEl.value;
+    const distinctTypes=[...new Set(_allIssues.map(function(r){return r.issue_type;}).filter(Boolean))].sort();
+    typeSelEl.innerHTML='<option value="">All Types</option>'+distinctTypes.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('');
+    typeSelEl.value=currentTypeVal;
+  }
+
   const q=(document.getElementById('is-search')?.value||'').toLowerCase().trim();
   const typeF=document.getElementById('is-type-filter')?.value||'';
   const statusF=document.getElementById('is-status-filter')?.value||'';
@@ -4364,11 +4556,30 @@ async function renderIssuesPage(){
       '<td>'+photoCell+'</td>'+
       '<td>'+(r.status==='resolved'?resolutionBadge(r.resolution):'<span class="badge b-expired">OPEN</span>')+'</td>'+
       '<td><div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        '<button class="btn btn-ghost btn-icon btn-sm" onclick="viewIssueDetail(\''+r.id+'\')" title="View">&#128065;</button>'+
         (r.status==='open'?'<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 7px;white-space:nowrap;" onclick="markIssueRepaired(\''+r.id+'\')">&#128295; Repaired</button>':'')+
         (r.status==='open'?'<button class="btn btn-secondary btn-sm" style="font-size:10px;padding:4px 7px;white-space:nowrap;" onclick="markIssueReplacementRequired(\''+r.id+'\')">&#128260; Requires Replacement</button>':'')+
         '<button class="btn btn-danger btn-icon btn-sm" onclick="deleteIssue(\''+r.id+'\')" title="Delete">&#128465;</button>'+
       '</div></td></tr>';
   }).join(''):'<tr><td colspan="7"><div class="empty"><div class="empty-icon">&#9888;&#65039;</div><div class="empty-title">No issues reported</div></div></td></tr>';
+}
+function viewIssueDetail(id){
+  var r=_allIssues.find(function(x){return x.id===id;}); if(!r) return;
+  var agent=r.agent_id?(S.agents.find(function(a){return a.id===r.agent_id;})||{}).full_name:null;
+  document.getElementById('isd-type-badge').textContent=(r.issue_type||'Issue');
+  document.getElementById('isd-status').innerHTML=r.status==='resolved'?resolutionBadge(r.resolution):'<span class="badge b-expired">OPEN</span>';
+  document.getElementById('isd-desc').textContent=r.description||'—';
+  document.getElementById('isd-location').textContent=agent||r.location||'—';
+  document.getElementById('isd-reported').textContent=fDT(r.created_at);
+  document.getElementById('isd-by').textContent=r.reported_by||'—';
+  var resolvedWrap=document.getElementById('isd-resolved-wrap');
+  if(r.resolved_at){ resolvedWrap.style.display='flex'; document.getElementById('isd-resolved').textContent=fDT(r.resolved_at); }
+  else{ resolvedWrap.style.display='none'; }
+  var photos=r.photos||[];
+  document.getElementById('isd-photos').innerHTML=photos.map(function(src){
+    return '<img src="'+src+'" onclick="viewIssuePhoto(\''+src+'\')" style="width:64px;height:64px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);"/>';
+  }).join('');
+  openM('m-issue-detail');
 }
 function renderNotifs(){
   const notifs=isDemo?DB.notifs:(window._liveNotifs||[]);
@@ -4399,7 +4610,7 @@ document.addEventListener('click',function(e){
 
 /* ════════════════════════ TOASTS ════════════════════════════ */
 let tid=0;
-function toast(msg,type='info'){const id='t'+(++tid);const ic={success:'&#9989;',error:'&#10060;',warning:'&#9888;&#65039;',info:'&#8505;'};const el=document.createElement('div');el.className=`toast t-${type}`;el.id=id;el.innerHTML=`<span>${ic[type]||''}</span><span style="flex:1;">${msg}</span><button class="toast-close" onclick="document.getElementById('${id}')?.remove()">&#10005;</button>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>{el.style.animation='slideOut .3s ease forwards';setTimeout(()=>el.remove(),300);},3800);}
+function toast(msg,type='info'){const id='t'+(++tid);const ic={success:'&#9989;',error:'&#10060;',warning:'&#9888;&#65039;',info:'&#8505;'};const el=document.createElement('div');el.className=`toast t-${type}`;el.id=id;el.innerHTML=`<span>${ic[type]||''}</span><span style="flex:1;color:var(--text);font-weight:500;">${msg}</span><button class="toast-close" onclick="document.getElementById('${id}')?.remove()">&#10005;</button>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>{el.style.animation='slideOut .3s ease forwards';setTimeout(()=>el.remove(),300);},3800);}
 
 /* ═══════════════════════ MODALS ════════════════════════════ */
 function openM(id){
@@ -4796,12 +5007,31 @@ function renderPppoe(){
       '<td style="font-size:11px;color:var(--muted);">'+(c.last_pay?fD(c.last_pay):'Never')+'</td>'+
       '<td>'+bdg(st==='paid'?'active':'suspended')+'</td>'+
       '<td><div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        '<button class="btn btn-ghost btn-icon btn-sm" onclick="viewPppoeDetail(\''+c.id+'\')" title="View">&#128065;</button>'+
         '<button class="btn btn-primary btn-sm" style="font-size:10px;padding:4px 8px;" onclick="markPppoePaid(\''+c.id+'\')">&#9989; Paid</button>'+
         '<button class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 8px;" onclick="openRandomSendForPppoe(\''+c.id+'\')">&#128228; Voucher</button>'+
         '<button class="btn btn-ghost btn-icon btn-sm" onclick="editPppoe(\''+c.id+'\')">&#9999;</button>'+
         '<button class="btn btn-danger btn-icon btn-sm" onclick="deletePppoe(\''+c.id+'\')">&#128465;</button>'+
       '</div></td></tr>';
   }).join(''):'<tr><td colspan="8"><div class="empty"><div class="empty-icon">&#128421;&#65039;</div><div class="empty-title">No PPPoE customers yet</div></div></td></tr>';
+}
+function viewPppoeDetail(id){
+  var c=S.pppoe.find(function(x){return x.id===id;}); if(!c) return;
+  var router=S.agents.find(function(a){return a.id===c.router_agent_id;});
+  document.getElementById('ppd-id').value=c.id;
+  document.getElementById('ppd-av').innerHTML=av(c.full_name);
+  document.getElementById('ppd-name').textContent=c.full_name;
+  document.getElementById('ppd-status').innerHTML=bdg(pppoeStatus(c)==='paid'?'active':'suspended');
+  document.getElementById('ppd-phone').textContent=c.phone||'—';
+  document.getElementById('ppd-username').textContent=c.username||'—';
+  document.getElementById('ppd-router').textContent=router?router.full_name:(c.region||'—');
+  document.getElementById('ppd-location').textContent=c.location||'—';
+  document.getElementById('ppd-fee').textContent=c.monthly_fee?('KES '+c.monthly_fee):'—';
+  document.getElementById('ppd-lastpay').textContent=c.last_pay?fD(c.last_pay):'Never';
+  var notesWrap=document.getElementById('ppd-notes-wrap');
+  if(c.notes){ notesWrap.style.display='block'; document.getElementById('ppd-notes').textContent=c.notes; }
+  else{ notesWrap.style.display='none'; }
+  openM('m-pppoe-detail');
 }
 function openAddPppoe(){
   document.getElementById('m-pp-title').textContent='Add PPPoE Customer';
@@ -5200,14 +5430,29 @@ function renderRandomSends(){
   var body=document.getElementById('random-body');
   if(!body) return;
   var list=[...S.randomSends].sort(function(a,b){return new Date(b.sent_at)-new Date(a.sent_at);});
+  window._allRandomSends=list;
   body.innerHTML=list.length?list.map(function(r){
     return '<tr><td style="font-size:11px;color:var(--muted);">'+fDT(r.sent_at)+'</td>'+
       '<td>'+(r.customer_name||'—')+'</td>'+
       '<td style="font-family:monospace;font-size:11px;">'+(r.phone||'—')+'</td>'+
       '<td class="code">'+(r.voucher_code||'—')+'</td>'+
       '<td style="font-size:11px;">'+(r.reason||'—')+'</td>'+
-      '<td>'+bdg(r.delivery_method||'whatsapp')+'</td></tr>';
-  }).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">&#127919;</div><div class="empty-title">No ad-hoc sends yet</div></div></td></tr>';
+      '<td>'+bdg(r.delivery_method||'whatsapp')+'</td>'+
+      '<td><button class="btn btn-ghost btn-icon btn-sm" onclick="viewRandomSendDetail(\''+r.id+'\')" title="View">&#128065;</button></td></tr>';
+  }).join(''):'<tr><td colspan="7"><div class="empty"><div class="empty-icon">&#127919;</div><div class="empty-title">No ad-hoc sends yet</div></div></td></tr>';
+}
+function viewRandomSendDetail(id){
+  var r=(window._allRandomSends||[]).find(function(x){return x.id===id;}); if(!r) return;
+  document.getElementById('rsd-date').textContent=fDT(r.sent_at);
+  document.getElementById('rsd-name').textContent=r.customer_name||'—';
+  document.getElementById('rsd-phone').textContent=r.phone||'—';
+  document.getElementById('rsd-voucher').textContent=r.voucher_code||'—';
+  document.getElementById('rsd-reason').textContent=r.reason||'—';
+  document.getElementById('rsd-method').innerHTML=bdg(r.delivery_method||'whatsapp');
+  var notesWrap=document.getElementById('rsd-notes-wrap');
+  if(r.notes){ notesWrap.style.display='block'; document.getElementById('rsd-notes').textContent=r.notes; }
+  else{ notesWrap.style.display='none'; }
+  openM('m-random-detail');
 }
 async function doRandomSend(){
   var phone=document.getElementById('rs2-phone').value.trim();
