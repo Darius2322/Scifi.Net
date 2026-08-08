@@ -326,7 +326,9 @@ tr:last-child td{border-bottom:none;}
 .card-title{font-size:11px;color:var(--muted);letter-spacing:.12em;font-weight:700;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .card-title::before{content:'';display:inline-block;width:3px;height:12px;background:var(--accent);border-radius:2px;}
 /* Stats */
-.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 10px 26px rgba(0,0,0,.3);}
+.stat-card:active{transform:translateY(0);}
 .stat-card::after{height:3px;opacity:.7;border-radius:0 0 var(--radius2) var(--radius2);}
 .stat-value{font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .stat-label{font-size:10px;letter-spacing:.12em;color:var(--muted);}
@@ -542,6 +544,7 @@ body::after{background:radial-gradient(ellipse 90% 50% at 50% -10%,rgba(59,130,2
       <div><div class="topbar-title" id="tb-title">Dashboard</div><div class="topbar-sub" id="tb-date"></div></div>
       <div class="sw"><span class="sw-icon">&#128269;</span><input type="text" placeholder="Search agents, vouchers, codes&#8230;" id="g-search" oninput="gSearch(this.value)"/></div>
       <div class="tb-right">
+        <button class="icon-btn" id="tb-install-btn" onclick="handleTopbarInstallClick()" style="display:none;font-size:15px;" title="Install app"></button>
         <div style="position:relative;">
           <button class="icon-btn" onclick="toggleND()">&#128276;<span class="nb-dot" id="nb-dot" style="display:none;"></span></button>
           <div class="nd" id="nd">
@@ -2212,6 +2215,7 @@ function isInstallableOrigin(){
   return location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
 }
 function checkInstallState(){
+  updateTopbarInstallButton();
   if(isRunningInstalled()){
     // Remember that this app has been installed at least once on this
     // device/browser, so a future visit via a plain browser tab (not
@@ -2224,6 +2228,34 @@ function checkInstallState(){
   if(localStorage.getItem('scifi_was_installed')==='1' && isInstallableOrigin()){
     var oa2=document.getElementById('open-in-app-banner');
     if(oa2 && localStorage.getItem('scifi_openinapp_dismissed')!=='1') oa2.style.display='flex';
+  }
+}
+function updateTopbarInstallButton(){
+  var btn=document.getElementById('tb-install-btn');
+  if(!btn) return;
+  if(isRunningInstalled() || !isInstallableOrigin()){
+    // Already in the installed app, or can't be installed from here at
+    // all (e.g. a local file) — nothing useful to offer in the topbar.
+    btn.style.display='none';
+    return;
+  }
+  if(localStorage.getItem('scifi_was_installed')==='1'){
+    btn.style.display='';
+    btn.innerHTML='&#8599;';
+    btn.title='Open in App';
+    btn.style.color='#7c8cff';
+  }else{
+    btn.style.display='';
+    btn.innerHTML='&#11015;';
+    btn.title='Install app';
+    btn.style.color='var(--accent)';
+  }
+}
+function handleTopbarInstallClick(){
+  if(localStorage.getItem('scifi_was_installed')==='1'){
+    attemptOpenInApp();
+  }else{
+    triggerInstall();
   }
 }
 function attemptOpenInApp(){
@@ -2258,6 +2290,7 @@ window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   if(!isInstallableOrigin()) return; // ignore — can't really install from this origin
   _deferredInstallPrompt=e;
+  updateTopbarInstallButton();
   if(!isRunningInstalled() && localStorage.getItem('scifi_install_dismissed')!=='1' && localStorage.getItem('scifi_was_installed')!=='1'){
     var b=document.getElementById('install-banner');
     if(b) b.style.display='flex';
@@ -2277,6 +2310,7 @@ window.addEventListener('appinstalled',function(){
   var b=document.getElementById('install-banner');
   if(b) b.style.display='none';
   closeM('m-install-popup');
+  updateTopbarInstallButton();
   toast('Installed! Open it from your home screen from now on.','success');
 });
 async function triggerInstall(){
@@ -2295,6 +2329,7 @@ async function triggerInstall(){
     var b=document.getElementById('install-banner');
     if(b) b.style.display='none';
     closeM('m-install-popup');
+    updateTopbarInstallButton();
   }catch(e){
     console.warn('Install prompt failed:',e);
     toast('Could not start install — try your browser menu → "Add to Home Screen" instead.','warning');
@@ -2776,12 +2811,12 @@ function closeSB(fromNav){
 function renderDash(){
   const today=new Date().toISOString().slice(0,10);
   document.getElementById('stats-grid').innerHTML=[
-    {icon:'&#128101;',val:S.agents.length,label:'Total Agents',c:'var(--accent)'},
-    {icon:'&#9989;',val:S.agents.filter(a=>a.status==='active').length,label:'Active Agents',c:'var(--accent3)'},
-    {icon:'&#127967;',val:S.vouchers.filter(v=>v.status==='available').length,label:'Available',c:'var(--accent2)'},
-    {icon:'&#128228;',val:S.vouchers.filter(v=>v.status==='sent').length,label:'Sent',c:'#8b5cf6'},
-    {icon:'&#128172;',val:S.comms.filter(c=>c.sent_at?.startsWith(today)).length,label:'Msgs Today',c:'var(--warn)'},
-  ].map(s=>`<div class="stat-card" style="--sc:${s.c}"><div class="stat-icon">${s.icon}</div><div class="stat-value">${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
+    {icon:'&#128101;',val:S.agents.length,label:'Total Agents',c:'var(--accent)',onclick:"qaStatClick('agents')"},
+    {icon:'&#9989;',val:S.agents.filter(a=>a.status==='active').length,label:'Active Agents',c:'var(--accent3)',onclick:"qaStatClick('agents')"},
+    {icon:'&#127967;',val:S.vouchers.filter(v=>v.status==='available').length,label:'Available',c:'var(--accent2)',onclick:"qaStatClick('vouchers-available')"},
+    {icon:'&#128228;',val:S.vouchers.filter(v=>v.status==='sent').length,label:'Sent',c:'#8b5cf6',onclick:"qaStatClick('vouchers-sent')"},
+    {icon:'&#128172;',val:S.comms.filter(c=>c.sent_at?.startsWith(today)).length,label:'Msgs Today',c:'var(--warn)',onclick:"qaStatClick('messages')"},
+  ].map(s=>`<div class="stat-card" style="--sc:${s.c};cursor:pointer;" onclick="${s.onclick}"><div class="stat-icon">${s.icon}</div><div class="stat-value">${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
 
   const sent=S.vouchers.filter(v=>v.status==='sent').slice(-6).reverse();
   document.getElementById('recent-body').innerHTML=sent.length?sent.map(v=>{
@@ -2814,6 +2849,20 @@ function renderAgents(){
 function qaDistribute(){ goP('distribute',document.querySelector('.nav-link[onclick*="\'distribute\'"]')); }
 function qaAddAgent(){ goP('agents',document.querySelector('.nav-link[onclick*="\'agents\'"]')); setTimeout(openAddAgent,100); }
 function qaReports(){ goP('reports',document.querySelector('.nav-link[onclick*="\'reports\'"]')); }
+function qaStatClick(target){
+  if(target==='agents'){
+    goP('agents',document.querySelector('.nav-link[onclick*="\'agents\'"]'));
+  }else if(target==='vouchers-available'||target==='vouchers-sent'){
+    goP('vouchers',document.querySelector('.nav-link[onclick*="\'vouchers\'"]'));
+    var filterName=target==='vouchers-available'?'available':'sent';
+    setTimeout(function(){
+      var btn=document.querySelector('#page-vouchers .fb[onclick*="\''+filterName+'\'"]');
+      if(btn) fV(filterName,btn);
+    },100);
+  }else if(target==='messages'){
+    goP('messages',document.querySelector('.nav-link[onclick*="\'messages\'"]'));
+  }
+}
 function openAddVoucherChoice(){ openM('m-add-voucher-choice'); }
 function qaAddVoucherSingle(){ closeM('m-add-voucher-choice'); goP('vouchers',document.querySelector('.nav-link[onclick*="\'vouchers\'"]')); setTimeout(openAddVoucher,100); }
 function qaAddVoucherBulk(){ closeM('m-add-voucher-choice'); goP('vouchers',document.querySelector('.nav-link[onclick*="\'vouchers\'"]')); setTimeout(openBulkImport,100); }
